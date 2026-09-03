@@ -1,0 +1,7 @@
+interface:
+  display_name: "Prove"
+  short_description: "Run the smallest decisive proof set and report a status"
+  default_prompt: "Use $prove on this change: translate the acceptance check into the smallest decisive proof set (typecheck/lint, targeted test, one real exercise of the path only if needed), run it, and report DONE / DONE_WITH_CONCERNS / BLOCKED / NEEDS_CONTEXT. Do not edit product code or add tests."
+  brand_color: "#D97757"
+policy:
+  allow_implicit_invocation: true

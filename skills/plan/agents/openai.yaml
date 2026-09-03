@@ -1,0 +1,7 @@
+interface:
+  display_name: "Plan"
+  short_description: "Break a locked goal into tasks with owned paths, acceptance and proof"
+  default_prompt: "Use $plan on this goal: <goal card, or the task text to scope first>. Produce ordered tasks with owned paths, acceptance, proof and test seams - a chat brief under four tasks, docs/plans/<yyyy-mm-dd>-<slug>.md otherwise - plus explicit non-goals. Do not implement."
+  brand_color: "#D97757"
+policy:
+  allow_implicit_invocation: true

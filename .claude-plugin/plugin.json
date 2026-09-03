@@ -1,0 +1,20 @@
+{
+  "name": "sniper",
+  "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code and Codex.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Giulio Leone",
+    "url": "https://github.com/giulioleone097"
+  },
+  "homepage": "https://github.com/giulioleone097/sniper",
+  "repository": "https://github.com/giulioleone097/sniper",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "code-review",
+    "simplification",
+    "anti-slop",
+    "tdd",
+    "quality"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "sniper",
+  "version": "0.1.0",
+  "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code and Codex.",
+  "author": {
+    "name": "Giulio Leone",
+    "url": "https://github.com/giulioleone097"
+  },
+  "repository": "https://github.com/giulioleone097/sniper",
+  "homepage": "https://github.com/giulioleone097/sniper",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "code-review",
+    "simplification",
+    "anti-slop",
+    "tdd",
+    "quality"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/codex-hooks.json",
+  "interface": {
+    "displayName": "Sniper",
+    "shortDescription": "Lock the outcome, ship the shortest safe path",
+    "longDescription": "Development, optimization and review flow for Claude Code and Codex: lock the requested outcome, take the shortest safe effective path, prove only changed behavior, and stop. Ten skills cover the loop from scope to ship: scope, plan, build, debug, review, simplify, prove, ship, learn, flow.",
+    "developerName": "Giulio Leone",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive",
+      "Lifecycle hooks"
+    ],
+    "defaultPrompt": [
+      "Scope this task before we touch code.",
+      "Build the change under the current goal card.",
+      "Review this diff for correctness, slop, and safety.",
+      "Run the flow end to end and stop before push."
+    ],
+    "brandColor": "#1A1A1A"
+  }
+}

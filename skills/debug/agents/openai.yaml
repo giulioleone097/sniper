@@ -1,0 +1,7 @@
+interface:
+  display_name: "Debug"
+  short_description: "Find the cause of a real failure through a tight pass/fail signal"
+  default_prompt: "Use $debug on this failure: <error, failing test, or the command that reproduces it>. Build a tight pass/fail signal first, minimise the repro, rank falsifiable hypotheses, inspect the nearest boundary, and instrument it after two uninformative attempts. Report the causal chain with file:line evidence. Fix only if I asked for a fix."
+  brand_color: "#D97757"
+policy:
+  allow_implicit_invocation: true

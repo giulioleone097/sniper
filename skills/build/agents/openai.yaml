@@ -1,0 +1,7 @@
+interface:
+  display_name: "Build"
+  short_description: "Implement the locked outcome, prove it, hand over the lean diff"
+  default_prompt: "Use $build to implement: <what to build, or the goal card from $scope>. Detect the mode (feature, fix, refactor, migrate), locate the code, edit surgically, test only at seams we agreed on, then prove the acceptance check with $prove and hand the diff to $simplify. Slices run sequentially here — there are no subagents."
+  brand_color: "#D97757"
+policy:
+  allow_implicit_invocation: true

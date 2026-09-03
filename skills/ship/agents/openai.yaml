@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ship"
+  short_description: "Commit proven changes; push and open a PR only if asked"
+  default_prompt: "Use $ship on the current change: require a prove status of DONE or DONE_WITH_CONCERNS, split into atomic Conventional Commits, and only push or open a PR if I pass --push or --pr. Never add agent attribution to commits or PRs."
+  brand_color: "#D97757"
+policy:
+  allow_implicit_invocation: true

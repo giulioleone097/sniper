@@ -1,0 +1,7 @@
+interface:
+  display_name: "Flow"
+  short_description: "Run the full sniper pipeline hands-off, stopping before push"
+  default_prompt: "Use $flow on this task: <task description>. Run scope, plan when the work is complex, build, simplify, review, prove and ship end to end with no check-ins, taking the recommended option at every decision. Commit only - add --push or --pr solely when I asked for them."
+  brand_color: "#D97757"
+policy:
+  allow_implicit_invocation: false
