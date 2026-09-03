@@ -30,8 +30,20 @@ codex plugin marketplace add giulioleone097/sniper   # or the local checkout pat
 codex plugin add sniper@sniper
 ```
 
-Then run `codex`, open `/hooks`, trust the two lifecycle hooks (SessionStart,
-SubagentStart), and start a new thread.
+Then run `codex`, open `/hooks`, trust the three plugin hooks (SessionStart,
+SubagentStart, PreToolUse), and start a new thread.
+
+```
+sh /path/to/sniper/scripts/install-codex-agents.sh
+```
+
+Generates `sniper_scout`, `sniper_worker`, `sniper_reviewer` as Codex custom
+agents from `agents/*.md`. Restart Codex after running it.
+
+### Checks
+
+`sh scripts/check.sh` — the one-command acceptance run (validates, guard
+fixtures, manifest JSON, doctrine sync, version parity).
 
 ## The flow
 
@@ -77,7 +89,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 
 ## Hooks
 
-`hooks/hooks.json` wires three Claude Code hook events, both scripts POSIX
+`hooks/hooks.json` is shared by Claude Code and Codex, both scripts POSIX
 `sh` + `python3 -c` (no node, no jq):
 
 - `SessionStart` and `SubagentStart` run `scripts/core-context.sh`, which
@@ -107,16 +119,19 @@ To disable: `/plugin disable sniper`, or delete the entry in
 
 ## Codex notes
 
-`.codex-plugin/plugin.json` points at `hooks/codex-hooks.json`, which carries
-only the two events Codex is known to run (`SessionStart`, `SubagentStart`),
-so the core doctrine is injected there too. The Bash guard is Claude Code
-only. Codex has no custom agent definitions (`agents/*.md`), so `build` and
-`review` run their slices and lenses sequentially in the same session. If
-hooks are disabled, reference the doctrine from your project's `AGENTS.md`:
+- Skills: same files, invoked as `$name` instead of `/sniper:name`.
+- Hooks: same `hooks/hooks.json`; trust it once in `/hooks` (see Install).
+- Agents: not bundled — `scripts/install-codex-agents.sh` generates
+  `sniper_scout`, `sniper_worker`, `sniper_reviewer` (hyphens become
+  underscores) as `~/.codex/agents/*.toml`; `build`/`review` spawn them
+  when installed, otherwise fall back to inline/sequential.
+- No `disable-model-invocation` on Codex; each skill's sidecar
+  `policy.allow_implicit_invocation` plays that role, `false` only on
+  `flow`'s `agents/openai.yaml`.
 
-```
-Also read: <path-to-sniper-checkout>/core/SNIPER.md
-```
+Without hooks, add the doctrine to your own project: copy the
+`<!-- doctrine:start -->` block into your `AGENTS.md`, or add
+`@/path/to/sniper/core/SNIPER.md` to your `CLAUDE.md`.
 
 ## Sources
 

@@ -13,7 +13,7 @@ argument-hint: "[baseline] [--fix] [--pr]"
 
 2. Load the `## Code Review Rules` section from the closest AGENTS.md or CLAUDE.md covering the changed paths, nested file over root. No section means no custom rules; ordinary defect finding still applies.
 
-3. Launch three `sniper-reviewer` Agent calls in one message, one per lens: `correctness`, `slop`, `safety`. Give each the baseline, its lens, the goal card when the session has one, and the rules from step 2. Keep working while they run: read the diff yourself so step 6 is verification and not first contact. When no Agent tool exists (Codex), run the three lenses sequentially in this session with `agents/sniper-reviewer.md` as the brief for each.
+3. Launch three `sniper-reviewer` Agent calls in one message, one per lens: `correctness`, `slop`, `safety`. Give each the baseline, its lens, the goal card when the session has one, and the rules from step 2. Keep working while they run: read the diff yourself so step 6 is verification and not first contact. On Codex spawn three `sniper_reviewer` custom agents the same way (installed by `scripts/install-codex-agents.sh`); when they are not installed, run the three lenses sequentially in this session with `agents/sniper-reviewer.md` as the brief for each.
 
 4. Filter what comes back. Keep confidence >= 80 and severity P0-P2; keep P3 only when the user asked for nits. Drop anything a linter, formatter, typechecker, or compiler catches, and anything on a line the diff did not touch: those move to the follow-ups list, per core.
 

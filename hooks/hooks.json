@@ -1,5 +1,5 @@
 {
-  "description": "sniper hooks: inject core/SNIPER.md doctrine at session and subagent start; deny a fixed list of destructive git/rm Bash commands before they run.",
+  "description": "sniper hooks (Claude Code and Codex share this file): inject core/SNIPER.md at session and subagent start; deny a fixed list of destructive git/rm Bash commands before they run.",
   "hooks": {
     "SessionStart": [
       {

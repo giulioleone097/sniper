@@ -23,11 +23,14 @@ sniper/
   agents/sniper-scout.md            # sonnet, read-only locator
   agents/sniper-worker.md           # sonnet by default, bounded implementer
   agents/sniper-reviewer.md         # opus, read-only diff reviewer with a lens
-  hooks/hooks.json                  # SessionStart, SubagentStart, PreToolUse(Bash)
-  hooks/codex-hooks.json            # Codex: SessionStart + SubagentStart only
+  AGENTS.md                         # doctrine (verbatim) + repo rules, both hosts read this
+  .claude/CLAUDE.md                 # @../AGENTS.md (root CLAUDE.md fails plugin validate --strict)
+  hooks/hooks.json                  # shared: SessionStart, SubagentStart, PreToolUse(Bash)
   scripts/core-context.sh           # prints core as additionalContext JSON
   scripts/guard.sh                  # denies destructive git / rm commands
   scripts/test-guard.sh             # fixture suite for guard.sh
+  scripts/install-codex-agents.sh   # generates ~/.codex/agents/*.toml from agents/*.md
+  scripts/check.sh                  # one-command acceptance run
   docs/DESIGN.md, docs/sources.md, README.md, LICENSE (MIT)
 ```
 
@@ -74,9 +77,11 @@ Shared output discipline for every skill: first line is the outcome, then only w
 
 `agents/sniper-reviewer.md` — `model: opus`, `tools: Read, Grep, Glob, Bash`. Input: baseline, lens (`correctness` | `slop` | `safety`), goal card if any. Reports every finding it sees with confidence 0–100 and severity P0–P3 (coverage stage; the lead filters). No fixes, no praise, no style nits that tooling already enforces.
 
+These same three files also generate the Codex custom agents (see Codex below): `scripts/install-codex-agents.sh` reads `agents/*.md` directly, so there is one agent definition per role for both hosts.
+
 ## Hooks
 
-`hooks/hooks.json`:
+`hooks/hooks.json` is one file shared by Claude Code and Codex (both support `SessionStart`/`SubagentStart` with `additionalContext` and `PreToolUse` with `permissionDecision`; Codex sets `PLUGIN_ROOT` natively and this hooks file also gets `CLAUDE_PLUGIN_ROOT` for compatibility). On Codex the user trusts the three hooks once in `/hooks` before they fire.
 - `SessionStart` (matcher `startup|resume|clear|compact`) and `SubagentStart` → `scripts/core-context.sh`, which prints `{"hookSpecificOutput":{"hookEventName":"<event>","additionalContext":"<core/SNIPER.md>"}}`. `SubagentStart` has no matcher on purpose: every subagent gets the doctrine; narrow with `sniper:.*`.
 - `PreToolUse` matcher `Bash` → `scripts/guard.sh`. Denies: `--no-verify` (as a token alongside `git`), `git push --force` / `-f` / a `+refspec` (allows `--force-with-lease`), `git reset --hard`, `git checkout ... .` in any form, `git restore ... .` in any form unless staged-only, `git clean -f*`, `rm -rf` of `/`, `~`, `$HOME`, `${HOME}`, `.`, `..`, `*` (with or without a trailing `/` or `/*`). Everything else passes. Deny output: `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"..."}}`. Any script error → allow (never trap the user).
 
@@ -84,7 +89,7 @@ Scripts are POSIX shell + `python3 -c` for JSON parsing (no node, no jq).
 
 ## Codex
 
-`.codex-plugin/plugin.json` mirrors name/version/description, points `"skills": "./skills/"`, and sets `"hooks": "./hooks/codex-hooks.json"` (`SessionStart`, `SubagentStart` only; the Bash guard is Claude Code only). `${CLAUDE_PLUGIN_ROOT}` in that hooks file is resolved by Codex the same way ponytail does it. Each skill ships `agents/openai.yaml` with `interface.display_name`, `short_description`, `default_prompt`. No custom agent definitions (`agents/*.md`) on Codex: `build` and `review` run their slices/lenses sequentially in the same session. If hooks are disabled, the core doctrine is reachable as the `$sniper` skill body and the README tells the user to reference it from AGENTS.md.
+`.codex-plugin/plugin.json` mirrors name/version/description, points `"skills": "./skills/"`, and sets `"hooks": "./hooks/hooks.json"` — the same file Claude Code uses. Codex plugins cannot bundle agent definitions, so `scripts/install-codex-agents.sh` generates `~/.codex/agents/{sniper_scout,sniper_worker,sniper_reviewer}.toml` from `agents/*.md` (hyphens → underscores, `model` → `model_reasoning_effort`, no Edit/Write tools → `sandbox_mode = "read-only"`); `build` and `review` spawn those when installed, else fall back to inline/sequential. Each skill also ships `agents/openai.yaml`; Codex has no `disable-model-invocation`, so `policy.allow_implicit_invocation` plays that role and is `false` only for `flow`. Without hooks, the doctrine is reachable via `AGENTS.md` (copy the block) or a `@/path/to/sniper/core/SNIPER.md` import in `CLAUDE.md`.
 
 ## Model prompting rules baked in
 
@@ -116,12 +121,9 @@ Each skill owner also writes that skill's `agents/openai.yaml`. Lead owns `core/
 
 ## Acceptance
 
-- `claude plugin validate --strict <root>` passes (marketplace).
-- `claude plugin validate --strict <root>/.claude-plugin/plugin.json` passes.
-- `claude plugin validate --strict <root>/skills` passes.
-- `claude plugin validate --strict <root>/agents` passes.
-- `sh scripts/test-guard.sh` passes.
+- `sh scripts/check.sh` passes (four `claude plugin validate --strict` targets, guard fixtures, manifest JSON, doctrine sync, version parity).
 - `claude plugin details sniper` lists 10 skills, 3 agents, 3 hook events, and the projected token cost stays under ~2.5k tokens at session start (core + skill descriptions).
 - `scripts/guard.sh` denies the listed commands and allows `git push --force-with-lease`, `rm -rf node_modules` (checked with fixture JSON on stdin).
 - Every SKILL.md body <= 120 lines; no skill references a file that does not exist.
 - Installed from the local marketplace and `/sniper:scope` resolves in a fresh session.
+- `sh scripts/install-codex-agents.sh` writes three TOML files and `codex` lists them.
