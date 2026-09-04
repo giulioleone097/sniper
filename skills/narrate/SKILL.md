@@ -16,7 +16,7 @@ argument-hint: "[pr-number | pr-url | branch] [--out file] [--post] [--walkthrou
 
 6. Read the judgment bucket per domain, entry points first; above 25 files dispatch one `sniper-scout` per domain in one message (Codex: `sniper_scout`) asking "what does each file do now, why did it change, what reaches it from outside, and what did NOT change around it", and read only their `path:line` lines. Every domain needs its before/after shape and its boundary list, so a scout that returns prose without call sites gets one follow-up, then you read the entry points yourself.
 
-7. Draw before you write. One map for the whole change, one shape per domain: read `${CLAUDE_SKILL_DIR}/references/shapes.md` and pick the smallest view that carries the point. Include the neighbours that did not change - a picture of only the changed nodes hides the blast radius. Mark the one edge the change is really about.
+7. Draw before you write, twice per domain. Read `${CLAUDE_SKILL_DIR}/references/shapes.md`. One map for the whole change; then, for every domain, its **own** map - that domain's pieces plus the neighbours it touches on either side, the ones that did not change included, with the edge this domain exists to serve marked - **and** a before/after shape of the mechanism inside it. The domain map answers "where does this sit and who does it talk to", the shape answers "what runs differently now". A domain with neither is not narrated, it is summarised.
 
 8. Write the dossier. The first screen (verdict, plain-words list, map) fits in 30 lines; the drill-down is the body and is where the depth goes; file-level evidence sits in `<details>` blocks that GitHub, GitLab and Azure DevOps render collapsed:
 
@@ -34,12 +34,14 @@ argument-hint: "[pr-number | pr-url | branch] [--out file] [--post] [--walkthrou
 ## Drill-down per dominio
 ### <n>. <domain, in plain words> - <✅ | ⚠️ | ❌>
 **Perché è toccato** <one or two sentences: the pressure that forced this domain open>
+**Dove sta** <this domain's own map: its pieces, the neighbours on both sides, unchanged ones included, the edge it exists to serve marked>
 **Cosa fa la modifica** <three to five sentences: the mechanism, in plain words, in the order it runs>
-**Com'era, com'è** <the shape from step 7: a diff of the call tree, the file tree, the control flow or the component tree; the unchanged neighbours stay in>
+**Com'era, com'è** <the before/after shape: a diff of the control flow, the call tree, the file tree or the component tree>
 **Confini attraversati** <one line per boundary: what leaves this domain, who consumes it at HEAD, and the line that absorbs it or the test that pins it. Unchanged consumers count.>
 **Decisioni** <one line per decision: what was chosen, the alternative rejected, and the reason - measured, not asserted>
-**Prova** <the executed evidence: what ran, the counts, the base attribution; the existing test name or the code path when no run covers it>
+**Prova** <the executed evidence: what ran, the counts, the base attribution, the named test that pins each headline behavior; the code path when no run covers it>
 **Rischio residuo** <a consequence in plain words, or "nessuno individuato">
+**Peso** <files changed, added, deleted, lines in and out - so the reader knows how much of the diff this domain is>
 <details><summary>Dettaglio tecnico</summary> file-level: path:line per claim, what each entry point does now, what was deleted and why nothing calls it </details>
 
 ## Fuori dal perimetro di questa verifica
@@ -52,7 +54,7 @@ argument-hint: "[pr-number | pr-url | branch] [--out file] [--post] [--walkthrou
 <details><summary>Guida di lettura per chi rivede il codice</summary> order (<= 25 `path - what it does now, why it changed`), follow-ups </details>
 ```
 
-9. Rules. ✅ means executed evidence passes or the failures are proven pre-existing on the base branch; ⚠️ means evidence exists but a residual risk or an environment gap remains, named; ❌ means the PR itself prevents the check or a new failure is attributed to it. Every "Confini attraversati" line names a consumer and its proof. Every "Decisioni" line names the rejected alternative; a decision without one is a description, cut it. The dossier contains no task for the approver: what the author must fix is in the verdict, what the release process covers is in "Fuori dal perimetro" with its owner. This is comprehension, not review: no bug list, no severity table, no security findings - `review` owns those. Numbers stay in the evidence lines or "N test verdi" form; a domain is at most 30 lines outside its details block and its shape at most 14; the whole dossier at most 500.
+9. Rules. ✅ means executed evidence passes or the failures are proven pre-existing on the base branch; ⚠️ means evidence exists but a residual risk or an environment gap remains, named; ❌ means the PR itself prevents the check or a new failure is attributed to it. Every "Confini attraversati" line names a consumer and its proof. Every "Decisioni" line names the rejected alternative; a decision without one is a description, cut it. The dossier contains no task for the approver: what the author must fix is in the verdict, what the release process covers is in "Fuori dal perimetro" with its owner. This is comprehension, not review: no bug list, no severity table, no security findings - `review` owns those. Numbers stay in the evidence lines, the weight line or "N test verdi" form. A domain gets at most 45 lines outside its details block, its map at most 10 nodes and its shape at most 16; the whole dossier at most 900. A domain that cannot fill those lines with mechanism, boundaries and named evidence is two domains merged, or one that did not need narrating.
 
 10. `--out <file>` writes the dossier, otherwise print it. `--post`: show it, then only after the user confirms in this session replace the PR body with `gh pr edit <n> -R OWNER/REPO --body-file <file>`; a body without the `<!-- sniper:narrate -->` marker is the author's text, say so and ask first. `--walkthrough`: write `comments.json` (one entry per decision, `path`, `line`, `body` of at most three lines saying why), run `python3 ${CLAUDE_SKILL_DIR}/scripts/pr-walkthrough.py OWNER/REPO <n> comments.json -C <repo>` to validate and show the payload (`-C` reads the diff locally; `gh pr diff` refuses PRs above 300 files), then only after the user confirms add `--post`.
 
