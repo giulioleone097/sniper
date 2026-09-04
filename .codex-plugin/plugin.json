@@ -1,6 +1,6 @@
 {
   "name": "sniper",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code and Codex.",
   "author": {
     "name": "Giulio Leone",

@@ -73,7 +73,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | `review` | after `simplify`, before shipping a diff | `path:line` findings, or `CLEAN` |
 | `simplify` | on the changed code before `review` (or `--repo` audit) | shorter diff, or `Lean already.` |
 | `prove` | acceptance needs the smallest decisive check | exact commands + `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT` |
-| `narrate` | a PR body is needed, or a reviewer must approve without reading every file | approval dossier: executed evidence per suite at HEAD, blast radius across domains (affected projects, removed contracts and their consumers, deleted modules), explicit not-verified list, then reading order, shape, decisions, risks; optional inline walkthrough |
+| `narrate` | a PR body is needed, or a reviewer must approve without reading every file | approval dossier for the approver, in the PR's language: verdict, what changes in plain words, traffic-light table of what was verified at HEAD (failures attributed on the base branch), impact on other domains, what the reviewer still has to check, risks; commands and the engineer's reading guide folded into collapsible sections |
 | `ship` | committing, pushing, or opening a PR | commit shas, PR url |
 | `learn` | a non-obvious fix needs its reasoning captured | file path, or "nothing to record" |
 | `flow` | running the whole pipeline hands-off | final report |
