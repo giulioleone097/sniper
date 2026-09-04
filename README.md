@@ -48,7 +48,7 @@ fixtures, manifest JSON, doctrine sync, version parity).
 ## The flow
 
 ```
-grill? ──► scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
+intake? ──► grill? ──► scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
                                                                         handoff (any time the session ends early)
   ▲                   │
   └──── debug ◄───────┘ (when a real failure appears)
@@ -67,6 +67,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | skill | when | output |
 |---|---|---|
 | `setup` | first time in a repository, or after a core update | local `AGENTS.md` + `CLAUDE.md` carrying the doctrine block; the hook then injects nothing there |
+| `intake` | the work arrived from outside: an issue, a pull request, a work item, a bug report, a pasted paragraph | reads the item from whichever tracker the repository has (gh, glab, az, or files under `docs/tickets/`), reproduces the claim against the code, checks whether it is already implemented or already decided against, then emits the goal card through `scope`; `--reply` posts what it found back after your confirmation, and it never changes the item's state on its own |
 | `grill` | the outcome is genuinely undecided, or a design has open branches | a decision tree worked in rounds: every question you can ask now, each with the recommended answer, facts looked up by a scout instead of asked; ends with the settled tree, the branches left open on purpose, and the request handed to `scope`. Needs a human, so `flow` never calls it |
 | `scope` | before touching code, to lock the outcome | goal card (<= 10 lines) |
 | `plan` | work has 4+ steps or more than one owner | chat brief or `docs/plans/<date>-<slug>.md` |

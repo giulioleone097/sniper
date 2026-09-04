@@ -9,7 +9,7 @@ You run autonomously: nobody can answer while the pipeline is moving. `grill` ne
 
 Invoke each stage as a skill by name: `sniper:<name>` through the Skill tool in Claude Code, `$<name>` in Codex.
 
-1. `scope` with the argument minus any flags. Answer each question it would ask with its own recommended default and keep those defaults in the card as assumptions. The card governs every later stage.
+1. `intake` first when the argument is a tracker item, a URL, or a pasted report rather than a task description; it verifies the claim and hands the card on. Then `scope` with the argument minus any flags. Answer each question it would ask with its own recommended default and keep those defaults in the card as assumptions. The card governs every later stage.
 2. `plan` only when Size is `complex` or the card implies four or more tasks. Otherwise skip it and record `plan skipped: size <size>`.
 3. `build` with the card and, when one exists, the plan path. Fan out only across the plan's disjoint owned paths.
 4. `simplify` on the changed code, before review sees it.
