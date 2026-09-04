@@ -10,12 +10,13 @@
 #   none=1                                                      when nothing is configured
 # Every command is printed for the caller to run from `project=`; nothing runs here.
 
-start=$(cd "${1:-.}" 2>/dev/null && pwd) || { echo "none=1"; exit 0; }
+start=$(cd "${1:-.}" 2>/dev/null && pwd -P) || { echo "none=1"; exit 0; }
 [ -f "$start" ] && start=$(dirname "$start")
 
 dir="$start"
 while [ "$dir" != "/" ]; do
   if [ -f "$dir/project.json" ] || [ -f "$dir/package.json" ] || [ -f "$dir/pyproject.toml" ] || \
+     [ -f "$dir/pytest.ini" ] || [ -f "$dir/setup.cfg" ] || [ -f "$dir/tox.ini" ] || [ -f "$dir/conftest.py" ] || \
      [ -f "$dir/Cargo.toml" ] || [ -f "$dir/go.mod" ] || [ -f "$dir/Makefile" ] || \
      ls "$dir"/*.csproj >/dev/null 2>&1 || ls "$dir"/*.sln >/dev/null 2>&1; then
     break
@@ -45,18 +46,24 @@ if [ "$found" -eq 0 ] && [ -f "$dir/package.json" ] && command -v python3 >/dev/
   scripts=$(python3 -c "import json,sys;print(' '.join(json.load(open(sys.argv[1])).get('scripts',{}).keys()))" "$dir/package.json" 2>/dev/null)
   pm=npm; [ -f "$dir/pnpm-lock.yaml" ] && pm=pnpm; [ -f "$dir/yarn.lock" ] && pm=yarn; [ -f "$dir/bun.lockb" ] && pm=bun
   for t in typecheck lint test build; do
-    case " $scripts " in *" $t "*) emit "$t" "$pm run $t";; esac
+    case " $scripts " in
+      *" $t "*) emit "$t" "$pm run $t";;
+      *) v=$(printf '%s\n' $scripts | grep -E "^$t:[a-z-]+$" | head -1); [ -n "$v" ] && emit "$t" "$pm run $v";;
+    esac
   done
-  case " $scripts " in *" typecheck "*) ;; *) [ -f "$dir/tsconfig.json" ] && emit typecheck "npx tsc --noEmit -p $dir/tsconfig.json";; esac
+  case " $scripts " in *" typecheck "*|*" typecheck:"*) ;; *) [ -f "$dir/tsconfig.json" ] && emit typecheck "npx tsc --noEmit -p $dir/tsconfig.json";; esac
 fi
 
 # python project
-if [ "$found" -eq 0 ] && [ -f "$dir/pyproject.toml" ]; then
+if [ "$found" -eq 0 ] && { [ -f "$dir/pyproject.toml" ] || [ -f "$dir/pytest.ini" ] || [ -f "$dir/setup.cfg" ] || [ -f "$dir/tox.ini" ] || [ -f "$dir/conftest.py" ]; }; then
   runner="python -m"; [ -f "$dir/uv.lock" ] && runner="uv run"
-  grep -qE '^\[tool\.(pytest|pytest\.ini_options)\]' "$dir/pyproject.toml" 2>/dev/null && emit test "$runner pytest -q"
-  grep -qE '^\[tool\.(mypy|pyright)\]' "$dir/pyproject.toml" 2>/dev/null && emit typecheck "$runner mypy ."
-  grep -qE '^\[tool\.ruff' "$dir/pyproject.toml" 2>/dev/null && emit lint "$runner ruff check ."
-  [ "$found" -eq 0 ] && [ -d "$dir/tests" ] && emit test "$runner pytest -q"
+  py="$dir/pyproject.toml"
+  { [ -f "$py" ] && grep -qE '^\[tool\.(mypy|pyright)' "$py"; } || [ -f "$dir/mypy.ini" ] && emit typecheck "$runner mypy ."
+  { [ -f "$py" ] && grep -qE '^\[tool\.ruff' "$py"; } || [ -f "$dir/ruff.toml" ] || [ -f "$dir/.ruff.toml" ] && emit lint "$runner ruff check ."
+  if { [ -f "$py" ] && grep -qE '^\[tool\.pytest' "$py"; } || [ -f "$dir/pytest.ini" ] || [ -f "$dir/conftest.py" ] || [ -d "$dir/tests" ] || \
+     { [ -f "$dir/setup.cfg" ] && grep -q '^\[tool:pytest\]' "$dir/setup.cfg"; } || { [ -f "$dir/tox.ini" ] && grep -q '^\[pytest\]' "$dir/tox.ini"; }; then
+    emit test "$runner pytest -q"
+  fi
 fi
 
 # .NET

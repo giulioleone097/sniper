@@ -27,7 +27,7 @@ argument-hint: "[baseline] [--fix] [--pr]"
 
 5. Read the diff yourself while they run, entry points first, so step 7 is a decision and not first contact.
 
-6. Merge with one `sniper-integrator` (Codex: `sniper_integrator`): pass the range, every area report verbatim with its area tag, the empty `applied` list, and the checks the repository uses for the affected areas (`sh <plugin root>/scripts/checks.sh <area path>` per area). Hand it `<plugin root>/skills/narrate/scripts/pr-contracts.py` for the removed-symbol sweep. It dedupes, settles contradictions by reading the code, hunts the cross-area breakages no single reviewer could see, verifies each finding, and runs the nearest check per affected area with failures attributed to the baseline. Not installed on this host: do that merge and that verification here, in this order, and say you did.
+6. Merge with one `sniper-integrator` (Codex: `sniper_integrator`): pass the range, every area report verbatim with its area tag, the empty `applied` list, the checks the repository uses for the affected areas (`sh <plugin root>/scripts/checks.sh <area path>` per area), and the repositories that depend on this one (`sh <plugin root>/scripts/consumers.sh`: sibling checkouts and workspace members whose manifests name this repo). Hand it `<plugin root>/skills/narrate/scripts/pr-contracts.py` for the removed-symbol sweep. It dedupes, settles contradictions by reading the code, hunts the cross-area breakages no single reviewer could see, verifies each finding, and runs the nearest check per affected area with failures attributed to the baseline. Not installed on this host: do that merge and that verification here, in this order, and say you did.
 
 7. Filter what the integrator returns. Keep confidence >= 80 and severity P0-P2; keep P3 only when the user asked for nits. Drop anything a linter, formatter, typechecker, or compiler catches, and anything on a line the diff did not touch: those move to the follow-ups list, per core. Slop findings keep their tag - `reuse:` `stdlib:` `native:` `delete:` `yagni:` `shrink:` - the same six rungs `simplify` uses. Re-verify the P0 and P1 lines yourself; a blocking claim you print is yours.
 
@@ -36,13 +36,14 @@ argument-hint: "[baseline] [--fix] [--pr]"
 ```
 path:line P<n> <area> <lens>: problem. fix.
 cross-area: path:line consumer path:line - absorbs | breaks.
+cross-repo: <repo> path:line consumes <symbol> - absorbs | breaks | unread.
 net: -<N> lines possible.
 regression: <command> - pass | fail (also fails on baseline) | fail (new) | none configured
 follow-ups:
 path:line problem.
 ```
 
-   The `net:` line comes from the slop lens; omit it when that lens found nothing to cut. Omit `cross-area:` and `follow-ups:` when there are none. The `regression:` lines always print, one per area check that ran. Nothing survives the filter and every check passes: print `CLEAN` and the regression lines.
+   The `net:` line comes from the slop lens; omit it when that lens found nothing to cut. Omit `cross-area:`, `cross-repo:` and `follow-ups:` when there are none; a consumer repository that exists but could not be read prints as `unread`, never as clean. The `regression:` lines always print, one per area check that ran. Nothing survives the filter and every check passes: print `CLEAN` and the regression lines.
 
 9. `--fix`: apply the P0-P2 findings here, surgical edits per core - not by handing each one to `build`. Leave the follow-ups untouched. Then one `sniper-integrator` pass with `applied` set to the edited files: it re-runs the checks for the touched areas, attributes any failure, and confirms each hunk preserved behavior - no guard thinned, no test weakened or skipped, no silent fallback added. Print its `regression:` and `behavior:` lines under the findings. Findings you did not fix stay printed as they were.
 

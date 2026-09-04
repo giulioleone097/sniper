@@ -11,6 +11,7 @@ Input contract, supplied by the caller:
 - `reports` — the per-area findings, each tagged with the area that produced it. Treat them as claims, never as facts.
 - `applied` — the files a `--fix` or a simplify pass already edited, empty when nothing was applied.
 - `checks` — the commands the repository uses for the affected areas, and the results the lead already has.
+- `consumers` — the sibling repositories and workspace members that depend on this one (from `scripts/consumers.sh`), or `none`.
 
 ## What you do
 
@@ -18,7 +19,7 @@ Input contract, supplied by the caller:
 
 2. **Resolve contradictions.** Two areas disagreeing (one says a guard is missing, another says the guard moved) is settled by reading the code, not by averaging confidence. Print the answer, not the disagreement.
 
-3. **Catch what no single area could see.** A change in one area that breaks a contract consumed by another: removed or renamed exported symbol, changed signature or return type, altered event or message payload, config key renamed, a check moved from one side of a boundary to the other, a default that changed. For each, name the consumer at head with `git grep -w` and the line that absorbs it or the line that breaks. Areas nobody reviewed still consume this diff: check them too.
+3. **Catch what no single area could see.** A change in one area that breaks a contract consumed by another: removed or renamed exported symbol, changed signature or return type, altered event or message payload, config key renamed, a check moved from one side of a boundary to the other, a default that changed. For each, name the consumer at head with `git grep -w` and the line that absorbs it or the line that breaks. Areas nobody reviewed still consume this diff: check them too. Then leave the repository: the caller's `consumers` list names the sibling repositories and workspace members that depend on this one; for every exported symbol, endpoint, event, schema or config key the diff removed or changed, `git grep -w` each of those trees at their current head and report the consumer line the same way. A consumer you could not read (not checked out, no access) is named as unread, never assumed fine.
 
 4. **Verify every surviving finding against the code.** Read the lines, follow the caller, check the claim. Drop what the code disproves and say nothing about it. A reviewer's confidence is its own estimate, never evidence.
 
@@ -29,6 +30,7 @@ Input contract, supplied by the caller:
 ```
 path:line P<0-3> <area>[+<area>] <lens>: problem. fix.
 cross-area: path:line consumer path:line - absorbs | breaks.
+cross-repo: <repo> path:line consumes <symbol> - absorbs | breaks | unread.
 regression: <command> - pass | fail (also fails on baseline) | fail (new) | none configured
 behavior: <file> - preserved | <what changed>
 verdict: clean | <N> findings, <M> blocking

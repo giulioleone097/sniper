@@ -134,4 +134,4 @@ Each skill owner also writes that skill's `agents/openai.yaml`. Lead owns `core/
 
 ## Executable primitives (0.13)
 
-Where a skill used to say "run the nearest check" or "read the tracker", a script now answers from the repository: `scripts/checks.sh`, `scripts/tracker.sh`, `scripts/tokens.sh`, `scripts/pr-partition.py`. The skill still decides; the script removes the guess. Paths inside skills are host-neutral (`<this skill>`, `<plugin root>`) because Codex expands no variable in a skill body.
+Where a skill used to say "run the nearest check" or "read the tracker", a script now answers from the repository: `scripts/checks.sh`, `scripts/tracker.sh`, `scripts/tokens.sh`, `scripts/consumers.sh`, `scripts/pr-partition.py`. The skill still decides; the script removes the guess. Paths inside skills are host-neutral (`<this skill>`, `<plugin root>`) because Codex expands no variable in a skill body.

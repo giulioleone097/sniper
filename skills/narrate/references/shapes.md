@@ -53,8 +53,8 @@ flowchart LR
  handle_turn
 -  pick specialist by heuristic score
 +  bind operator scope from the page catalogue
-+  XMateOrchestrator.run -> typed phase (analytics | execution | troubleshooting)
-+    xmate_investigate           # one call, was four
++  PhaseGraph.run -> typed phase (analytics | execution | troubleshooting)
++    investigate                 # one call, was four
    stream_consumer
 +  if the phase needs the operator: pause, persist, resume on answer
 ```

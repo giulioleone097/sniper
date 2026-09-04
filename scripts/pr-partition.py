@@ -39,7 +39,11 @@ ORDER = ["judgment", "tests", "mechanical", "generated", "docs", "config"]
 
 
 def git(repo, *args, stdin=None):
-    return subprocess.run(["git", "-C", repo, *args], input=stdin, capture_output=True, text=True, check=True).stdout
+    r = subprocess.run(["git", "-C", repo, *args], input=stdin, capture_output=True, text=True)
+    if r.returncode != 0:
+        first = next((l for l in r.stderr.splitlines() if l.strip()), "unknown error")
+        raise SystemExit(f"pr-partition: git {' '.join(args[:3])} failed in {repo}: {first}")
+    return r.stdout
 
 
 def rename_new(path):

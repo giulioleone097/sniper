@@ -9,7 +9,7 @@
 # `cli=none` or `auth=missing` is not an error: the caller falls back to `local`.
 # Any read here is read-only; nothing is created.
 
-cd "${1:-.}" 2>/dev/null || { echo "forge=none"; echo "cli=none"; echo "auth=unknown"; echo "repo=-"; echo "local=docs/tickets"; exit 0; }
+cd -P "${1:-.}" 2>/dev/null || { echo "forge=none"; echo "cli=none"; echo "auth=unknown"; echo "repo=-"; echo "local=docs/tickets"; exit 0; }
 
 url=$(git remote get-url origin 2>/dev/null || echo "")
 forge=none; cli=none; auth=unknown; repo=-

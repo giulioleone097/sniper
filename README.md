@@ -106,6 +106,7 @@ Four detectors make the skills run the repository's own commands instead of gues
 | `scripts/checks.sh <path>` | the project's own typecheck, lint, test and build commands for that path (nx targets, package scripts, pyproject, .NET, cargo, go, make), or `none=1` | `prove`, `review`, `simplify`, the integrator |
 | `scripts/tracker.sh [repo]` | the forge, the CLI and whether it is logged in, from the origin remote alone (GitHub/gh, GitLab/glab, Azure DevOps/az, else files under `docs/tickets/`) | `intake`, `plan --tickets`, `ship` |
 | `scripts/tokens.sh <ui path>` | the design tokens the repository already defines, with counts: custom properties, colours, fonts, sizes, theme keys | `build` on UI work, the reviewer's `taste:` tag |
+| `scripts/consumers.sh [repo]` | what depends on this repository outside its tree: the names it publishes (package, module, crate, assembly, remote) and every sibling checkout or workspace member whose manifest names one of them | `review`, `simplify`, `narrate`, the integrator's cross-repo sweep |
 | `scripts/pr-partition.py BASE HEAD` | the diff split into judgment, tests, mechanical, generated, docs and config, so only judgment code is read | `narrate`, `review`, `simplify` |
 
 `scripts/check.sh` is the plugin's own acceptance: four strict validations, the guard fixtures, manifest parity, doctrine sync, and the repository rules executed (skill bodies under 120 lines, references under 80, no host env var inside a skill, every script parses, both detectors answer on this repo).
