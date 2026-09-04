@@ -17,7 +17,8 @@ What sniper is built from. Star counts snapshotted 2026-09-03.
 | taste (design taste skill) + frontend-design | local — Claude skills, no public repo | local | anti-slop for UI: concrete px/hex, no vague vibes → `references/ui-taste.md` |
 | agent-workflow-orchestrator (own) | https://github.com/giulioleone097/agent-workflow-orchestrator | local | goal contract, owner contract + handoff, review-diff one-pass rule, elision rule, prove-work ladder, "## Code Review Rules" in AGENTS.md → `scope`, agents, `review`, `core`, `prove`, `learn` |
 
-| humanlayer/skills | https://github.com/humanlayer/skills | 2026-09 | show-me: explain a change by its shape (pseudocode, call tree, file tree, one Mermaid sequence, diff-shaped before/after) → `narrate` shape views |
+| humanlayer/skills | https://github.com/humanlayer/skills | 2026-09 | show-me: explain a change by its shape (pseudocode, call tree, file tree, component tree, one Mermaid sequence, diff-shaped before/after) → `narrate` shapes (`skills/narrate/references/shapes.md`) |
+| coldtea/pr-lens | https://github.com/coldteadotai/pr-lens | 2026-09 | comprehension layer, not another review bot: lanes as the reader's mental model, one hero edge, unchanged neighbours as the blast radius, C4-inspired view choice, no findings in a picture → `narrate` map and shape rules |
 
 ## Also read / rejected
 
