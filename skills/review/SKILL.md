@@ -13,7 +13,7 @@ argument-hint: "[baseline] [--fix] [--pr]"
 
 2. Load the `## Code Review Rules` section from the closest AGENTS.md or CLAUDE.md covering the changed paths, nested file over root. No section means no custom rules; ordinary defect finding still applies.
 
-3. Split into areas. `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/pr-partition.py BASE HEAD` gives the judgment bucket; group it the way the reader already names the system - one area per deployable unit, shared library, contract surface, or infrastructure layer. Generated, mechanical and docs files are not reviewed; tests are read inside the area they cover.
+3. Split into areas. `python3 <plugin root>/scripts/pr-partition.py BASE HEAD` (`<plugin root>` is the parent of the `skills/` directory this file lives in) gives the judgment bucket; group it the way the reader already names the system - one area per deployable unit, shared library, contract surface, or infrastructure layer. Generated, mechanical and docs files are not reviewed; tests are read inside the area they cover.
 
 4. Dispatch, all in one message, per the table. Every `sniper-reviewer` gets the baseline, the exact path globs of its area, the goal card when the session has one, and the rules from step 2 (Codex: `sniper_reviewer`; not installed: run the lenses sequentially here with `agents/sniper-reviewer.md` as the brief).
 
@@ -27,7 +27,7 @@ argument-hint: "[baseline] [--fix] [--pr]"
 
 5. Read the diff yourself while they run, entry points first, so step 7 is a decision and not first contact.
 
-6. Merge with one `sniper-integrator` (Codex: `sniper_integrator`): pass the range, every area report verbatim with its area tag, the empty `applied` list, and the checks the repository uses for the affected areas. Hand it `${CLAUDE_PLUGIN_ROOT}/skills/narrate/scripts/pr-contracts.py` for the removed-symbol sweep. It dedupes, settles contradictions by reading the code, hunts the cross-area breakages no single reviewer could see, verifies each finding, and runs the nearest check per affected area with failures attributed to the baseline. Not installed on this host: do that merge and that verification here, in this order, and say you did.
+6. Merge with one `sniper-integrator` (Codex: `sniper_integrator`): pass the range, every area report verbatim with its area tag, the empty `applied` list, and the checks the repository uses for the affected areas (`sh <plugin root>/scripts/checks.sh <area path>` per area). Hand it `<plugin root>/skills/narrate/scripts/pr-contracts.py` for the removed-symbol sweep. It dedupes, settles contradictions by reading the code, hunts the cross-area breakages no single reviewer could see, verifies each finding, and runs the nearest check per affected area with failures attributed to the baseline. Not installed on this host: do that merge and that verification here, in this order, and say you did.
 
 7. Filter what the integrator returns. Keep confidence >= 80 and severity P0-P2; keep P3 only when the user asked for nits. Drop anything a linter, formatter, typechecker, or compiler catches, and anything on a line the diff did not touch: those move to the follow-ups list, per core. Slop findings keep their tag - `reuse:` `stdlib:` `native:` `delete:` `yagni:` `shrink:` - the same six rungs `simplify` uses. Re-verify the P0 and P1 lines yourself; a blocking claim you print is yours.
 

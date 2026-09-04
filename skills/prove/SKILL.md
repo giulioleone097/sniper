@@ -4,7 +4,7 @@ description: Translates the acceptance check from a goal card or request into th
 ---
 
 1. Take the acceptance check from the goal card if one exists; otherwise read the request and state the check that would fail if the change were wrong.
-2. Build the smallest decisive set per core's proof ladder: typecheck/lint, then the targeted test for the changed behavior, then one real exercise of the path (curl, CLI run, script) only when no test can reach it. Stop adding checks once the set would catch a wrong change.
+2. Build the smallest decisive set per core's proof ladder: typecheck/lint, then the targeted test for the changed behavior, then one real exercise of the path (curl, CLI run, script) only when no test can reach it. Take the commands from the repository, not from memory: `sh <plugin root>/scripts/checks.sh <changed path>` (`<plugin root>` is the parent of the `skills/` directory this file lives in) prints the project's own typecheck, lint, test and build commands, or `none=1`. Narrow the test command to the changed behavior where the runner allows it. Stop adding checks once the set would catch a wrong change.
 3. Before running a command, check whether a prior run already proves it for the current tree: same command, no file it depends on changed since. Reuse that result and mark it `reused` instead of rerunning.
 4. Run every remaining command exactly as written. Capture exit status and the decisive line of output, not the full log.
 5. Do not edit product code — unless the request explicitly asked for fixes, in which case fix the canonical cause per core and rerun only the checks that fix invalidated.

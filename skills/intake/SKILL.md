@@ -4,7 +4,7 @@ description: Turns whatever the work arrived as - an issue, a pull request, a wo
 argument-hint: "[issue number | url | file | pasted text] [--reply]"
 ---
 
-1. Read the source. `sh ${CLAUDE_PLUGIN_ROOT}/scripts/tracker.sh` names the forge, the CLI and whether it is authenticated. A bare number or a URL is then fetched with the CLI the script named:
+1. Read the source. `sh <plugin root>/scripts/tracker.sh` (`<plugin root>` is the parent of the `skills/` directory this file lives in) names the forge, the CLI and whether it is authenticated. A bare number or a URL is then fetched with the CLI the script named:
 
    | forge | item | pull request |
    |---|---|---|

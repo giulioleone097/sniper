@@ -15,6 +15,23 @@ done
 
 sh "$ROOT/scripts/test-guard.sh" || fail=1
 
+# Repository rules, executed: skill bodies <= 120 lines, references <= 80, no host-specific
+# env var in a skill body (Codex knows none of them there), every script parses, and the
+# two detectors answer on this very repository.
+for f in "$ROOT"/skills/*/SKILL.md; do
+  n=$(wc -l < "$f" | tr -d ' '); [ "$n" -le 120 ] || { echo "rules: $f has $n lines (> 120)"; fail=1; }
+done
+for f in "$ROOT"/skills/*/references/*.md; do
+  n=$(wc -l < "$f" | tr -d ' '); [ "$n" -le 80 ] || { echo "rules: $f has $n lines (> 80)"; fail=1; }
+done
+if grep -rn 'CLAUDE_SKILL_DIR\|\${CLAUDE_PLUGIN_ROOT}' "$ROOT"/skills/*/SKILL.md "$ROOT"/skills/*/references "$ROOT"/agents >/dev/null 2>&1; then
+  echo "rules: host env var inside a skill or agent body"; grep -rln 'CLAUDE_SKILL_DIR\|\${CLAUDE_PLUGIN_ROOT}' "$ROOT"/skills/*/SKILL.md "$ROOT"/skills/*/references "$ROOT"/agents; fail=1
+fi
+for s in "$ROOT"/scripts/*.sh; do sh -n "$s" || { echo "rules: $s does not parse"; fail=1; }; done
+sh "$ROOT/scripts/tracker.sh" "$ROOT" | grep -q '^forge=' || { echo "rules: tracker.sh gave no forge"; fail=1; }
+sh "$ROOT/scripts/checks.sh" "$ROOT" | grep -qE '^(project=|none=1)' || { echo "rules: checks.sh gave no answer"; fail=1; }
+[ "$fail" -eq 0 ] && echo "rules: ok"
+
 python3 - "$ROOT" <<'EOF' || fail=1
 import json, re, sys
 root = sys.argv[1]

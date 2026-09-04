@@ -131,3 +131,7 @@ Each skill owner also writes that skill's `agents/openai.yaml`. Lead owns `core/
 - Every SKILL.md body <= 120 lines; no skill references a file that does not exist.
 - Installed from the local marketplace and `/sniper:scope` resolves in a fresh session.
 - `sh scripts/install-codex-agents.sh` writes three TOML files and `codex` lists them.
+
+## Executable primitives (0.13)
+
+Where a skill used to say "run the nearest check" or "read the tracker", a script now answers from the repository: `scripts/checks.sh`, `scripts/tracker.sh`, `scripts/tokens.sh`, `scripts/pr-partition.py`. The skill still decides; the script removes the guess. Paths inside skills are host-neutral (`<this skill>`, `<plugin root>`) because Codex expands no variable in a skill body.

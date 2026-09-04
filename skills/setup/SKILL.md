@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 1. Resolve the project directory: the argument, else the git top level of the current directory, else the current directory. Refuse a home directory or `/`.
 
-2. Run `python3 ${CLAUDE_SKILL_DIR}/scripts/upsert-agents.py <project-dir> ${CLAUDE_SKILL_DIR}/../../core/SNIPER.md` (the script lives in `scripts/` beside this file; `core/SNIPER.md` is at the plugin root). It creates or refreshes only the block between `<!-- sniper:core:start -->` and `<!-- sniper:core:end -->` in `AGENTS.md`, and makes sure `CLAUDE.md` imports it with `@AGENTS.md`. Report the two status lines it prints.
+2. Run `python3 <this skill>/scripts/upsert-agents.py <project-dir> <plugin root>/core/SNIPER.md`, where `<this skill>` is the directory this file lives in and `<plugin root>` is the parent of its `skills/` directory: the script sits in `scripts/` beside this file, `core/SNIPER.md` at the plugin root. It creates or refreshes only the block between `<!-- sniper:core:start -->` and `<!-- sniper:core:end -->` in `AGENTS.md`, and makes sure `CLAUDE.md` imports it with `@AGENTS.md`. Report the two status lines it prints.
 
 3. When the script reports the fill marker present, replace it with the repository's own proof commands, three to six lines, one command each, taken from what the repository already declares: `package.json` scripts, `pyproject.toml`/`Makefile`/`justfile`, `nx`/`turbo` targets, the CI workflow. Prefer the exact CI commands. Do not invent commands and do not run them here. Leave the section alone when the marker is absent: the user owns it.
 

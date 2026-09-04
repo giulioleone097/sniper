@@ -97,6 +97,19 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
   reading the code, catches what crosses areas, and runs the nearest checks with
   every failure attributed to the baseline before it is called new.
 
+## Scripts
+
+Four detectors make the skills run the repository's own commands instead of guessing. Each reads the tree, prints key=value lines, and never changes anything; every skill that needs one names it.
+
+| Script | Answers | Used by |
+|---|---|---|
+| `scripts/checks.sh <path>` | the project's own typecheck, lint, test and build commands for that path (nx targets, package scripts, pyproject, .NET, cargo, go, make), or `none=1` | `prove`, `review`, `simplify`, the integrator |
+| `scripts/tracker.sh [repo]` | the forge, the CLI and whether it is logged in, from the origin remote alone (GitHub/gh, GitLab/glab, Azure DevOps/az, else files under `docs/tickets/`) | `intake`, `plan --tickets`, `ship` |
+| `scripts/tokens.sh <ui path>` | the design tokens the repository already defines, with counts: custom properties, colours, fonts, sizes, theme keys | `build` on UI work, the reviewer's `taste:` tag |
+| `scripts/pr-partition.py BASE HEAD` | the diff split into judgment, tests, mechanical, generated, docs and config, so only judgment code is read | `narrate`, `review`, `simplify` |
+
+`scripts/check.sh` is the plugin's own acceptance: four strict validations, the guard fixtures, manifest parity, doctrine sync, and the repository rules executed (skill bodies under 120 lines, references under 80, no host env var inside a skill, every script parses, both detectors answer on this repo).
+
 ## Hooks
 
 `hooks/hooks.json` is shared by Claude Code and Codex, both scripts POSIX
@@ -148,6 +161,8 @@ instructions together; the project file is the more specific one, and when the
 block is present the `SessionStart` hook injects nothing, so the doctrine costs
 its tokens once. Teammates without the plugin get the same rules from the file.
 Re-run after a core update; the block is replaced, your sections stay.
+
+- Codex substitutes `${CLAUDE_PLUGIN_ROOT}` in `hooks/hooks.json` only. Inside a skill body neither host expands a variable, and Codex presents skills to the model as absolute skill roots, so every path in a skill is written relative to the file that names it (`<this skill>/scripts/…`, `<plugin root>/scripts/…`); `scripts/check.sh` fails on any `CLAUDE_SKILL_DIR` or `${CLAUDE_PLUGIN_ROOT}` inside a skill or agent.
 
 ## Sources
 
