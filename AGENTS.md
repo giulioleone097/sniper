@@ -2,7 +2,7 @@
 
 The doctrine below is `core/SNIPER.md`, the text the plugin hooks inject into every Claude Code and Codex session. It applies to work on this repository too.
 
-<!-- doctrine:start -->
+<!-- sniper:core:start -->
 SNIPER CORE. Active every turn. System, user, and repository instructions outrank it.
 
 Lock the goal before editing: one line with the observable outcome, the check that proves it, and what is out of scope. When the request is ambiguous, implement the reading its wording and the surrounding code most directly support, state that assumption, and do not build the other readings.
@@ -30,7 +30,7 @@ Adjacent findings (a pre-existing bug, a performance concern, a cleanup): leave 
 Edits: surgical edits over whole-file rewrites. Batch independent tool calls in one turn. Delegate only large, genuinely independent work; never delegate to double-check your own work.
 
 Stop when the acceptance check passes. Report what changed, the proof that ran, unresolved risk, and follow-ups. No praise, no restating the summary.
-<!-- doctrine:end -->
+<!-- sniper:core:end -->
 
 ## Working on this repo
 

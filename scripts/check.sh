@@ -22,7 +22,7 @@ for f in (".claude-plugin/plugin.json", ".claude-plugin/marketplace.json",
           ".codex-plugin/plugin.json", ".agents/plugins/marketplace.json", "hooks/hooks.json"):
     json.load(open(f"{root}/{f}"))
 core = open(f"{root}/core/SNIPER.md").read().strip()
-m = re.search(r"<!-- doctrine:start -->\n(.*?)\n<!-- doctrine:end -->", open(f"{root}/AGENTS.md").read(), re.S)
+m = re.search(r"<!-- sniper:core:start -->\n(.*?)\n<!-- sniper:core:end -->", open(f"{root}/AGENTS.md").read(), re.S)
 if not m or m.group(1).strip() != core:
     sys.exit("doctrine: AGENTS.md block differs from core/SNIPER.md")
 v = [json.load(open(f"{root}/{f}"))["version"] for f in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json")]

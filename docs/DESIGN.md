@@ -17,7 +17,8 @@ sniper/
   .codex-plugin/plugin.json         # Codex manifest ("skills": "./skills/")
   .agents/plugins/marketplace.json  # Codex marketplace
   core/SNIPER.md                    # doctrine, injected at SessionStart/SubagentStart
-  skills/<name>/SKILL.md            # 11 skills, each <= 120 lines body
+  skills/<name>/SKILL.md            # 12 skills, each <= 120 lines body
+  skills/setup/scripts/upsert-agents.py  # idempotent AGENTS.md/CLAUDE.md upsert
   skills/narrate/scripts/*.py       # pr-partition.py, pr-contracts.py, test-summary.py, pr-walkthrough.py
   skills/<name>/references/*.md     # only when a branch is genuinely conditional
   skills/<name>/agents/openai.yaml  # Codex sidecar
@@ -57,6 +58,7 @@ Every SKILL.md: frontmatter `name`, `description` (third person, front-loaded tr
 
 | skill | invoke | what | output | stop when |
 |---|---|---|---|---|
+| `setup` | user | `scripts/upsert-agents.py` installs or refreshes the doctrine block in the project's `AGENTS.md` between `sniper:core` markers and makes `CLAUDE.md` (or `.claude/CLAUDE.md`) import it; the skill then fills the proof commands from what the repo declares. `SessionStart` skips injection when the block is present in the project. | two status lines | files written |
 | `scope` | model+user | Lock outcome, acceptance check, exclusions, material risk, proof, size (surgical / normal / complex). Ask at most 3 questions, one at a time, only when different answers change the work. | Goal card (<= 10 lines) | card accepted or answered |
 | `plan` | model+user (scope's Next: plan, flow) | Tasks with owned paths (disjoint when parallel), acceptance, proof, test seams. Chat brief for < 4 tasks, `docs/plans/<yyyy-mm-dd>-<slug>.md` otherwise. | brief or plan file | plan written; never implements |
 | `build` | model+user | Implement under the goal card. Modes `feature` / `fix` / `refactor` / `migrate` auto-detected; each mode is a short reference. Tests at pre-agreed seams only. Fan out `sniper-worker` only for disjoint owned paths. | changed files + proof line | acceptance passes; hands to `simplify` |
@@ -84,7 +86,7 @@ These same three files also generate the Codex custom agents (see Codex below): 
 ## Hooks
 
 `hooks/hooks.json` is one file shared by Claude Code and Codex (both support `SessionStart`/`SubagentStart` with `additionalContext` and `PreToolUse` with `permissionDecision`; Codex sets `PLUGIN_ROOT` natively and this hooks file also gets `CLAUDE_PLUGIN_ROOT` for compatibility). On Codex the user trusts the three hooks once in `/hooks` before they fire.
-- `SessionStart` (matcher `startup|resume|clear|compact`) and `SubagentStart` → `scripts/core-context.sh`, which prints `{"hookSpecificOutput":{"hookEventName":"<event>","additionalContext":"<core/SNIPER.md>"}}`. `SubagentStart` has no matcher on purpose: every subagent gets the doctrine; narrow with `sniper:.*`.
+- `SessionStart` (matcher `startup|resume|clear|compact`) and `SubagentStart` → `scripts/core-context.sh`, which (for `SessionStart` only) prints nothing when the session's `cwd` has an `AGENTS.md` or `CLAUDE.md` carrying `<!-- sniper:core:start -->`, and otherwise prints `{"hookSpecificOutput":{"hookEventName":"<event>","additionalContext":"<core/SNIPER.md>"}}`. `SubagentStart` has no matcher on purpose: every subagent gets the doctrine; narrow with `sniper:.*`.
 - `PreToolUse` matcher `Bash` → `scripts/guard.sh`. Denies: `--no-verify` (as a token alongside `git`), `git push --force` / `-f` / a `+refspec` (allows `--force-with-lease`), `git reset --hard`, `git checkout ... .` in any form, `git restore ... .` in any form unless staged-only, `git clean -f*`, `rm -rf` of `/`, `~`, `$HOME`, `${HOME}`, `.`, `..`, `*` (with or without a trailing `/` or `/*`). Everything else passes. Deny output: `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"..."}}`. Any script error → allow (never trap the user).
 
 Scripts are POSIX shell + `python3 -c` for JSON parsing (no node, no jq).

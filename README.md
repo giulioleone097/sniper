@@ -1,8 +1,8 @@
 # sniper
 
 One plugin for the whole development loop, for Claude Code and Codex. Lock the
-outcome, take the shortest safe path, prove only changed behavior, stop. Eleven
-skills carry scope through ship; three agents do the locating, the bounded
+outcome, take the shortest safe path, prove only changed behavior, stop. Twelve
+skills carry setup through ship; three agents do the locating, the bounded
 implementing, and the read-only reviewing.
 
 ## Install
@@ -65,6 +65,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 
 | skill | when | output |
 |---|---|---|
+| `setup` | first time in a repository, or after a core update | local `AGENTS.md` + `CLAUDE.md` carrying the doctrine block; the hook then injects nothing there |
 | `scope` | before touching code, to lock the outcome | goal card (<= 10 lines) |
 | `plan` | work has 4+ steps or more than one owner | chat brief or `docs/plans/<date>-<slug>.md` |
 | `build` | implementing under a locked goal card | changed files + proof line |
@@ -130,9 +131,15 @@ To disable: `/plugin disable sniper`, or delete the entry in
   `policy.allow_implicit_invocation` plays that role, `false` only on
   `flow`'s `agents/openai.yaml`.
 
-Without hooks, add the doctrine to your own project: copy the
-`<!-- doctrine:start -->` block into your `AGENTS.md`, or add
-`@/path/to/sniper/core/SNIPER.md` to your `CLAUDE.md`.
+Per project, run `/sniper:setup` (`$setup` on Codex): it writes the doctrine
+block into the repository's `AGENTS.md` (created, or appended between
+`<!-- sniper:core:start -->` / `<!-- sniper:core:end -->` markers, nothing else
+touched) and makes `CLAUDE.md` import it with `@AGENTS.md` (or `.claude/CLAUDE.md`
+when the project keeps it there). Claude Code and Codex load global and project
+instructions together; the project file is the more specific one, and when the
+block is present the `SessionStart` hook injects nothing, so the doctrine costs
+its tokens once. Teammates without the plugin get the same rules from the file.
+Re-run after a core update; the block is replaced, your sections stay.
 
 ## Sources
 

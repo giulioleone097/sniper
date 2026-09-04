@@ -7,11 +7,12 @@
 CORE_FILE="$(dirname "$0")/../core/SNIPER.md"
 
 exec python3 -c '
-import sys, json
+import os, sys, json
 
 core_path = sys.argv[1]
 
 event = "SessionStart"
+data = {}
 try:
     raw = sys.stdin.read()
     if raw.strip():
@@ -21,6 +22,17 @@ try:
             event = e
 except Exception:
     pass
+
+# A project that carries the block (installed by /sniper:setup) already loads it as
+# project instructions; injecting again would cost the doctrine twice.
+if event == "SessionStart":
+    cwd = data.get("cwd") if isinstance(data, dict) else None
+    for name in ("AGENTS.md", "CLAUDE.md"):
+        try:
+            if cwd and "<!-- sniper:core:start -->" in open(os.path.join(cwd, name)).read():
+                sys.exit(0)
+        except Exception:
+            pass
 
 try:
     with open(core_path, "r") as f:
