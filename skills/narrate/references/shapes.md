@@ -73,8 +73,7 @@ flowchart LR
 
 ## Rules
 
-- Unchanged neighbours stay in: faded on the map, a leading space in a `diff` fence.
-- A domain map shares nodes with the big map - that is the point - but two domain maps must not be the same picture retitled, and no shape repeats another's nodes.
+- Unchanged neighbours stay in: faded on the map, a leading space in a `diff` fence. A domain map shares nodes with the big map - that is the point - but two domain maps must not be the same picture retitled, and no shape repeats another's nodes.
 - No findings in a shape - no severity, no bug, no security note. This is the comprehension layer; `review` owns defects.
 - No folder tree as architecture, and no level added because the previous one existed: system context, then containers, a component view only when an affected container's internals matter.
 
