@@ -1,10 +1,10 @@
 # Shapes for a dossier
 
-One map for the whole change; then per domain its own map **and** its own before/after shape. Smallest view that carries the point; a shape needing a paragraph of explanation is the wrong shape. Keep the neighbours that did **not** change - a picture of only the changed nodes says nothing about blast radius - and use real names and real numbers, or the shape is decoration.
+One map for the whole change; then per domain its own map **and** its own before/after shape. Smallest view that carries the point: a shape needing a paragraph of explanation is the wrong shape, a shape without real names and real numbers is decoration, and a picture of only the changed nodes says nothing about blast radius - the neighbours that did **not** change stay in.
 
 ## The map, once, after the plain-words list
 
-Lanes are the reader's mental model - a runtime, a tier, a trust boundary - never the folder tree. Twelve nodes at the outside. Mark the one edge the change is really about. Mermaid renders natively on GitHub, GitLab and Azure DevOps.
+Lanes are the reader's mental model - a runtime, a tier, a trust boundary - never the folder tree. Twelve nodes at the outside, and mark the one edge the change is really about. Mermaid renders natively on GitHub, GitLab and Azure DevOps.
 
 ```mermaid
 flowchart LR
@@ -32,7 +32,7 @@ Faded nodes are untouched and prove the reach; a deleted node a reader would sti
 
 ## The per-domain map
 
-Same grammar as the big map, scoped down: this domain's pieces, the neighbours that call in and the ones it calls out, unchanged ones included, at most ten nodes. It answers where the domain sits; the shape below answers what runs differently. Reuse the node names from the big map so the reader keeps one vocabulary.
+Same grammar, scoped down: this domain's pieces plus the neighbours that call in and the ones it calls out, unchanged included, ten nodes at most. It answers where the domain sits, the shape answers what runs differently. Reuse the big map's node names so the reader keeps one vocabulary.
 
 ```mermaid
 flowchart LR
@@ -69,15 +69,13 @@ flowchart LR
 +└── insights/             # cards and KPI tiles
 ```
 
-**Component tree**, for a UI change - state and boundaries that matter, real path on the root: `<AiChat> (…/ai-chat.ts)` / `useChatRuntime()` / `+ <AnswerProvenance/>` / `<ChatTimeline>` / `+ <KpiTiles/>`, in a `diff` fence.
-
-**Sequence** (`sequenceDiagram`), only when ordering across boundaries is the point and no tree shows it; one flow beats three thin ones.
+**Component tree**, for a UI change - state and boundaries that matter, real path on the root: `<AiChat> (…/ai-chat.ts)` / `useChatRuntime()` / `+ <AnswerProvenance/>` / `<ChatTimeline>` / `+ <KpiTiles/>`, in a `diff` fence. **Sequence** (`sequenceDiagram`) only when ordering across boundaries is the point and no tree shows it.
 
 ## Rules
 
 - Unchanged neighbours stay in: faded on the map, a leading space in a `diff` fence.
 - A domain map shares nodes with the big map - that is the point - but two domain maps must not be the same picture retitled, and no shape repeats another's nodes.
 - No findings in a shape - no severity, no bug, no security note. This is the comprehension layer; `review` owns defects.
-- No folder tree presented as architecture, and no level added because the previous one existed: system context, then containers, then a component view only when an affected container's internals matter.
+- No folder tree as architecture, and no level added because the previous one existed: system context, then containers, a component view only when an affected container's internals matter.
 
 Distilled from humanlayer/skills `show-me` (view catalogue, diff-shaped views) and coldtea `pr-lens` (lanes, hero edge, unchanged neighbours, no findings lens, C4-inspired view choice).
