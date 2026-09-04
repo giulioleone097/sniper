@@ -70,8 +70,8 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | `plan` | work has 4+ steps or more than one owner | chat brief or `docs/plans/<date>-<slug>.md` |
 | `build` | implementing under a locked goal card | changed files + proof line |
 | `debug` | a real failure needs a proven root cause | cause in one line + evidence + fix |
-| `review` | after `simplify`, before shipping a diff | `path:line` findings, or `CLEAN` |
-| `simplify` | on the changed code before `review` (or `--repo` audit) | shorter diff, or `Lean already.` |
+| `review` | a change, branch, PR, or working tree needs reviewing | area-by-area review: one reviewer per affected area (or per lens on a single-area diff), then one integrator that merges the reports, settles contradictions against the code, catches the breakages that cross areas, verifies every finding, and runs the nearest check per area with failures attributed to the baseline; prints one line per surviving issue plus the regression lines, `--fix` applies P0-P2 and re-proves them |
+| `simplify` | a slice is built, or a whole tree needs a read-only audit | six rungs (reuse, stdlib, native, delete, yagni, shrink) applied to the changed code, split per area when the change spans several, then an integrator that proves nothing moved: checks re-run and attributed, no guard thinned, no test weakened, no exported symbol cut that something outside still consumes; `--repo` audits read-only, ranked by git hot spots |
 | `prove` | acceptance needs the smallest decisive check | exact commands + `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT` |
 | `narrate` | a PR body is needed, or a reviewer must approve without reading every file | approval dossier in the PR's language: verdict, what changes in plain words, a map of the change (lanes, unchanged neighbours, the one edge that matters), then a deep drill-down per affected domain or repository - why it was touched, what the change does, the before/after shape, every boundary crossed with the consumer that absorbs it, the decisions with their rejected alternative, executed evidence with base attribution, residual risk - plus what lies outside this verification and who covers it; no task is ever handed to the approver; commands and the engineer's reading guide fold into collapsible sections |
 | `ship` | committing, pushing, or opening a PR | commit shas, PR url |
@@ -88,6 +88,10 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 - `sniper-reviewer` — opus, never edits files. Reviews one lens (`correctness`,
   `slop`, or `safety`) against a baseline diff; reports every finding with a
   confidence score, never fixes anything itself.
+- `sniper-integrator` — opus, never edits files. Merges the per-area reports of a
+  `review` or `simplify` pass into one verified list, settles contradictions by
+  reading the code, catches what crosses areas, and runs the nearest checks with
+  every failure attributed to the baseline before it is called new.
 
 ## Hooks
 
