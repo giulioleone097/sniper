@@ -1,7 +1,7 @@
 # sniper
 
 One plugin for the whole development loop, for Claude Code and Codex. Lock the
-outcome, take the shortest safe path, prove only changed behavior, stop. Ten
+outcome, take the shortest safe path, prove only changed behavior, stop. Eleven
 skills carry scope through ship; three agents do the locating, the bounded
 implementing, and the read-only reviewing.
 
@@ -48,7 +48,7 @@ fixtures, manifest JSON, doctrine sync, version parity).
 ## The flow
 
 ```
-scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► ship ──► learn?
+scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
   ▲                   │
   └──── debug ◄───────┘ (when a real failure appears)
 ```
@@ -72,6 +72,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | `review` | after `simplify`, before shipping a diff | `path:line` findings, or `CLEAN` |
 | `simplify` | on the changed code before `review` (or `--repo` audit) | shorter diff, or `Lean already.` |
 | `prove` | acceptance needs the smallest decisive check | exact commands + `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT` |
+| `narrate` | a PR body is needed, or a diff is too large to read as one | reading guide: order, shape, decisions, risks; optional inline walkthrough |
 | `ship` | committing, pushing, or opening a PR | commit shas, PR url |
 | `learn` | a non-obvious fix needs its reasoning captured | file path, or "nothing to record" |
 | `flow` | running the whole pipeline hands-off | final report |

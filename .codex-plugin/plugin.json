@@ -1,6 +1,6 @@
 {
   "name": "sniper",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code and Codex.",
   "author": {
     "name": "Giulio Leone",
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Sniper",
     "shortDescription": "Lock the outcome, ship the shortest safe path",
-    "longDescription": "Development, optimization and review flow for Claude Code and Codex: lock the requested outcome, take the shortest safe effective path, prove only changed behavior, and stop. Ten skills cover the loop from scope to ship: scope, plan, build, debug, review, simplify, prove, ship, learn, flow.",
+    "longDescription": "Development, optimization and review flow for Claude Code and Codex: lock the requested outcome, take the shortest safe effective path, prove only changed behavior, and stop. Eleven skills cover the loop from scope to ship: scope, plan, build, debug, review, simplify, prove, narrate, ship, learn, flow.",
     "developerName": "Giulio Leone",
     "category": "Developer Tools",
     "capabilities": [

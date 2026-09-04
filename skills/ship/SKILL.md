@@ -12,7 +12,7 @@ argument-hint: "[--push] [--pr]"
 6. Never pass `--no-verify`. If a hook fails, fix the underlying issue and recommit.
 7. Never bump VERSION or CHANGELOG unless the repository already maintains them.
 8. With `--push`: push the current branch to its tracking remote (`-u origin <branch>` if it has none yet). Never force-push, never `--force`; use `--force-with-lease` only if the user explicitly asks for it in this request.
-9. With `--pr`: detect the forge from the remote URL (GitHub -> `gh pr create`, GitLab -> `glab mr create`, Azure DevOps -> `az repos pr create`) and open it with body sections `## What`, `## Why`, `## Proof` (the commands and results from step 1), `## Follow-ups`. Push first if `--push` was not also given.
+9. With `--pr`: detect the forge from the remote URL (GitHub -> `gh pr create`, GitLab -> `glab mr create`, Azure DevOps -> `az repos pr create`) and open it with the body produced by the `narrate` skill (`sniper:narrate --out`, `$narrate` on Codex): outcome, verify commands, size, reading order, decisions, risks, follow-ups. Push first if `--push` was not also given.
 10. Without `--push` or `--pr`, stop after committing — never push or open a PR on inference alone.
 
 Emit exactly this, and nothing else:

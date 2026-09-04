@@ -1,0 +1,7 @@
+interface:
+  display_name: "Narrate"
+  short_description: "Turn a diff or PR into a reading guide for human reviewers"
+  default_prompt: "Use $narrate on this PR: partition the diff, give me the reading order, the shape of the change, the decisions with rejected alternatives, and the risk map. Do not post anything until I confirm."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true

@@ -17,7 +17,8 @@ sniper/
   .codex-plugin/plugin.json         # Codex manifest ("skills": "./skills/")
   .agents/plugins/marketplace.json  # Codex marketplace
   core/SNIPER.md                    # doctrine, injected at SessionStart/SubagentStart
-  skills/<name>/SKILL.md            # 10 skills, each <= 120 lines body
+  skills/<name>/SKILL.md            # 11 skills, each <= 120 lines body
+  skills/narrate/scripts/*.py       # pr-partition.py, pr-walkthrough.py
   skills/<name>/references/*.md     # only when a branch is genuinely conditional
   skills/<name>/agents/openai.yaml  # Codex sidecar
   agents/sniper-scout.md            # sonnet, read-only locator
@@ -39,7 +40,7 @@ Skills are invoked as `/sniper:<name>` in Claude Code and `$<name>` in Codex.
 ## The flow
 
 ```
-scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► ship ──► learn?
+scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
   ▲                   │
   └──── debug ◄───────┘ (when a real failure appears)
 ```
@@ -63,6 +64,7 @@ Every SKILL.md: frontmatter `name`, `description` (third person, front-loaded tr
 | `review` | model+user | Exact `baseline..HEAD` or working-tree diff. Three lenses run as parallel `sniper-reviewer` calls: correctness, slop (ponytail format), safety/silent-failure. Reviewers report everything with confidence 0–100; the lead keeps >= 80 and P0–P2. Applies repository `## Code Review Rules`. `--fix` applies findings; `--pr` posts one comment via `gh` after confirmation. | `path:line P<n> <lens>: problem. fix.` lines, `net: -N lines possible`, or `CLEAN` | one pass done |
 | `simplify` | model+user | Behavior-preserving elision of the changed code through six rungs that are also the output tags: `reuse:` `stdlib:` `native:` `delete:` `yagni:` `shrink:` (shared with the review slop lens). `--repo [path]` = read-only audit ranked by git hot spots. Never clever. | shorter diff or `Lean already.` | no finding left or scope exhausted |
 | `prove` | model+user | Translate acceptance into the smallest decisive check set; run it; reuse still-valid results. | exact commands + `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT` | proof complete |
+| `narrate` | model+user; `ship --pr` uses it for the body | Partition the diff with `scripts/pr-partition.py` (judgment / tests / mechanical / generated / docs / config), read only the judgment bucket (scouts per directory above 25 files), then emit a reading guide: outcome, verify commands, size line, reading order (<= 25), at most two shape views, decision log with rejected alternatives, risk map with proof commands. `--post` replaces the PR body after confirmation; `--walkthrough` posts one review of inline why-comments via `scripts/pr-walkthrough.py` after confirmation. | guide (<= 120 lines) | guide written or posted |
 | `ship` | user, or from flow | Atomic behavior-named commits (Conventional Commits, subject <= 50, body only for non-obvious why), PR body (what / why / proof / follow-ups). No attribution trailers. Push and PR only on explicit ask. | commit shas, PR url | committed (and pushed if asked) |
 | `learn` | user; model after non-obvious fix | Capture one durable learning: <= 3 lines under `## Code Review Rules` in the closest AGENTS.md/CLAUDE.md, or a `docs/solutions/<slug>.md` when it needs more. Write nothing when the reasoning is already in code/tests/docs. Prints the proposed lines and writes only after the user confirms; inside `flow` it reports the proposal instead of writing. | file path or "nothing to record" | one learning or none |
 | `flow` | user | Run the pipeline hands-off; auto-choose the recommended option at every decision; stop before push. | final report | pipeline done or blocked |
