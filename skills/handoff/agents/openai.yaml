@@ -1,0 +1,7 @@
+interface:
+  display_name: "Handoff"
+  short_description: "Write the document a fresh session needs to continue this work"
+  default_prompt: "Use $handoff: where the work stands, what is proven and by which command, what is open, the exact next action and the skill to call. Point at artifacts instead of restating them, and redact every secret."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true

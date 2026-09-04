@@ -48,7 +48,8 @@ fixtures, manifest JSON, doctrine sync, version parity).
 ## The flow
 
 ```
-scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
+grill? ──► scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
+                                                                        handoff (any time the session ends early)
   ▲                   │
   └──── debug ◄───────┘ (when a real failure appears)
 ```
@@ -66,6 +67,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | skill | when | output |
 |---|---|---|
 | `setup` | first time in a repository, or after a core update | local `AGENTS.md` + `CLAUDE.md` carrying the doctrine block; the hook then injects nothing there |
+| `grill` | the outcome is genuinely undecided, or a design has open branches | a decision tree worked in rounds: every question you can ask now, each with the recommended answer, facts looked up by a scout instead of asked; ends with the settled tree, the branches left open on purpose, and the request handed to `scope`. Needs a human, so `flow` never calls it |
 | `scope` | before touching code, to lock the outcome | goal card (<= 10 lines) |
 | `plan` | work has 4+ steps or more than one owner | chat brief or `docs/plans/<date>-<slug>.md` |
 | `build` | implementing under a locked goal card | changed files + proof line |
@@ -76,6 +78,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | `narrate` | a PR body is needed, or a reviewer must approve without reading every file | approval dossier in the PR's language: verdict, what changes in plain words, a map of the change (lanes, unchanged neighbours, the one edge that matters), then a deep drill-down per affected domain or repository - why it was touched, what the change does, the before/after shape, every boundary crossed with the consumer that absorbs it, the decisions with their rejected alternative, executed evidence with base attribution, residual risk - plus what lies outside this verification and who covers it; no task is ever handed to the approver; commands and the engineer's reading guide fold into collapsible sections |
 | `ship` | committing, pushing, or opening a PR | commit shas, PR url |
 | `learn` | a non-obvious fix needs its reasoning captured | file path, or "nothing to record" |
+| `handoff` | the context is running out, or the work moves to another session, machine, or person | the document a fresh session needs: goal card as it stands, branch and tree state, what is proven and by which command, what is open with the next action first, artifacts pointed at rather than restated, every secret redacted |
 | `flow` | running the whole pipeline hands-off | final report |
 
 ## Agents

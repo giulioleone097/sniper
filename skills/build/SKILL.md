@@ -13,6 +13,7 @@ argument-hint: "[what to build, a plan task, or the goal card from scope]"
 4. Cut the work into slices, each with an outcome, owned paths, and an acceptance check. Walk the core ladder before writing anything new: the reuse rung usually collapses a slice into a few lines.
 
 5. Name the seams you will test before writing any test. A seam is the public boundary where the behavior is observable; confirm the list when the goal card did not already fix it. When to add a test at all is per core. Then work one seam, one test, one implementation, next slice.
+   Run each new test before the code that satisfies it and watch it fail: a test that passes on its first run proves nothing yet, and the failure message is the last chance to notice it is testing the wrong thing.
    Reject three shapes: a test that mocks internal collaborators or asserts private state; an assertion that recomputes the expected value the way the code does; all tests written up front before any implementation (horizontal slicing). Expected values come from a known-good literal, a worked example, or the spec.
 
 6. Implement inline. This is the normal path: most work is a handful of edits and belongs in this session.

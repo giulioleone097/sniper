@@ -126,7 +126,7 @@ Each skill owner also writes that skill's `agents/openai.yaml`. Lead owns `core/
 ## Acceptance
 
 - `sh scripts/check.sh` passes (four `claude plugin validate --strict` targets, guard fixtures, manifest JSON, doctrine sync, version parity).
-- `claude plugin details sniper` lists 10 skills, 3 agents, 3 hook events, and the projected token cost stays under ~2.5k tokens at session start (core + skill descriptions).
+- `claude plugin details sniper` lists 14 skills, 4 agents, 3 hook events, and the projected token cost stays under ~2.5k tokens at session start (core + skill descriptions).
 - `scripts/guard.sh` denies the listed commands and allows `git push --force-with-lease`, `rm -rf node_modules` (checked with fixture JSON on stdin).
 - Every SKILL.md body <= 120 lines; no skill references a file that does not exist.
 - Installed from the local marketplace and `/sniper:scope` resolves in a fresh session.

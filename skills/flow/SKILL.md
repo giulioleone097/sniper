@@ -5,7 +5,7 @@ argument-hint: "[task description] [--push] [--pr]"
 disable-model-invocation: true
 ---
 
-You run autonomously: nobody can answer while the pipeline is moving. Take the recommended option at every decision and record which one you took. Proceed on reversible actions; stop only for a destructive action or a genuine scope change.
+You run autonomously: nobody can answer while the pipeline is moving. `grill` needs a human in the loop, so it never runs here; a request too fuzzy for `scope` to card stops the run instead. When the run is cut short by anything other than a finished pipeline, call `handoff` before stopping so the next session starts where this one died. Take the recommended option at every decision and record which one you took. Proceed on reversible actions; stop only for a destructive action or a genuine scope change.
 
 Invoke each stage as a skill by name: `sniper:<name>` through the Skill tool in Claude Code, `$<name>` in Codex.
 
