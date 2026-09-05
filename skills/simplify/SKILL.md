@@ -1,6 +1,6 @@
 ---
 name: simplify
-description: Makes the changed code smaller without changing behavior - reuse what already exists, use the stdlib or platform, delete dead flexibility, shrink - area by area when the change spans several, then one integrator that proves no behavior moved. Use when a slice is built and before review, or with --repo to audit a whole tree read-only, ranked by git hot spots. Not for fixing bugs or adding behavior; build and debug own that.
+description: Use when a slice is built and before review, or with --repo to audit a tree read-only. Makes changed code smaller without changing behavior: reuse, stdlib, native, delete, yagni, shrink; per area when the change spans several, then an integrator proves nothing moved. Not for bugs or new behavior.
 argument-hint: "[baseline | files] [--repo [path]]"
 ---
 

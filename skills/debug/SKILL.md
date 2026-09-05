@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Diagnoses a real failure by building a tight pass/fail signal first, then ranking hypotheses, inspecting the nearest boundary, and instrumenting after two uninformative attempts; reports the cause with file:line evidence. Use when something fails, throws, hangs, or runs slow and the cause is not known. Not for implementing a change whose cause is already understood, which goes to build.
+description: Use when a failure or unexplained behavior has no known cause. Builds a tight pass/fail signal, instruments the nearest boundary instead of guessing, fixes the canonical cause, and proves it with the same signal. Not for known changes, which build owns.
 argument-hint: "[failure, error text, failing test path, or the command that reproduces it]"
 ---
 

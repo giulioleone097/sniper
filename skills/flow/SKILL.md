@@ -1,11 +1,11 @@
 ---
 name: flow
-description: Runs the whole pipeline hands-off (scope, plan when needed, build, simplify, review, prove, ship, learn), taking the recommended option at every decision and stopping before push unless the argument says otherwise. Use when the user asks for a task to be carried end to end with no check-ins. Not for exploratory work, and not when a decision genuinely needs the user mid-run.
+description: Use when the user wants a task carried end to end with no check-ins. Runs intake when the argument is an item, then scope, plan when complex, build, simplify, review, prove, ship, learn, taking the recommended option at every decision and stopping before push unless asked. Not for exploratory work.
 argument-hint: "[task description] [--push] [--pr]"
 disable-model-invocation: true
 ---
 
-You run autonomously: nobody can answer while the pipeline is moving. `grill` needs a human in the loop, so it never runs here; a request too fuzzy for `scope` to card stops the run instead. When the run is cut short by anything other than a finished pipeline, call `handoff` before stopping so the next session starts where this one died. Take the recommended option at every decision and record which one you took. Proceed on reversible actions; stop only for a destructive action or a genuine scope change.
+You run autonomously: nobody can answer while the pipeline is moving. `grill` needs a human in the loop, so it never runs here; a request too fuzzy for `scope` to card stops the run instead. When the run is cut short by anything other than a finished pipeline, call `handoff` before stopping so the next session starts where this one died. Before ending, read your last paragraph: if it is a plan, a question, a list of next steps, or a promise about work not yet done, do that work now; end only when the pipeline is complete or blocked on input only the user can give. Take the recommended option at every decision and record which one you took. Proceed on reversible actions; stop only for a destructive action or a genuine scope change.
 
 Invoke each stage as a skill by name: `sniper:<name>` through the Skill tool in Claude Code, `$<name>` in Codex.
 

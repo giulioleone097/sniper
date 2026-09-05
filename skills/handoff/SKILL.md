@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Writes the document a fresh session needs to continue this work - the goal card as it stands, what is proven and by which command, what is open, and the exact next action - pointing at artifacts instead of restating them. Use when the context is about to run out, when the work moves to another session, machine, or person, or when the user asks for a handoff. Not for reporting to an approver, which is narrate's job.
+description: Use when context is running out or the work moves to another session, machine or person. Writes what a fresh session needs: goal card, branch and tree state, proven versus believed with the command, open work with the next action first, artifacts pointed at, secrets redacted. Not for approvers.
 argument-hint: "[what the next session will focus on] [--out file]"
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: review
-description: Reviews the exact diff area by area - one reviewer per affected area or lens, then one integrator that merges the reports, resolves contradictions, catches what crosses areas, verifies every finding against the code, and proves the nearest checks still pass. Prints one line per surviving issue. Use when the user asks to review a change, branch, PR, or working tree, or right after a build slice lands. Not for auditing code the diff did not touch; simplify --repo does that.
+description: Use when a change, branch, PR or working tree needs review, or right after a build slice. One reviewer per area or lens, then an integrator that merges, settles contradictions, catches cross-area and cross-repo breakage, verifies each finding and runs the nearest checks. Not for code the diff did not touch.
 argument-hint: "[baseline] [--fix] [--pr]"
 ---
 

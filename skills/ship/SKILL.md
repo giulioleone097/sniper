@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Commits the current change as atomic, Conventional-Commits-formatted commits once prove has produced DONE or DONE_WITH_CONCERNS (invoking prove first when that status is missing), then pushes and opens a PR only when explicitly asked via --push or --pr. Use when the user says ship it, commit this, or open a PR. Runs only on an explicit ask to commit or ship, or from flow. Not for committing without proof, force-pushing, skipping hooks, or bumping VERSION/CHANGELOG unless the repository already maintains them.
+description: Use when the user says ship it, commit this, or open a PR, or from flow. Commits proven work as atomic Conventional Commits, links the tracker item, and pushes or opens a PR only with --push or --pr, body from narrate, no attribution trailer. Not for force-pushing, skipping hooks or unproven work.
 argument-hint: "[--push] [--pr]"
 ---
 

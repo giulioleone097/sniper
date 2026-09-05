@@ -27,6 +27,13 @@ done
 if grep -rn 'CLAUDE_SKILL_DIR\|\${CLAUDE_PLUGIN_ROOT}' "$ROOT"/skills/*/SKILL.md "$ROOT"/skills/*/references "$ROOT"/agents >/dev/null 2>&1; then
   echo "rules: host env var inside a skill or agent body"; grep -rln 'CLAUDE_SKILL_DIR\|\${CLAUDE_PLUGIN_ROOT}' "$ROOT"/skills/*/SKILL.md "$ROOT"/skills/*/references "$ROOT"/agents; fail=1
 fi
+# Codex shortens skill descriptions to ~45 characters when many plugins are installed, so the
+# trigger must sit in the first clause; both hosts route on the description, so keep it short.
+for f in "$ROOT"/skills/*/SKILL.md; do
+  d=$(grep -m1 '^description:' "$f" | sed 's/^description: //')
+  case "$d" in "Use when "*) ;; *) echo "rules: $f description must open with the trigger (Use when ...)"; fail=1;; esac
+  w=$(printf '%s' "$d" | wc -w | tr -d ' '); [ "$w" -le 70 ] || { echo "rules: $f description has $w words (> 70)"; fail=1; }
+done
 for s in "$ROOT"/scripts/*.sh; do sh -n "$s" || { echo "rules: $s does not parse"; fail=1; }; done
 sh "$ROOT/scripts/tracker.sh" "$ROOT" | grep -q '^forge=' || { echo "rules: tracker.sh gave no forge"; fail=1; }
 sh "$ROOT/scripts/checks.sh" "$ROOT" | grep -qE '^(project=|none=1)' || { echo "rules: checks.sh gave no answer"; fail=1; }

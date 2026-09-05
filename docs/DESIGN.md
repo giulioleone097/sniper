@@ -135,3 +135,11 @@ Each skill owner also writes that skill's `agents/openai.yaml`. Lead owns `core/
 ## Executable primitives (0.13)
 
 Where a skill used to say "run the nearest check" or "read the tracker", a script now answers from the repository: `scripts/checks.sh`, `scripts/tracker.sh`, `scripts/tokens.sh`, `scripts/consumers.sh`, `scripts/pr-partition.py`. The skill still decides; the script removes the guess. Paths inside skills are host-neutral (`<this skill>`, `<plugin root>`) because Codex expands no variable in a skill body.
+
+## Prompting basis (0.15)
+
+The doctrine and the skills are written against the current guidance of both hosts' vendors, and re-audited against it when either publishes a new model guide.
+
+- Anthropic, Claude Fable 5.1 (behavioral shifts and long-running agent recommendations): skills state goals, constraints and proof rather than step choreography where order does not matter; sub-agents are used for parallel, independent work and their output is treated as claims; progress and completion are grounded in tool results; the deliverable for a question is an assessment, not a fix; state-changing commands are checked against the evidence first; the final report is written for a reader who did not watch, outcome first; no anti-formatting rules, no numeric word caps.
+- OpenAI, GPT-6 Astra model guide and Codex prompting guide: user instructions take precedence over a skill, and a skill that makes the model pause or stop short must name itself; bias to action, with every stated intention closed as done, blocked or dropped before the turn ends; tests calibrated to the change; delegation stated explicitly; descriptions front-load the trigger because Codex shortens them to about 45 characters when many plugins are installed.
+- Both: no pressure language (no MUST, NEVER, CRITICAL in caps), prohibitions only where the failure is real and the reason is stated, exact commands only for fragile bridges (git, tracker CLIs, scripts), judgment left to the model.

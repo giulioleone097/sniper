@@ -1,6 +1,6 @@
 ---
 name: prove
-description: Translates the acceptance check from a goal card or request into the smallest decisive proof set, runs it, and reports one of DONE, DONE_WITH_CONCERNS, BLOCKED, or NEEDS_CONTEXT. Use before claiming work complete, before committing or shipping, or when acceptance needs independent verification. Reuses still-valid results instead of rerunning. Not for editing product code beyond an explicitly requested fix, and not for adding tests.
+description: Use when work is about to be called complete or shipped, or acceptance needs independent proof. Turns the acceptance check into the smallest decisive set from the repository's own commands, runs it, reuses still-valid results, and reports DONE, DONE_WITH_CONCERNS, BLOCKED or NEEDS_CONTEXT. Not for editing code or adding tests.
 ---
 
 1. Take the acceptance check from the goal card if one exists; otherwise read the request and state the check that would fail if the change were wrong.

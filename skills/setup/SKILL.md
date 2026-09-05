@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Installs the sniper doctrine into the current project as local AGENTS.md and CLAUDE.md, so teammates and agents without the plugin follow the same rules and the project file takes precedence over global ones. Idempotent - re-run to refresh the doctrine block; existing content is never overwritten. Use when starting sniper in a repository or after a core update. Not for per-user settings or hooks.
+description: Use when a project needs sniper's local rules. Writes the doctrine block into the project's AGENTS.md and makes CLAUDE.md import it, idempotently; own content is preserved and the session hook then injects nothing there. Not for editing the doctrine itself.
 argument-hint: "[project-dir]"
 disable-model-invocation: true
 ---

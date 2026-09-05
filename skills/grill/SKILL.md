@@ -1,6 +1,6 @@
 ---
 name: grill
-description: Interrogates a fuzzy request until the design is settled - a decision tree worked in rounds, every open question asked with your recommended answer, facts looked up rather than asked - and ends by handing scope a request that no longer has holes. Use before scope when the outcome is genuinely undecided, when a design has open branches, or when the user asks to have their thinking stress-tested. Not for a request whose shape is already clear: scope's three questions cover that. Never writes code.
+description: Use when the outcome is genuinely undecided or a design has open branches. Works the decision tree in rounds, asks the whole frontier at once with a recommended answer each, looks facts up itself, and hands scope a request with no holes. Not for a request whose shape is already clear.
 argument-hint: "[the idea, plan, or design to grill]"
 ---
 

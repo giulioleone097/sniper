@@ -1,6 +1,6 @@
 ---
 name: build
-description: Implements the locked outcome in the codebase, detecting the mode (feature, fix, refactor, migrate), editing surgically, testing only at agreed seams, proving the change, and handing the lean diff to simplify. Use when a goal card, plan task, or clear build request exists and code has to change. Not for an unexplained failure whose cause is still unknown, which goes to debug first.
+description: Use when a goal card, plan task or clear build request exists and code must change. Detects the mode (feature, fix, refactor, migrate), edits surgically, tests only at agreed seams, proves the change, hands the diff to simplify. Not for an unexplained failure, which debug owns.
 argument-hint: "[what to build, a plan task, or the goal card from scope]"
 ---
 

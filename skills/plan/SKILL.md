@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Breaks a locked goal into ordered tasks carrying owned paths, acceptance, proof, and test seams; delivers a chat brief under four tasks and writes docs/plans/<yyyy-mm-dd>-<slug>.md otherwise. Use when the work spans four or more tasks, more than one owner, or a change others depend on such as a schema, interface, or migration. Not for implementing: it writes the plan and stops.
+description: Use when work spans four or more tasks, several owners, or a change others depend on. Breaks a goal card into ordered tasks with owned paths, acceptance, proof and test seams; brief in chat under four tasks, docs/plans file otherwise; --tickets publishes them. Not for implementing.
 argument-hint: "[task text or goal card] [--tickets]"
 ---
 

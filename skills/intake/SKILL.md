@@ -1,6 +1,6 @@
 ---
 name: intake
-description: Turns whatever the work arrived as - an issue, a pull request, a work item, a bug report, a chat transcript, a paragraph from a colleague - into a verified goal card, reading the item from whichever tracker the repository actually has, checking the claim against the code before anyone plans around it, and saying plainly when it is already implemented, already rejected, or too thin to act on. Use at the start of work that came from outside this session. Not for work already carded, and not for reporting back to a reviewer, which narrate owns.
+description: Use when work arrives from outside: an issue, PR, work item, bug report or pasted text. Reads it from whatever tracker the repo has, reproduces the claim, checks whether it already exists or was rejected, and hands a goal card to scope. Not for work already carded or for reporting back, which narrate owns.
 argument-hint: "[issue number | url | file | pasted text] [--reply]"
 ---
 

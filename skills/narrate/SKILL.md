@@ -1,12 +1,12 @@
 ---
 name: narrate
-description: Turns a diff or pull request into an approval dossier for the person who approves - verdict, what changes in plain words, a map of the change, then a deep drill-down per affected domain or repository that says why it was touched, what the change does, the before/after shape, the boundaries it crosses with the consumer that absorbs each one, the decisions with their rejected alternative, and the executed evidence - followed by what is outside this verification and who covers it. Never hands the approver a checklist. Use when a PR body is needed, when a reviewer must approve without reading every file, or when a change reaches domains it does not touch. Not for finding bugs (review) or shrinking code (simplify).
+description: Use when a PR needs a body or a reviewer must approve without reading every file. Writes the approval dossier: verdict, plain-words changes, a map, then per domain the before/after shape, boundaries crossed with their consumers, decisions with rejected alternatives, executed evidence. Not for finding bugs.
 argument-hint: "[pr-number | pr-url | branch] [--out file] [--post] [--walkthrough] [--no-run] [--lang it|en]"
 ---
 
 1. Resolve the range. A PR number or URL: `gh pr view <pr> --json number,url,headRefName,baseRefName,headRefOid,mergeable`, then `git fetch origin +refs/heads/<base>:refs/remotes/origin/<base> +refs/pull/<n>/head:refs/remotes/origin/pr/<n>`; range `merge-base(origin/<base>, origin/pr/<n>)..origin/pr/<n>`. A branch or nothing: current branch against the merge-base with the default branch. Record `OWNER/REPO`, `<n>`, `BASE`, `HEAD`, `mergeable`.
 
-2. Audience and language first. The reader approves and may not know this code: sentences under 20 words, acronyms expanded once, no path or command in the prose - paths belong in the shapes, the boundary lines and the collapsible blocks. Language: `--lang`, else the language of the repository's recent PR descriptions and commits.
+2. Audience and language first. The reader approves and may not know this code: one idea per sentence, in words they would use, acronyms expanded once, no path or command in the prose - paths belong in the shapes, the boundary lines and the collapsible blocks. Language: `--lang`, else the language of the repository's recent PR descriptions and commits.
 
 3. Partition: `python3 <plugin root>/scripts/pr-partition.py -C <repo> BASE HEAD`. Paths: `<plugin root>` is the parent of the `skills/` directory this file lives in; `scripts/` beside this file holds `pr-contracts.py`, `pr-walkthrough.py` and `test-summary.py`. The judgment list is the only code you read; group it into domains the reader already has a name for: one per deployable unit, shared library, contract surface, or infrastructure layer, plus one per repository or project the diff reaches without touching. Domains are the reader's mental model, never the folder tree.
 

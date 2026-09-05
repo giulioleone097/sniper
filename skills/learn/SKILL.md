@@ -1,6 +1,6 @@
 ---
 name: learn
-description: Records a durable learning from a fix whose reasoning is absent from the code, tests, and docs, as at most three lines under "## Code Review Rules" in the closest AGENTS.md or CLAUDE.md, or a short docs/solutions file when it needs more. Use when a non-obvious invariant, trap, or decision surfaced during a fix and would otherwise be lost. Not for routine changes; it writes nothing when the artifacts already explain themselves.
+description: Use when a proven fix uncovered an invariant, trap or decision the code, tests and docs will not explain, or the user asks for a session retrospective. Writes at most three lines under Code Review Rules in the closest AGENTS.md or CLAUDE.md, or a short docs/solutions file; nothing when artifacts already explain themselves.
 ---
 
 1. Name the candidate in one sentence: the invariant, trap, or decision this work uncovered. Only a fix that is already proven qualifies. When the user asked for a retrospective on the session rather than a rule about the code, the subject is the environment the next agent inherits: read `references/environment.md` and work its categories instead of steps 2 and 3, then rejoin at step 8.
