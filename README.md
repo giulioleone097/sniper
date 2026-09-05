@@ -48,7 +48,7 @@ fixtures, manifest JSON, doctrine sync, version parity).
 ## The flow
 
 ```
-intake? ──► grill? ──► scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
+map? ──► intake? ──► grill? ──► scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
                                                                         handoff (any time the session ends early)
   ▲                   │
   └──── debug ◄───────┘ (when a real failure appears)
@@ -67,6 +67,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | skill | when | output |
 |---|---|---|
 | `setup` | first time in a repository, or after a core update | local `AGENTS.md` + `CLAUDE.md` carrying the doctrine block; the hook then injects nothing there |
+| `map` | a repository is new to the session, setup runs, or the map's stamp is behind the work | drills into the repository and the ones that depend on it: layout, entry points, checks, hot spots, owners, who reviews and what they ask for in the last merged PRs; writes `docs/sniper/map.md` and `conventions.md` with a stamp and refreshes only what moved since; uses a code-graph or symbol server when the host exposes one, git and the scripts otherwise |
 | `intake` | the work arrived from outside: an issue, a pull request, a work item, a bug report, a pasted paragraph | reads the item from whichever tracker the repository has (gh, glab, az, or files under `docs/tickets/`), reproduces the claim against the code, checks whether it is already implemented or already decided against, then emits the goal card through `scope`; `--reply` posts what it found back after your confirmation, and it never changes the item's state on its own |
 | `grill` | the outcome is genuinely undecided, or a design has open branches | a decision tree worked in rounds: every question you can ask now, each with the recommended answer, facts looked up by a scout instead of asked; ends with the settled tree, the branches left open on purpose, and the request handed to `scope`. Rounds go through the host's question tool (`AskUserQuestion`, `request_user_input`) with the recommendation first. Needs a human, so `flow` never calls it |
 | `scope` | before touching code, to lock the outcome | goal card (<= 10 lines) |
@@ -78,7 +79,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | `prove` | acceptance needs the smallest decisive check | exact commands + `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT` |
 | `narrate` | a PR body is needed, or a reviewer must approve without reading every file | approval dossier in the PR's language: verdict, what changes in plain words, a map of the change (lanes, unchanged neighbours, the one edge that matters), then a deep drill-down per affected domain or repository - why it was touched, what the change does, the before/after shape, every boundary crossed with the consumer that absorbs it, the decisions with their rejected alternative, executed evidence with base attribution, residual risk - plus what lies outside this verification and who covers it; no task is ever handed to the approver; commands and the engineer's reading guide fold into collapsible sections |
 | `ship` | committing, pushing, or opening a PR | commit shas, PR url |
-| `learn` | a non-obvious fix needs its reasoning captured | file path, or "nothing to record" |
+| `learn` | a non-obvious fix needs its reasoning captured | file path, or "nothing to record"; `--from-pr <n>` turns what reviewers asked for on a pull request into candidate rules, each through the same counterfactual |
 | `handoff` | the context is running out, or the work moves to another session, machine, or person | the document a fresh session needs: goal card as it stands, branch and tree state, what is proven and by which command, what is open with the next action first, artifacts pointed at rather than restated, every secret redacted |
 | `flow` | running the whole pipeline hands-off | final report |
 
@@ -107,6 +108,7 @@ Four detectors make the skills run the repository's own commands instead of gues
 | `scripts/tracker.sh [repo]` | the forge, the CLI and whether it is logged in, from the origin remote alone (GitHub/gh, GitLab/glab, Azure DevOps/az, else files under `docs/tickets/`) | `intake`, `plan --tickets`, `ship` |
 | `scripts/tokens.sh <ui path>` | the design tokens the repository already defines, with counts: custom properties, colours, fonts, sizes, theme keys | `build` on UI work, the reviewer's `taste:` tag |
 | `scripts/consumers.sh [repo]` | what depends on this repository outside its tree: the names it publishes (package, module, crate, assembly, remote) and every sibling checkout or workspace member whose manifest names one of them | `review`, `simplify`, `narrate`, the integrator's cross-repo sweep |
+| `scripts/repo-facts.sh [repo] [months] [prs]` | the facts a map starts from, read-only: layout, languages, hot spots, authors, commit conventions, checks, instruction files, and through `gh` the merged-PR cadence, reviewers and inline commenters (bots kept apart) | `map` |
 | `scripts/pr-partition.py BASE HEAD` | the diff split into judgment, tests, mechanical, generated, docs and config, so only judgment code is read | `narrate`, `review`, `simplify` |
 
 `scripts/check.sh` is the plugin's own acceptance: four strict validations, the guard fixtures, manifest parity, doctrine sync, and the repository rules executed (skill bodies under 120 lines, references under 80, no host env var inside a skill, every script parses, both detectors answer on this repo).

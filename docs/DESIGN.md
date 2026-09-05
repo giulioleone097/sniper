@@ -126,7 +126,7 @@ Each skill owner also writes that skill's `agents/openai.yaml`. Lead owns `core/
 ## Acceptance
 
 - `sh scripts/check.sh` passes (four `claude plugin validate --strict` targets, guard fixtures, manifest JSON, doctrine sync, version parity).
-- `claude plugin details sniper` lists 15 skills, 4 agents, 3 hook events, and the projected token cost stays under ~2.5k tokens at session start (core + skill descriptions).
+- `claude plugin details sniper` lists 16 skills, 4 agents, 3 hook events, and the projected token cost stays under ~2.5k tokens at session start (core + skill descriptions).
 - `scripts/guard.sh` denies the listed commands and allows `git push --force-with-lease`, `rm -rf node_modules` (checked with fixture JSON on stdin).
 - Every SKILL.md body <= 120 lines; no skill references a file that does not exist.
 - Installed from the local marketplace and `/sniper:scope` resolves in a fresh session.
@@ -147,3 +147,7 @@ The doctrine and the skills are written against the current guidance of both hos
 ## Asking (0.16)
 
 When a skill must ask the user, it asks through the host's question tool: `AskUserQuestion` on Claude Code (up to four questions, two to four options), `request_user_input` on Codex (up to three questions, two to three options, only in the collaboration modes its description names, never in `codex exec`). One contract in `skills/scope/references/asking.md`: header of twelve characters, one-sentence question with the why, recommended option first and labelled. Numbered text is the fallback where no tool exists.
+
+## The map (0.17)
+
+No session should start a repository from zero. `map` drills into the repository and the ones that depend on it and writes `docs/sniper/map.md` (domains, entry points, checks, boundaries, linked repositories, hot spots, people) and `conventions.md` (what the reviewers actually ask for, quoted with PR numbers) with a stamp; every later skill reads the map before discovering, and refreshes only what moved since the stamp. AGENTS.md holds one navigation line to it, never the map itself. What a session learns beyond the map goes back through `learn` - including reviewer comments on a PR (`learn --from-pr`) - so knowledge accrues instead of being rediscovered.

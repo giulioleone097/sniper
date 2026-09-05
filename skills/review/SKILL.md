@@ -11,7 +11,7 @@ argument-hint: "[baseline] [--fix] [--pr]"
 
    Confirm the diff is non-empty before spending an agent on it. Empty diff: say so and stop.
 
-2. Load the `## Code Review Rules` section from the closest AGENTS.md or CLAUDE.md covering the changed paths, nested file over root. No section means no custom rules; ordinary defect finding still applies.
+2. Load the `## Code Review Rules` section from the closest AGENTS.md or CLAUDE.md covering the changed paths, nested file over root, and `docs/sniper/conventions.md` when the repository has one: what its reviewers ask for is a rule here, cited with the theme. No section and no map means no custom rules; ordinary defect finding still applies.
 
 3. Split into areas. `python3 <plugin root>/scripts/pr-partition.py BASE HEAD` (`<plugin root>` is the parent of the `skills/` directory this file lives in) gives the judgment bucket; group it the way the reader already names the system - one area per deployable unit, shared library, contract surface, or infrastructure layer. Generated, mechanical and docs files are not reviewed; tests are read inside the area they cover.
 

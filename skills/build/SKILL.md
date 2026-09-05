@@ -8,7 +8,7 @@ argument-hint: "[what to build, a plan task, or the goal card from scope]"
 
 2. Detect the mode from the request: `feature` (behavior that does not exist yet), `fix` (behavior that is wrong), `refactor` (structure changes, behavior identical), `migrate` (schema, data, API, protocol, config, or dependency transition). `feature` is the default and runs on these steps alone. Read `references/<mode>.md` when the mode is `fix`, `refactor`, or `migrate`. Read `references/ui-taste.md` before writing any UI code when the change touches components, styles, or templates.
 
-3. Locate the code. Skip this step when the files are already named or already read. Otherwise dispatch one `sniper-scout` with the entry point or the symptom, and read only the `path:line` candidates it returns. On Codex spawn the custom agent `sniper_scout` (installed by `scripts/install-codex-agents.sh`); without it, locate inline with grep.
+3. Locate the code. `docs/sniper/map.md` names the entry points and checks per domain when the repository has one; skip this step when the files are already named or already read. Otherwise dispatch one `sniper-scout` with the entry point or the symptom, and read only the `path:line` candidates it returns. On Codex spawn the custom agent `sniper_scout` (installed by `scripts/install-codex-agents.sh`); without it, locate inline with grep.
 
 4. Cut the work into slices, each with an outcome, owned paths, and an acceptance check. Walk the core ladder before writing anything new: the reuse rung usually collapses a slice into a few lines.
 

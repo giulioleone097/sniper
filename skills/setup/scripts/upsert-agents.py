@@ -55,13 +55,34 @@ def upsert_claude(path: Path) -> str:
     return "import appended"
 
 
+POINTER = "Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with the sniper `map` skill)."
+
+
+def upsert_pointer(path: Path) -> str:
+    """One navigation line after the doctrine block, so AGENTS.md points at the map instead of holding it."""
+    text = path.read_text()
+    if "docs/sniper/map.md" in text:
+        return "unchanged"
+    end = "<!-- sniper:core:end -->"
+    i = text.find(end)
+    if i < 0:
+        return "no block"
+    i += len(end)
+    path.write_text(text[:i] + "\n\n" + POINTER + text[i:])
+    return "pointer added"
+
+
 def main():
-    if len(sys.argv) != 3:
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    flags = {a for a in sys.argv[1:] if a.startswith("--")}
+    if len(args) != 2:
         sys.exit(__doc__)
-    project, core_file = Path(sys.argv[1]).resolve(), Path(sys.argv[2])
+    project, core_file = Path(args[0]).resolve(), Path(args[1])
     core = core_file.read_text()
     print(f"AGENTS.md: {upsert_agents(project / 'AGENTS.md', core, project.name)}")
     print(f"CLAUDE.md: {upsert_claude(project / 'CLAUDE.md')}")
+    if "--map" in flags:
+        print(f"map pointer: {upsert_pointer(project / 'AGENTS.md')}")
     print(f"fill marker present: {FILL in (project / 'AGENTS.md').read_text()}")
 
 

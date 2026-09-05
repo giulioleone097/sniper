@@ -5,7 +5,7 @@ argument-hint: "[task description]"
 ---
 
 1. Take the argument as the task. When it is empty, emit `blocked: task missing` and stop. That line is the only output allowed in place of the card.
-2. Find the facts yourself: read the files, symbols, or commands the request names; when it names none, run one bounded search for the flow it describes. Never ask the user for something the repository can answer.
+2. Find the facts yourself: `docs/sniper/map.md` first when it exists, then the files, symbols, or commands the request names; when it names none, run one bounded search for the flow it describes. Never ask the user for something the repository can answer.
 3. Draft the card from what you found. Resolve ambiguity per core, and put the chosen reading in the card as `Assuming <reading>.` inside Outcome.
 4. Test every remaining unknown against one bar: would a different answer change which files change, what acceptance means, or whether the work is safe? Decide everything below that bar yourself and say nothing about it.
 5. More than three survive, or a survivor is a design decision rather than a missing fact: the request is not ready for a card. Say so in one line and invoke `grill`, which settles the tree in rounds and hands the request back. Otherwise ask the survivors, at most three, through the host's question tool (`AskUserQuestion` on Claude Code, `request_user_input` on Codex where its mode allows it) with the recommended default first: contract in `references/asking.md` beside this file. One call carries all three; recompute after the answers, since one often settles the next. Recompute after each answer, since one answer often settles the next question. When nothing survives step 4, emit the card with no questions at all.

@@ -20,7 +20,7 @@ argument-hint: "[issue number | url | file | pasted text] [--reply]"
 3. Reproduce before believing. A bug gets the reporter's steps run against the code as it stands: the failing command, the request, the input. Report what happened - reproduced, did not reproduce, or could not tell and why. An unreproduced bug is not a fixed bug and not a wrong reporter; it is a missing detail, and step 6 asks for it.
 
 4. Check the two things that make the work vanish before doing any of it:
-   - **Already implemented.** Search by the domain concept the item describes, not by its wording; the feature may exist under another name. Found: say where it lives and stop.
+   - **Already implemented.** Search by the domain concept the item describes, not by its wording, starting from `docs/sniper/map.md` when it exists; the feature may exist under another name. Found: say where it lives and stop.
    - **Already decided against.** Read the repository's own record of rejected work when it keeps one (a decisions or out-of-scope directory, closed items the CLI can list). Found: say which decision, and let the user reopen it deliberately rather than by accident.
 
 5. Emit the card. Everything the item says becomes one of: outcome, acceptance, out of scope, risk. Where the item is precise, quote it; where it is vague, resolve it per core and mark the reading as an assumption. Then invoke `scope` with what you have so the card comes out in its shape - `scope` decides the size and what comes next.

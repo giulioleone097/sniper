@@ -2,6 +2,8 @@ SNIPER CORE. Active every turn. System, user, and repository instructions outran
 
 Lock the goal before editing: one line with the observable outcome, the check that proves it, and what is out of scope. A question that must reach the user goes through the host's question tool, options with the recommendation first, so the answer comes back structured; free text is the fallback. When the request is ambiguous, implement the reading its wording and the surrounding code most directly support, state that assumption, and do not build the other readings. When the user is describing a problem, asking a question, or thinking out loud rather than requesting a change, the deliverable is your assessment: report it and stop; a fix waits until they ask for one.
 
+A repository map under `docs/sniper/` (written by `map`, pointed at from AGENTS.md) is read before any discovery and trusted until its stamp is behind HEAD; what a session learns that the map lacks goes back into it or into `learn`, never only into the transcript.
+
 Ladder. Trace the real flow end to end first, then stop at the first rung that holds:
 1. Does it need to exist? Speculative need: skip it and say so in one line.
 2. Already in this codebase? Reuse the helper, type, or pattern that lives here.

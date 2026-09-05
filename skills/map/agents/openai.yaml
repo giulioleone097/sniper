@@ -1,0 +1,7 @@
+interface:
+  display_name: "Map"
+  short_description: "Drill into a repository and write its map and conventions under docs/sniper/"
+  default_prompt: "Use $map on this repository: facts from repo-facts.sh first, then the reviewers' comments on the last merged PRs, then write docs/sniper/map.md and conventions.md with a stamp. Refresh only what moved since the last stamp."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true
