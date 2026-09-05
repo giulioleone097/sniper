@@ -16,6 +16,7 @@ root=$(cd "${1:-.}" 2>/dev/null && pwd -P) || { echo "none=1"; exit 0; }
 files=$(find "$root" -type f \( -name '*.css' -o -name '*.scss' -o -name '*.less' -o -name '*.sass' \) \
         -not -path '*/node_modules/*' -not -path '*/dist/*' -not -path '*/build/*' -not -path '*/out/*' -not -path '*/.next/*' -not -path '*/.nuxt/*' \
         -not -path '*/.svelte-kit/*' -not -path '*/.angular/*' -not -path '*/coverage/*' -not -path '*/storybook-static/*' -not -name '*.min.css' 2>/dev/null | head -400)
+# ceiling: first 400 stylesheets only, upgrade to sampling by directory if a design system spans more
 cfg=$(find "$root" -maxdepth 3 -type f \( -name 'tailwind.config.*' -o -name 'theme.ts' -o -name 'theme.js' -o -name 'tokens.json' -o -name 'design-tokens.json' \) \
       -not -path '*/node_modules/*' 2>/dev/null | head -5)
 [ -z "$files" ] && [ -z "$cfg" ] && { echo "none=1"; exit 0; }

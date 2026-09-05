@@ -34,6 +34,20 @@ if event == "SessionStart":
         except Exception:
             pass
 
+# SNIPER_SUBAGENT_MATCHER: an unanchored, case-insensitive regex; when set, subagents whose
+# agent_type does not match get no doctrine. Unset means every subagent, as before. A bad
+# regex counts as unset rather than failing the hook.
+if event == "SubagentStart":
+    pat = os.environ.get("SNIPER_SUBAGENT_MATCHER")
+    if pat:
+        import re
+        try:
+            agent = str((data or {}).get("agent_type") or (data or {}).get("agentType") or "")
+            if not re.search(pat, agent, re.I):
+                sys.exit(0)
+        except re.error:
+            pass
+
 try:
     with open(core_path, "r") as f:
         core = f.read()

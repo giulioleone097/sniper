@@ -6,7 +6,7 @@ argument-hint: "[repo path] [--refresh] [--prs N] [--linked]"
 
 1. Read what exists first. `docs/sniper/map.md` and `docs/sniper/conventions.md` carry a header line `stamp: <commit> <last PR> <date>`; without `--refresh`, a map whose commit is still an ancestor of HEAD and whose PR number is the latest merged is current: print its path and stop. With `--refresh`, or when the stamp is behind, read only what moved since the stamp: `git log <stamp>..HEAD`, PRs above the stamped number. A rebuild from nothing happens once per repository.
 
-2. Facts before judgment: `sh <plugin root>/scripts/repo-facts.sh <repo> 12 <N>` (`<plugin root>` is the parent of the `skills/` directory this file lives in; `N` from `--prs`, default 30) prints layout, languages, hot spots, authors, commit conventions, checks, merged-PR cadence, who reviews and who leaves inline comments. Add `sh <plugin root>/scripts/checks.sh` per top-level project, `scripts/tracker.sh` for the forge, `scripts/consumers.sh` for the repositories that depend on this one, `scripts/tokens.sh` on the UI tree when there is one.
+2. Facts before judgment: `sh <plugin root>/scripts/repo-facts.sh <repo> 12 <N>` (`<plugin root>` is the parent of the `skills/` directory this file lives in; `N` from `--prs`, default 30) prints layout, languages, hot spots, authors, commit conventions, checks, merged-PR cadence, who reviews and who leaves inline comments. Add `sh <plugin root>/scripts/checks.sh` per top-level project, `scripts/tracker.sh` for the forge, `scripts/consumers.sh` for the repositories that depend on this one, `scripts/tokens.sh` on the UI tree when there is one, `scripts/debt.sh` for the declared shortcuts.
 
 3. Enrich with what the host exposes, never with what it does not. A code-graph server (gitnexus: `list_repos`, then `context`, `route_map`, `group_list` on this repo) gives routes and clusters for the entry points; a symbol server (serena: `get_symbols_overview` on the entry files) gives the public shape of each; use them for the parts the scripts cannot see and cite them as sources. Indexing a repository is a state change: say it before doing it. None available: the map is built from git, the scripts and reading, and says so.
 
@@ -26,6 +26,7 @@ stamp: <commit> <last merged PR> <yyyy-mm-dd>
 ## Repository collegati   from consumers.sh: name, what it takes from here, unread when not checked out
 ## Controlli         the commands checks.sh named, per project
 ## Punti caldi       hot spots with why they churn
+## Scorciatoie dichiarate   the `ceiling:` ledger from scripts/debt.sh, no-trigger rows first
 ## Persone           authors by area from git, reviewers by weight, in the window
 ## Fonti             scripts, servers and PRs this map was built from
 ```

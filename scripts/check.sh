@@ -37,6 +37,8 @@ done
 for s in "$ROOT"/scripts/*.sh; do sh -n "$s" || { echo "rules: $s does not parse"; fail=1; }; done
 sh "$ROOT/scripts/tracker.sh" "$ROOT" | grep -q '^forge=' || { echo "rules: tracker.sh gave no forge"; fail=1; }
 sh "$ROOT/scripts/checks.sh" "$ROOT" | grep -qE '^(project=|none=1)' || { echo "rules: checks.sh gave no answer"; fail=1; }
+sh "$ROOT/scripts/debt.sh" "$ROOT" | grep -qE '^(markers=|none=1)' || { echo "rules: debt.sh gave no answer"; fail=1; }
+python3 "$ROOT/evals/run.py" --selftest >/dev/null 2>&1 || { echo "rules: evals selftest failed (a scorer no longer separates good from bad)"; fail=1; }
 [ "$fail" -eq 0 ] && echo "rules: ok"
 
 python3 - "$ROOT" <<'EOF' || fail=1

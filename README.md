@@ -75,7 +75,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
 | `build` | implementing under a locked goal card | changed files + proof line |
 | `debug` | a real failure needs a proven root cause | cause in one line + evidence + fix |
 | `review` | a change, branch, PR, or working tree needs reviewing | area-by-area review: one reviewer per affected area (or per lens on a single-area diff), then one integrator that merges the reports, settles contradictions against the code, catches the breakages that cross areas, verifies every finding, and runs the nearest check per area with failures attributed to the baseline; prints one line per surviving issue plus the regression lines, `--fix` applies P0-P2 and re-proves them |
-| `simplify` | a slice is built, or a whole tree needs a read-only audit | six rungs (reuse, stdlib, native, delete, yagni, shrink) applied to the changed code, split per area when the change spans several, then an integrator that proves nothing moved: checks re-run and attributed, no guard thinned, no test weakened, no exported symbol cut that something outside still consumes; `--repo` audits read-only, ranked by git hot spots |
+| `simplify` | a slice is built, or a whole tree needs a read-only audit | six rungs (reuse, stdlib, native, delete, yagni, shrink) applied to the changed code, split per area when the change spans several, then an integrator that proves nothing moved: checks re-run and attributed, no guard thinned, no test weakened, no exported symbol cut that something outside still consumes; `--repo` audits read-only, ranked by git hot spots; `--debt` prints the `ceiling:` ledger |
 | `prove` | acceptance needs the smallest decisive check | exact commands + `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT` |
 | `narrate` | a PR body is needed, or a reviewer must approve without reading every file | approval dossier in the PR's language: verdict, what changes in plain words, a map of the change (lanes, unchanged neighbours, the one edge that matters), then a deep drill-down per affected domain or repository - why it was touched, what the change does, the before/after shape, every boundary crossed with the consumer that absorbs it, the decisions with their rejected alternative, executed evidence with base attribution, residual risk - plus what lies outside this verification and who covers it; no task is ever handed to the approver; commands and the engineer's reading guide fold into collapsible sections |
 | `ship` | committing, pushing, or opening a PR | commit shas, PR url |
@@ -109,6 +109,7 @@ Four detectors make the skills run the repository's own commands instead of gues
 | `scripts/tokens.sh <ui path>` | the design tokens the repository already defines, with counts: custom properties, colours, fonts, sizes, theme keys | `build` on UI work, the reviewer's `taste:` tag |
 | `scripts/consumers.sh [repo]` | what depends on this repository outside its tree: the names it publishes (package, module, crate, assembly, remote) and every sibling checkout or workspace member whose manifest names one of them | `review`, `simplify`, `narrate`, the integrator's cross-repo sweep |
 | `scripts/repo-facts.sh [repo] [months] [prs]` | the facts a map starts from, read-only: layout, languages, hot spots, authors, commit conventions, checks, instruction files, and through `gh` the merged-PR cadence, reviewers and inline commenters (bots kept apart) | `map` |
+| `scripts/debt.sh [repo]` | the ledger of declared shortcuts: every `ceiling:` comment with its limit and upgrade trigger, `no-trigger` on the ones that will rot | `simplify --debt`, `map` |
 | `scripts/pr-partition.py BASE HEAD` | the diff split into judgment, tests, mechanical, generated, docs and config, so only judgment code is read | `narrate`, `review`, `simplify` |
 
 `scripts/check.sh` is the plugin's own acceptance: four strict validations, the guard fixtures, manifest parity, doctrine sync, and the repository rules executed (skill bodies under 120 lines, references under 80, no host env var inside a skill, every script parses, both detectors answer on this repo).
@@ -143,6 +144,8 @@ Four detectors make the skills run the repository's own commands instead of gues
 To disable: `/plugin disable sniper`, or delete the entry in
 `hooks/hooks.json`.
 
+`SNIPER_SUBAGENT_MATCHER=<regex>` (unanchored, case-insensitive) limits the SubagentStart injection to the agent types that match, for example `^sniper`; unset injects into every subagent.
+
 ## Codex notes
 
 - Skills: same files, invoked as `$name` instead of `/sniper:name`.
@@ -166,6 +169,10 @@ its tokens once. Teammates without the plugin get the same rules from the file.
 Re-run after a core update; the block is replaced, your sections stay.
 
 - Codex substitutes `${CLAUDE_PLUGIN_ROOT}` in `hooks/hooks.json` only. Inside a skill body neither host expands a variable, and Codex presents skills to the model as absolute skill roots, so every path in a skill is written relative to the file that names it (`<this skill>/scripts/…`, `<plugin root>/scripts/…`); `scripts/check.sh` fails on any `CLAUDE_SKILL_DIR` or `${CLAUDE_PLUGIN_ROOT}` inside a skill or agent.
+
+## Evals
+
+`evals/` measures the plugin the only way that counts: a real headless session per cell, bare, with and without sniper, scored on the files it leaves behind by deterministic scorers that prove themselves on good and bad references first (`python3 evals/run.py --selftest`, also run by `scripts/check.sh`). Three probes to start: path traversal, per-client rate limiting, and a bug report that names one caller while the canonical cause sits in the shared function. See `evals/README.md`.
 
 ## Sources
 

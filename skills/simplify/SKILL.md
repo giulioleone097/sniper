@@ -1,10 +1,10 @@
 ---
 name: simplify
 description: Use when a slice is built and before review, or with --repo to audit a tree read-only. Makes changed code smaller without changing behavior: reuse, stdlib, native, delete, yagni, shrink; per area when the change spans several, then an integrator proves nothing moved. Not for bugs or new behavior.
-argument-hint: "[baseline | files] [--repo [path]]"
+argument-hint: "[baseline | files] [--repo [path]] [--debt]"
 ---
 
-1. Resolve scope. `--repo [path]` means the read-only audit: go to step 7. Otherwise the changed code: `git diff <baseline>...HEAD` when the caller named a baseline or the branch has a merge-base, else `git diff HEAD`. No diff and no files named: ask which files, do not guess.
+1. Resolve scope. `--debt` means the ledger: run `sh <plugin root>/scripts/debt.sh <repo>` (`<plugin root>` is the parent of the `skills/` directory this file lives in), print its rows as they come with the `no-trigger` ones first, end with its count line, and stop; a `ceiling:` comment that names no upgrade trigger is the one that rots. `--repo [path]` means the read-only audit: go to step 7. Otherwise the changed code: `git diff <baseline>...HEAD` when the caller named a baseline or the branch has a merge-base, else `git diff HEAD`. No diff and no files named: ask which files, do not guess.
 
 2. Split into areas when the change spans more than one: `python3 <plugin root>/scripts/pr-partition.py BASE HEAD` (`<plugin root>` is the parent of the `skills/` directory this file lives in) for the judgment bucket, grouped per deployable unit, shared library, or contract surface. One area, or fewer than about 15 judgment files: skip to step 4 and do it here.
 
@@ -16,12 +16,12 @@ argument-hint: "[baseline | files] [--repo [path]]"
 
    1. `reuse:` a helper, type, or pattern already in this repo does it. Call that instead.
    2. `stdlib:` the standard library or an already-installed dependency does it. Name it and use it.
-   3. `native:` a platform feature or a database constraint does it. Name it and use it.
+   3. `native:` a platform feature or a database constraint does it. Name it and use it. `references/platform-native.md` beside this file is the lookup for both rungs: browser, Node, Python, Swift, database.
    4. `delete:` dead code, an unused flag, config nobody sets. Remove it and the tests that exist only for it.
    5. `yagni:` an abstraction with one implementation, a wrapper that only delegates, a layer with one caller, or anything else on the never-add list, per core. Collapse it into its one caller.
    6. `shrink:` same logic, fewer lines. Rename or flatten only where it lowers the cost of reading that function, never as a sweep across the diff.
 
-   Apply the edits directly, surgical and behavior-preserving. A proposal from step 3 is a claim: verify the replacement really covers the case before cutting. Skip any cut whose behavior preservation you cannot establish, and never thin the guards core lists as never-remove. Boring over clever: a shorter line that takes longer to read is not a win.
+   A cut that keeps a known ceiling (a global lock, a linear scan, a naive heuristic) gets a `ceiling:` comment naming the limit and the upgrade trigger, per core. Apply the edits directly, surgical and behavior-preserving. A proposal from step 3 is a claim: verify the replacement really covers the case before cutting. Skip any cut whose behavior preservation you cannot establish, and never thin the guards core lists as never-remove. Boring over clever: a shorter line that takes longer to read is not a win.
 
 6. Prove nothing moved. One area edited: run its nearest existing check (`sh <plugin root>/scripts/checks.sh <path>`) and report the exact result. Two or more areas edited, or a cut that crossed a boundary: one `sniper-integrator` pass (Codex: `sniper_integrator`) with the range, the per-area proposals, `applied` set to every file you edited, the checks for those areas from `sh <plugin root>/scripts/checks.sh <area path>`, and the repositories that depend on this one from `sh <plugin root>/scripts/consumers.sh`. It runs each check, attributes a failure to the baseline before calling it new, confirms no guard was thinned and no test weakened, skipped or deleted, and names any exported symbol a cut removed that something outside the area, or in a consumer repository, still consumes. Not installed: do that here, in that order, and say you did. No check configured for an area: say that instead of implying one ran.
 

@@ -151,3 +151,11 @@ When a skill must ask the user, it asks through the host's question tool: `AskUs
 ## The map (0.17)
 
 No session should start a repository from zero. `map` drills into the repository and the ones that depend on it and writes `docs/sniper/map.md` (domains, entry points, checks, boundaries, linked repositories, hot spots, people) and `conventions.md` (what the reviewers actually ask for, quoted with PR numbers) with a stamp; every later skill reads the map before discovering, and refreshes only what moved since the stamp. AGENTS.md holds one navigation line to it, never the map itself. What a session learns beyond the map goes back through `learn` - including reviewer comments on a PR (`learn --from-pr`) - so knowledge accrues instead of being rediscovered.
+
+## Shortcuts and their ceiling (0.18)
+
+A deliberate shortcut is allowed when its limit is known and written down: `ceiling: <limit>, upgrade <trigger>` in a comment. `scripts/debt.sh` harvests them into a ledger, `simplify --debt` prints it, `map` carries it, and a marker without a trigger is flagged because that is the one that becomes permanent. The doctrine also took three rules ponytail measured rather than argued: grep every caller before a bug fix, take the edge-case-correct stdlib option, and leave one runnable check behind non-trivial logic where the repository keeps none.
+
+## Evals (0.18)
+
+A prompt change is a hypothesis until a session proves it. `evals/run.py` runs each probe as a bare `claude -p` session in a seeded temp workspace, baseline against sniper (`--plugin-dir` plus the doctrine as system prompt, since bare mode skips hooks), and scores the files left behind with stdlib-only scorers; every scorer ships a good and a bad reference and `--selftest` must pass before a single call is spent. `check.sh` runs the selftest. The trace-transfer probe tests the doctrine's own claim about canonical causes.

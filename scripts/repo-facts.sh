@@ -45,6 +45,7 @@ echo "[instructions]"
 git ls-files | grep -iE '(^|/)(AGENTS\.md|AGENTS\.override\.md|CLAUDE\.md|CONTRIBUTING\.md|CODEOWNERS|adr/|decisions/|docs/solutions/|docs/sniper/)' | head -15
 
 # tracker-backed sections (GitHub through gh; other forges are read by the skill itself)
+# ceiling: three gh calls per PR, upgrade to one GraphQL query when prs grows past ~50
 [ "$prs" -gt 0 ] 2>/dev/null || exit 0
 url=$(git remote get-url origin 2>/dev/null)
 case "$url" in *github.com*) ;; *) exit 0;; esac
