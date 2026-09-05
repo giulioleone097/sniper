@@ -1,38 +1,35 @@
 # sniper — design
 
-One plugin for the whole development loop: lock the outcome, take the shortest safe path, prove only changed behavior, stop. Works in Claude Code (skills + subagents + hooks) and Codex (skills + sidecars). Everything here is deliberately small: the plugin itself must not be slop.
+One plugin for the whole development loop, on Claude Code and Codex: read the repository once, take work in from wherever it arrives, lock the outcome, take the shortest safe path, prove only changed behavior, hand the reviewer a dossier, ship, and keep what was learned. Everything here is deliberately small: the plugin itself must not be slop.
 
 ## Non-goals
 
-- No PRD/architecture/tech-doc quintuplets, no 50 KB skills, no telemetry, no "instincts", no memory system, no MCP server.
-- No per-language rule packs. Repository instructions (CLAUDE.md / AGENTS.md) own language conventions.
+- No PRD/architecture/tech-doc quintuplets, no 50 KB skills, no telemetry, no MCP server, no modes or intensity levels: one doctrine.
+- No per-language rule packs. Repository instructions (AGENTS.md / CLAUDE.md) own language conventions.
+- No memory outside the repository. What a session learns goes into `docs/sniper/` and AGENTS.md, where the next session and the next person read it.
+- No dependency on any other plugin, server or registry. Every detector reads git, the filesystem and the CLIs the repository already uses.
 - No CHANGELOG/VERSION ceremony in `ship` unless the repository already has it.
 
 ## Layout
 
 ```
 sniper/
-  .claude-plugin/plugin.json        # Claude Code manifest
-  .claude-plugin/marketplace.json   # marketplace "sniper", source "./"
-  .codex-plugin/plugin.json         # Codex manifest ("skills": "./skills/")
-  .agents/plugins/marketplace.json  # Codex marketplace
-  core/SNIPER.md                    # doctrine, injected at SessionStart/SubagentStart
-  skills/<name>/SKILL.md            # 12 skills, each <= 120 lines body
-  skills/setup/scripts/upsert-agents.py  # idempotent AGENTS.md/CLAUDE.md upsert
-  skills/narrate/scripts/*.py       # pr-partition.py, pr-contracts.py, test-summary.py, pr-walkthrough.py
-  skills/<name>/references/*.md     # only when a branch is genuinely conditional
-  skills/<name>/agents/openai.yaml  # Codex sidecar
-  agents/sniper-scout.md            # sonnet, read-only locator
-  agents/sniper-worker.md           # sonnet by default, bounded implementer
-  agents/sniper-reviewer.md         # opus, read-only diff reviewer with a lens
-  AGENTS.md                         # doctrine (verbatim) + repo rules, both hosts read this
-  .claude/CLAUDE.md                 # @../AGENTS.md (root CLAUDE.md fails plugin validate --strict)
-  hooks/hooks.json                  # shared: SessionStart, SubagentStart, PreToolUse(Bash)
-  scripts/core-context.sh           # prints core as additionalContext JSON
-  scripts/guard.sh                  # denies destructive git / rm commands
-  scripts/test-guard.sh             # fixture suite for guard.sh
-  scripts/install-codex-agents.sh   # generates ~/.codex/agents/*.toml from agents/*.md
-  scripts/check.sh                  # one-command acceptance run
+  .claude-plugin/plugin.json, marketplace.json   Claude Code manifest and marketplace ("sniper", source "./")
+  .codex-plugin/plugin.json, .agents/plugins/marketplace.json   Codex manifest and marketplace
+  core/SNIPER.md                    the doctrine, injected at SessionStart and SubagentStart
+  skills/<name>/SKILL.md            16 skills, each under 120 lines
+  skills/<name>/agents/openai.yaml  Codex sidecar, one per skill
+  skills/<name>/references/*.md     a genuinely conditional branch, under 80 lines
+  skills/setup/scripts/upsert-agents.py          doctrine block and map pointer in AGENTS.md
+  skills/narrate/scripts/*.py       pr-contracts, pr-walkthrough, test-summary
+  agents/sniper-{scout,worker,reviewer,integrator}.md   one definition per role for both hosts
+  hooks/hooks.json                  shared: SessionStart, SubagentStart, PreToolUse(Bash)
+  scripts/core-context.sh, guard.sh, test-guard.sh   the hooks and the guard fixtures
+  scripts/checks.sh, tracker.sh, consumers.sh, tokens.sh, repo-facts.sh, debt.sh, pr-partition.py   detectors
+  scripts/install-codex-agents.sh, check.sh      Codex agents generation, one-command acceptance
+  evals/run.py, tasks.py            the agentic benchmark
+  docs/sniper/map.md, conventions.md   the plugin's own map, built by its own skill
+  AGENTS.md, .claude/CLAUDE.md      doctrine verbatim plus repo rules; CLAUDE.md imports it
   docs/DESIGN.md, docs/sources.md, README.md, LICENSE (MIT)
 ```
 
@@ -41,121 +38,77 @@ Skills are invoked as `/sniper:<name>` in Claude Code and `$<name>` in Codex.
 ## The flow
 
 ```
-scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
+map? ──► intake? ──► grill? ──► scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
+                                                                        handoff (any time the session ends early)
   ▲                   │
   └──── debug ◄───────┘ (when a real failure appears)
 ```
 
-- `plan` only when the work has 4+ steps or more than one owner. Otherwise `scope` hands straight to `build`.
-- `simplify` runs on the changed code before `review`, so review sees the lean diff.
+- `map` once per repository, refreshed only for what moved since its stamp; every later skill reads it before discovering.
+- `intake` when the work arrives as an issue, PR, work item or pasted report; `grill` when the design is genuinely undecided; both hand a request to `scope`.
+- `plan` only for four or more tasks, several owners, or a change others depend on. Otherwise `scope` hands straight to `build`.
+- `simplify` runs on the changed code before `review`, so review sees the lean diff. Both split by area and end in the integrator.
 - `review` findings go back to `build`; one exact-diff pass, recheck only what a fix touched.
-- `learn` runs only when the solved problem's reasoning is absent from code, tests, and docs.
-- `flow` runs the pipeline end to end hands-off (scope → plan? → build → simplify → review → prove → ship → learn?) and stops before push/PR unless told otherwise.
+- `narrate` writes the dossier `ship --pr` uses as the PR body. `learn` runs only when the reasoning would otherwise be lost, or on the comments a PR received.
+- `flow` runs the pipeline hands-off, taking the recommended option at every decision and stopping before push unless told otherwise; it never calls `grill`, and calls `handoff` when it stops early.
 
-## Skill contracts
+## Doctrine
 
-Every SKILL.md: frontmatter `name`, `description` (third person, front-loaded trigger, what it does + when to use, <= 600 chars), optional `argument-hint`, `allowed-tools` only when the skill needs a grant. Body: imperative, numbered steps, one output format block, explicit stop condition. No preamble, no philosophy sections, no "you are an expert". Hard cap 120 lines; push a genuinely conditional branch into `references/<branch>.md` and point at it with one line.
+`core/SNIPER.md` is the one text every session and every subagent gets, about 1.3k tokens: precedence (user over skill, and a blocking skill names itself), the goal lock, the map read before discovery, the reuse ladder with the never-add and never-remove lists, the operational bug rule (grep every caller, guard the shared function once), elision with `ceiling:` comments for deliberate shortcuts, test discipline including one runnable check for non-trivial logic where none exists, proof reported exactly, adjacent findings as follow-ups, surgical edits and evidence before state changes, delegation of parallel work with results read as claims, and a stop that closes every stated intention and reports for a reader who did not watch.
 
-| skill | invoke | what | output | stop when |
-|---|---|---|---|---|
-| `setup` | user | `scripts/upsert-agents.py` installs or refreshes the doctrine block in the project's `AGENTS.md` between `sniper:core` markers and makes `CLAUDE.md` (or `.claude/CLAUDE.md`) import it; the skill then fills the proof commands from what the repo declares. `SessionStart` skips injection when the block is present in the project. | two status lines | files written |
-| `scope` | model+user | Lock outcome, acceptance check, exclusions, material risk, proof, size (surgical / normal / complex). Ask at most 3 questions, one at a time, only when different answers change the work. | Goal card (<= 10 lines) | card accepted or answered |
-| `plan` | model+user (scope's Next: plan, flow) | Tasks with owned paths (disjoint when parallel), acceptance, proof, test seams. Chat brief for < 4 tasks, `docs/plans/<yyyy-mm-dd>-<slug>.md` otherwise. | brief or plan file | plan written; never implements |
-| `build` | model+user | Implement under the goal card. Modes `feature` / `fix` / `refactor` / `migrate` auto-detected; each mode is a short reference. Tests at pre-agreed seams only. Fan out `sniper-worker` only for disjoint owned paths. | changed files + proof line | acceptance passes; hands to `simplify` |
-| `debug` | model+user | Build a tight pass/fail signal first, then rank hypotheses, inspect the nearest boundary, instrument after two uninformative attempts. | cause in one line + evidence + fix (only if authorized) | mechanism proven |
-| `review` | model+user | Exact `baseline..HEAD` or working-tree diff. Three lenses run as parallel `sniper-reviewer` calls: correctness, slop (ponytail format), safety/silent-failure. Reviewers report everything with confidence 0–100; the lead keeps >= 80 and P0–P2. Applies repository `## Code Review Rules`. `--fix` applies findings; `--pr` posts one comment via `gh` after confirmation. | `path:line P<n> <lens>: problem. fix.` lines, `net: -N lines possible`, or `CLEAN` | one pass done |
-| `simplify` | model+user | Behavior-preserving elision of the changed code through six rungs that are also the output tags: `reuse:` `stdlib:` `native:` `delete:` `yagni:` `shrink:` (shared with the review slop lens). `--repo [path]` = read-only audit ranked by git hot spots. Never clever. | shorter diff or `Lean already.` | no finding left or scope exhausted |
-| `prove` | model+user | Translate acceptance into the smallest decisive check set; run it; reuse still-valid results. | exact commands + `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT` | proof complete |
-| `narrate` | model+user; `ship --pr` uses it for the body | Approval dossier. Mechanical first: `scripts/pr-partition.py` splits the diff into judgment / tests / mechanical / generated / docs / config; the workspace tool lists affected projects and which are pure dependents; `scripts/pr-contracts.py` finds exported symbols the diff removes with consumers outside the diff and deleted files still referenced. Then executed evidence: a worktree at HEAD, the repository's own test target per affected project, build/typecheck per pure dependent, results summarised by `scripts/test-summary.py`; failures are attributed by running the same target on the merge-base. Written for the approver in the PR's language: verdict, plain-words change list, then one drill-down per affected domain or repository (why touched, what the change does, kind of change, who it reaches and the line that absorbs it, executed evidence with base attribution, residual risk, technical detail folded); before anything is declared outside the verification the skill must try to run the check, cite the existing test, or show the code path, and what remains names its owner (release runbook, nightly job, the author), never the approver. Commands and the engineer's reading guide sit in collapsible `<details>` blocks. `--post` replaces the PR body after confirmation; `--walkthrough` posts one review of inline why-comments via `scripts/pr-walkthrough.py` after confirmation. | dossier (<= 150 lines) | dossier written or posted |
-| `ship` | user, or from flow | Atomic behavior-named commits (Conventional Commits, subject <= 50, body only for non-obvious why), PR body (what / why / proof / follow-ups). No attribution trailers. Push and PR only on explicit ask. | commit shas, PR url | committed (and pushed if asked) |
-| `learn` | user; model after non-obvious fix | Capture one durable learning: <= 3 lines under `## Code Review Rules` in the closest AGENTS.md/CLAUDE.md, or a `docs/solutions/<slug>.md` when it needs more. Write nothing when the reasoning is already in code/tests/docs. Prints the proposed lines and writes only after the user confirms; inside `flow` it reports the proposal instead of writing. | file path or "nothing to record" | one learning or none |
-| `flow` | user | Run the pipeline hands-off; auto-choose the recommended option at every decision; stop before push. | final report | pipeline done or blocked |
+It is written against the current guidance of both vendors and re-audited when either publishes a new model guide. From Anthropic's Claude Fable 5.1 guidance: goals and constraints rather than step choreography, sub-agents for parallel work, progress grounded in tool results, an assessment rather than a fix when the user asks a question, evidence before a state-changing command, a final report written outcome first for someone who was not there, no anti-formatting rules and no numeric word caps. From OpenAI's GPT-6 Astra and Codex guides: user instructions outrank a skill, bias to action with every intention closed before the turn ends, tests calibrated to the change, delegation stated explicitly, and descriptions that open with the trigger because Codex shortens them to about 45 characters when many plugins are installed. From both: no pressure language, prohibitions only where the failure is real and the reason stated, exact commands only for fragile bridges.
 
-Shared output discipline for every skill: first line is the outcome, then only what a reader who did not watch needs. No "Great question", no bullet praise, no restating the request.
+## Skills
 
-## Agent contracts
+Every SKILL.md: frontmatter `name`, `description` opening with `Use when`, under 70 words, ending with what it is not for; body imperative, one output block, the stop condition last, under 120 lines; a genuinely conditional branch in `references/<branch>.md` under 80 lines; paths written as `<this skill>/…` or `<plugin root>/…` because neither host expands a variable in a skill body. Each skill ships `agents/openai.yaml` for Codex.
 
-`agents/sniper-scout.md` — `model: sonnet`, `tools: Read, Grep, Glob, Bash`. Read-only locator. Returns `path:line — symbol — note` lines plus the 3–8 files worth reading, or `No match.` Never suggests fixes.
+| skill | does | ends when |
+|---|---|---|
+| `setup` | doctrine block into AGENTS.md, CLAUDE.md import, map pointer, then `map` | files written |
+| `map` | `repo-facts.sh` facts, reviewers' comments on the last merged PRs, optional code-graph or symbol server, `docs/sniper/map.md` and `conventions.md` with a stamp; `--linked` for consumer repositories | paths and stamp printed |
+| `intake` | item read through the tracker the repo has, claim reproduced, already-implemented and already-rejected checked, card through `scope`; `--reply` after confirmation | card or what is missing |
+| `grill` | decision tree in rounds through the host's question tool, facts looked up by a scout, settled tree handed to `scope` | frontier empty |
+| `scope` | goal card: outcome, acceptance, exclusions, risk, proof, size; at most three questions through the question tool | card emitted |
+| `plan` | tasks with owned paths, acceptance, proof, test seams; brief or `docs/plans/` file; `--tickets` publishes them | plan written |
+| `build` | mode detected, code located from the map, slices with seams, one runnable check where no test exists, proof through `prove`, diff to `simplify` | acceptance passes |
+| `debug` | pass/fail signal, boundary instrumented, canonical cause fixed and proven | mechanism proven |
+| `simplify` | six rungs per area with the platform lookup, `ceiling:` on kept limits, integrator proves nothing moved; `--repo` audits, `--debt` prints the ledger | nothing left in scope |
+| `review` | one reviewer per area or lens with the repository's conventions, integrator merges, catches cross-area and cross-repo breakage, runs the checks; `--fix`, `--pr` | one pass printed |
+| `prove` | smallest decisive set from `checks.sh`, results reused, status reported | status line |
+| `narrate` | partition, blast radius in and out of the repository, executed evidence attributed to the baseline, dossier with a map and a per-domain drill-down; `--post`, `--walkthrough` | dossier written |
+| `handoff` | where the work stands, proven versus believed, open work, artifacts pointed at, secrets redacted | file written |
+| `ship` | atomic commits, tracker item linked, push or PR only when asked, body from `narrate` | commits exist |
+| `learn` | one durable rule into Code Review Rules or `docs/solutions`, from a fix, a PR's reviewers (`--from-pr`), or a session retrospective | one learning or none |
+| `flow` | the pipeline hands-off | done or blocked |
 
-`agents/sniper-worker.md` — `model: sonnet` (the caller passes `model: opus` for genuinely complex slices), all tools. Receives an owner contract: outcome, owned paths (touch nothing else), acceptance, proof, checkpoint. Returns one terminal message: changed files, proof run with results, blockers, follow-ups. Never widens scope, never reviews its own work twice.
+## Agents
 
-`agents/sniper-reviewer.md` — `model: opus`, `tools: Read, Grep, Glob, Bash`. Input: baseline, lens (`correctness` | `slop` | `safety`), goal card if any. Reports every finding it sees with confidence 0–100 and severity P0–P3 (coverage stage; the lead filters). No fixes, no praise, no style nits that tooling already enforces.
+`sniper-scout` (sonnet, read-only) locates code and returns `path:line` lines. `sniper-worker` (sonnet, opus on request) implements one owned slice under a contract and reports changed files, proof, blockers. `sniper-reviewer` (opus, read-only) reviews one area or lens and reports every finding with severity and confidence; its slop lens carries the six rungs plus `taste:` on UI diffs and never flags the one runnable check. `sniper-integrator` (opus, read-only) merges the per-area reports, settles contradictions by reading the code, sweeps consumers inside and outside the repository, verifies every finding, and runs the nearest checks with each failure attributed to the baseline before it is called new. The same four files generate the Codex custom agents.
 
-These same three files also generate the Codex custom agents (see Codex below): `scripts/install-codex-agents.sh` reads `agents/*.md` directly, so there is one agent definition per role for both hosts.
+## Hooks and guard
 
-## Hooks
+`hooks/hooks.json` is one file for both hosts, using only what both support: `SessionStart` and `SubagentStart` with `additionalContext`, `PreToolUse` with `permissionDecision`. `core-context.sh` injects the doctrine, prints nothing at `SessionStart` when the project's AGENTS.md or CLAUDE.md already carries the block, and honours `SNIPER_SUBAGENT_MATCHER` to narrow which subagents receive it. `guard.sh` denies `--no-verify`, force pushes, `reset --hard`, whole-tree discards, `clean -f` and `rm -rf` of the root, with 45 fixtures; any script error allows, so the guard never traps the user. Scripts are POSIX shell plus `python3`, no node, no jq.
 
-`hooks/hooks.json` is one file shared by Claude Code and Codex (both support `SessionStart`/`SubagentStart` with `additionalContext` and `PreToolUse` with `permissionDecision`; Codex sets `PLUGIN_ROOT` natively and this hooks file also gets `CLAUDE_PLUGIN_ROOT` for compatibility). On Codex the user trusts the three hooks once in `/hooks` before they fire.
-- `SessionStart` (matcher `startup|resume|clear|compact`) and `SubagentStart` → `scripts/core-context.sh`, which (for `SessionStart` only) prints nothing when the session's `cwd` has an `AGENTS.md` or `CLAUDE.md` carrying `<!-- sniper:core:start -->`, and otherwise prints `{"hookSpecificOutput":{"hookEventName":"<event>","additionalContext":"<core/SNIPER.md>"}}`. `SubagentStart` has no matcher on purpose: every subagent gets the doctrine; narrow with `sniper:.*`.
-- `PreToolUse` matcher `Bash` → `scripts/guard.sh`. Denies: `--no-verify` (as a token alongside `git`), `git push --force` / `-f` / a `+refspec` (allows `--force-with-lease`), `git reset --hard`, `git checkout ... .` in any form, `git restore ... .` in any form unless staged-only, `git clean -f*`, `rm -rf` of `/`, `~`, `$HOME`, `${HOME}`, `.`, `..`, `*` (with or without a trailing `/` or `/*`). Everything else passes. Deny output: `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"..."}}`. Any script error → allow (never trap the user).
+## Detectors
 
-Scripts are POSIX shell + `python3 -c` for JSON parsing (no node, no jq).
+Where a skill used to guess, a script answers from the repository, read-only, with no configuration: `checks.sh` (the project's own typecheck, lint, test and build commands), `tracker.sh` (forge, CLI and login from the origin remote), `consumers.sh` (the names a repository publishes and the sibling checkouts whose manifests name them), `tokens.sh` (the design tokens a UI tree defines), `repo-facts.sh` (layout, hot spots, authors, commit conventions, checks, and through `gh` the merged-PR cadence, reviewers and inline commenters), `debt.sh` (the `ceiling:` ledger), `pr-partition.py` (judgment versus mechanical diff). The skill still decides; the script removes the guess. Each was proven on real repositories of several stacks before it shipped.
+
+## Asking
+
+A question to the user goes through the host's question tool: `AskUserQuestion` on Claude Code, `request_user_input` on Codex where its collaboration mode allows it. One contract in `skills/scope/references/asking.md`: a twelve-character header, a one-sentence question carrying the why, the recommended option first and labelled. Numbered text is the fallback.
 
 ## Codex
 
-`.codex-plugin/plugin.json` mirrors name/version/description, points `"skills": "./skills/"`, and sets `"hooks": "./hooks/hooks.json"` — the same file Claude Code uses. Codex plugins cannot bundle agent definitions, so `scripts/install-codex-agents.sh` generates `~/.codex/agents/{sniper_scout,sniper_worker,sniper_reviewer}.toml` from `agents/*.md` (hyphens → underscores, `model` → `model_reasoning_effort`, no Edit/Write tools → `sandbox_mode = "read-only"`); `build` and `review` spawn those when installed, else fall back to inline/sequential. Each skill also ships `agents/openai.yaml`; Codex has no `disable-model-invocation`, so `policy.allow_implicit_invocation` plays that role and is `false` only for `flow`. Without hooks, the doctrine is reachable via `AGENTS.md` (copy the block) or a `@/path/to/sniper/core/SNIPER.md` import in `CLAUDE.md`.
+`.codex-plugin/plugin.json` mirrors the Claude manifest and points at the same `skills/` and `hooks/hooks.json`. Codex cannot bundle agents, so `scripts/install-codex-agents.sh` generates `~/.codex/agents/sniper_{scout,worker,reviewer,integrator}.toml` from `agents/*.md`. Codex has no `disable-model-invocation`; the sidecar's `policy.allow_implicit_invocation` is `false` only for `flow` and `setup`. Codex expands `${CLAUDE_PLUGIN_ROOT}` in `hooks/hooks.json` only, presents skills to the model as absolute roots, and shortens descriptions to about 45 characters when many plugins are installed: hence host-neutral paths and trigger-first descriptions, both enforced by `check.sh`.
 
-## Model prompting rules baked in
+## Evals
 
-From Anthropic's Fable 5.1 / Opus 5 / Sonnet 5 guidance:
-- Scope discipline snippet (don't fix adjacent bugs, one focused test per stated behavior, scratch checks not committed) → `core` and `build`.
-- "Finish the whole task; don't stop on a plan" → `flow`, `build`.
-- Batch independent tool calls; lead keeps working while subagents run → `build`, `review`.
-- Surgical edits over whole-file rewrites → `core`.
-- Progress cadence: one line before the first tool call, updates only on direction change, outcome first at the end → `core`, every skill's output block.
-- Delegate only large independent work; never to double-check yourself → `core`, `build`.
-- Review harness: reviewers report everything with confidence, a separate filter stage ranks → `review`.
-- Frontend anti-slop (no Inter/Roboto/system fonts, no purple gradients, no cookie-cutter layouts) → `build` reference `ui-taste.md`, used only when UI files change.
-
-## Sources
-
-See docs/sources.md.
-
-## Ownership for implementation
-
-| owner | paths |
-|---|---|
-| W1 (opus) | `skills/scope`, `skills/plan`, `skills/flow` |
-| W2 (opus) | `skills/build` (+ references `fix.md`, `refactor.md`, `migrate.md`, `ui-taste.md`), `skills/debug` |
-| W3 (opus) | `skills/review`, `skills/simplify`, `skills/learn`, `agents/sniper-reviewer.md` |
-| W4 (sonnet) | `skills/prove`, `skills/ship`, `agents/sniper-scout.md`, `agents/sniper-worker.md` |
-| W5 (sonnet) | manifests (`.claude-plugin/*`, `.codex-plugin/*`, `.agents/*`), `hooks/`, `scripts/`, `LICENSE`, `docs/sources.md`, `README.md` |
-
-Each skill owner also writes that skill's `agents/openai.yaml`. Lead owns `core/SNIPER.md`, this file, final README pass, validation, review, install.
+A prompt change is a hypothesis until a session proves it. `evals/run.py` runs each probe as a bare `claude -p` session in a seeded temp workspace, baseline against sniper (`--plugin-dir` plus the doctrine as an appended system prompt, since bare mode skips hooks), and scores the files left behind with stdlib-only scorers. Every scorer ships a good and a bad reference and `--selftest` must pass before a single call is spent; `check.sh` runs it. The trace-transfer probe tests the doctrine's own claim about canonical causes. Live runs need `ANTHROPIC_API_KEY`, since bare mode reads no login.
 
 ## Acceptance
 
-- `sh scripts/check.sh` passes (four `claude plugin validate --strict` targets, guard fixtures, manifest JSON, doctrine sync, version parity).
-- `claude plugin details sniper` lists 16 skills, 4 agents, 3 hook events, and the projected token cost stays under ~2.5k tokens at session start (core + skill descriptions).
-- `scripts/guard.sh` denies the listed commands and allows `git push --force-with-lease`, `rm -rf node_modules` (checked with fixture JSON on stdin).
-- Every SKILL.md body <= 120 lines; no skill references a file that does not exist.
-- Installed from the local marketplace and `/sniper:scope` resolves in a fresh session.
-- `sh scripts/install-codex-agents.sh` writes three TOML files and `codex` lists them.
+`sh scripts/check.sh`: four `claude plugin validate --strict` targets, the guard fixtures, manifest JSON, doctrine sync, version parity, and the repository rules executed: skill bodies under 120 lines, references under 80, no host variable inside a skill or agent, every skill with a Codex sidecar, every file a skill names present, every script parsing, the detectors answering on this repository, the ledger answering, the evals selftest passing. After a change: bump both manifests, `claude plugin update sniper@sniper`, `codex plugin remove sniper` then `codex plugin add sniper@sniper`, and `scripts/install-codex-agents.sh` when an agent changed.
 
-## Executable primitives (0.13)
+## Sources
 
-Where a skill used to say "run the nearest check" or "read the tracker", a script now answers from the repository: `scripts/checks.sh`, `scripts/tracker.sh`, `scripts/tokens.sh`, `scripts/consumers.sh`, `scripts/pr-partition.py`. The skill still decides; the script removes the guess. Paths inside skills are host-neutral (`<this skill>`, `<plugin root>`) because Codex expands no variable in a skill body.
-
-## Prompting basis (0.15)
-
-The doctrine and the skills are written against the current guidance of both hosts' vendors, and re-audited against it when either publishes a new model guide.
-
-- Anthropic, Claude Fable 5.1 (behavioral shifts and long-running agent recommendations): skills state goals, constraints and proof rather than step choreography where order does not matter; sub-agents are used for parallel, independent work and their output is treated as claims; progress and completion are grounded in tool results; the deliverable for a question is an assessment, not a fix; state-changing commands are checked against the evidence first; the final report is written for a reader who did not watch, outcome first; no anti-formatting rules, no numeric word caps.
-- OpenAI, GPT-6 Astra model guide and Codex prompting guide: user instructions take precedence over a skill, and a skill that makes the model pause or stop short must name itself; bias to action, with every stated intention closed as done, blocked or dropped before the turn ends; tests calibrated to the change; delegation stated explicitly; descriptions front-load the trigger because Codex shortens them to about 45 characters when many plugins are installed.
-- Both: no pressure language (no MUST, NEVER, CRITICAL in caps), prohibitions only where the failure is real and the reason is stated, exact commands only for fragile bridges (git, tracker CLIs, scripts), judgment left to the model.
-
-## Asking (0.16)
-
-When a skill must ask the user, it asks through the host's question tool: `AskUserQuestion` on Claude Code (up to four questions, two to four options), `request_user_input` on Codex (up to three questions, two to three options, only in the collaboration modes its description names, never in `codex exec`). One contract in `skills/scope/references/asking.md`: header of twelve characters, one-sentence question with the why, recommended option first and labelled. Numbered text is the fallback where no tool exists.
-
-## The map (0.17)
-
-No session should start a repository from zero. `map` drills into the repository and the ones that depend on it and writes `docs/sniper/map.md` (domains, entry points, checks, boundaries, linked repositories, hot spots, people) and `conventions.md` (what the reviewers actually ask for, quoted with PR numbers) with a stamp; every later skill reads the map before discovering, and refreshes only what moved since the stamp. AGENTS.md holds one navigation line to it, never the map itself. What a session learns beyond the map goes back through `learn` - including reviewer comments on a PR (`learn --from-pr`) - so knowledge accrues instead of being rediscovered.
-
-## Shortcuts and their ceiling (0.18)
-
-A deliberate shortcut is allowed when its limit is known and written down: `ceiling: <limit>, upgrade <trigger>` in a comment. `scripts/debt.sh` harvests them into a ledger, `simplify --debt` prints it, `map` carries it, and a marker without a trigger is flagged because that is the one that becomes permanent. The doctrine also took three rules ponytail measured rather than argued: grep every caller before a bug fix, take the edge-case-correct stdlib option, and leave one runnable check behind non-trivial logic where the repository keeps none.
-
-## Evals (0.18)
-
-A prompt change is a hypothesis until a session proves it. `evals/run.py` runs each probe as a bare `claude -p` session in a seeded temp workspace, baseline against sniper (`--plugin-dir` plus the doctrine as system prompt, since bare mode skips hooks), and scores the files left behind with stdlib-only scorers; every scorer ships a good and a bad reference and `--selftest` must pass before a single call is spent. `check.sh` runs the selftest. The trace-transfer probe tests the doctrine's own claim about canonical causes.
+`docs/sources.md` names every external plugin, skill and vendor guide this plugin took from, what was taken, and what was rejected with the reason.

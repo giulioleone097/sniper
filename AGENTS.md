@@ -42,11 +42,13 @@ Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.m
 
 - `core/SNIPER.md` is the canonical doctrine; the block above must stay identical to it (`scripts/check.sh` verifies). Claude Code reads this file through `.claude/CLAUDE.md` (`@../AGENTS.md`); a `CLAUDE.md` at the plugin root fails `claude plugin validate --strict`.
 - Skill bodies stay under 120 lines with one output block and the stop condition last; a genuinely conditional branch goes to `references/<branch>.md`, under 80 lines.
-- Proof for any change: `sh scripts/check.sh` (four `claude plugin validate --strict` targets, the guard fixture suite, manifest JSON, doctrine sync, version parity).
+- Proof for any change: `sh scripts/check.sh`: four `claude plugin validate --strict` targets, the guard fixtures, manifest JSON, doctrine sync, version parity, and the repository rules executed (skill bodies under 120 lines, references under 80, no host variable in a skill or agent, every script parses, every skill has its Codex sidecar and every file it names exists, the detectors answer on this repo, the evals selftest passes).
 - Claude Code installs a cache copy: bump the version in both manifests and run `claude plugin update sniper@sniper`, or uninstall and install again. Codex resolves the repo path directly; run `codex plugin remove sniper` then `codex plugin add sniper@sniper` after manifest changes.
 - Codex custom agents are generated from `agents/*.md` by `scripts/install-codex-agents.sh`; edit the `.md`, rerun the script.
+- A deliberate limit in a script carries a `ceiling:` comment naming it and its upgrade trigger; `sh scripts/debt.sh .` lists them.
 
 ## Code Review Rules
 
 - A skill that invokes another skill must not target one carrying `disable-model-invocation: true`; the Skill tool cannot call it. Safe path: only `flow` carries that flag.
 - `hooks/hooks.json` is shared by Claude Code and Codex. Safe path: use only events and output shapes both hosts support (`SessionStart`, `SubagentStart` with `additionalContext`; `PreToolUse` with `permissionDecision`), and check developers.openai.com/codex/hooks before adding one.
+- Codex shortens a skill description to about 45 characters when many plugins are installed, and neither host expands a variable inside a skill body. Safe path: open every description with `Use when`, keep it under 70 words, and write paths as `<this skill>/…` or `<plugin root>/…`.

@@ -34,6 +34,20 @@ for f in "$ROOT"/skills/*/SKILL.md; do
   case "$d" in "Use when "*) ;; *) echo "rules: $f description must open with the trigger (Use when ...)"; fail=1;; esac
   w=$(printf '%s' "$d" | wc -w | tr -d ' '); [ "$w" -le 70 ] || { echo "rules: $f description has $w words (> 70)"; fail=1; }
 done
+for d in "$ROOT"/skills/*/; do
+  [ -f "$d/agents/openai.yaml" ] || { echo "rules: $d has no Codex sidecar (agents/openai.yaml)"; fail=1; }
+done
+# every references/ or scripts/ file a skill names must exist (beside the skill, at the plugin root, or under narrate)
+python3 - "$ROOT" <<'PYEOF' || fail=1
+import glob, os, re, sys
+root = sys.argv[1]; bad = 0
+for f in glob.glob(f"{root}/skills/*/SKILL.md"):
+    d = os.path.dirname(f)
+    for m in set(re.findall(r'`(?:<this skill>/)?(references/[a-z-]+\.md|scripts/[a-z_-]+\.(?:py|sh))`', open(f).read())):
+        if not any(os.path.exists(os.path.join(x, m)) for x in (d, root, f"{root}/skills/narrate")):
+            print(f"rules: {f} names {m}, which does not exist"); bad += 1
+sys.exit(1 if bad else 0)
+PYEOF
 for s in "$ROOT"/scripts/*.sh; do sh -n "$s" || { echo "rules: $s does not parse"; fail=1; }; done
 sh "$ROOT/scripts/tracker.sh" "$ROOT" | grep -q '^forge=' || { echo "rules: tracker.sh gave no forge"; fail=1; }
 sh "$ROOT/scripts/checks.sh" "$ROOT" | grep -qE '^(project=|none=1)' || { echo "rules: checks.sh gave no answer"; fail=1; }

@@ -1,6 +1,6 @@
 interface:
   display_name: "Simplify"
-  short_description: "Behavior-preserving elision of the code you just changed"
+  short_description: "Shrink the changed code without changing behavior; --debt prints the ceiling ledger"
   default_prompt: "Use $simplify on the code I just changed: reuse what already exists, prefer the stdlib or platform, delete dead flexibility, shrink. Preserve behavior, then run the nearest existing check and report its result. Scope: <files, or leave empty for the current diff, or --repo [path] for a read-only audit>."
   brand_color: "#D97757"
 policy:

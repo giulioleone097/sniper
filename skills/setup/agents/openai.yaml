@@ -1,6 +1,6 @@
 interface:
   display_name: "Setup"
-  short_description: "Install the sniper doctrine into this project's AGENTS.md and CLAUDE.md"
+  short_description: "Install the doctrine into AGENTS.md and CLAUDE.md, then map the repository"
   default_prompt: "Use $setup to install or refresh the sniper doctrine in this repository's AGENTS.md and CLAUDE.md, then fill the proof commands from what the repo already declares."
   brand_color: "#1A1A1A"
 policy:

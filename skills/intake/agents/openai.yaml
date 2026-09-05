@@ -1,0 +1,7 @@
+interface:
+  display_name: "Intake"
+  short_description: "Turn an issue, pull request or report into a verified goal card"
+  default_prompt: "Use $intake on this item: read it from whatever tracker this repo has, reproduce the claim against the code, check whether it already exists or was already rejected, then emit the goal card. Do not change the item's state."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true

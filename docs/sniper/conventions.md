@@ -1,4 +1,4 @@
-stamp: 492dbe1 none 2026-09-05
+stamp: 452f32d none 2026-09-05
 # sniper - conventions
 
 Nessuna pull request merged nella finestra: le convenzioni qui vengono dai commit, dalle regole in `AGENTS.md` e da `scripts/check.sh`, che le esegue.
@@ -8,6 +8,9 @@ Un commit per comportamento, con il perché nel corpo quando non è ovvio; nessu
 
 ## Skill e riferimenti
 Corpo sotto le 120 righe, un solo blocco di output, condizione di stop per ultima; un ramo davvero condizionale vive in `references/<nome>.md` sotto le 80 righe. La descrizione apre con "Use when", sta sotto le 70 parole e chiude con "Not for". Eseguito da `check.sh`.
+
+## Scorciatoie
+Un limite deliberato in uno script porta `ceiling: <limite>, upgrade <trigger>`; `scripts/debt.sh` li elenca e marca chi non ha trigger. Eseguito da `check.sh` come risposta del registro.
 
 ## Percorsi e host
 Nessuna variabile di host dentro skill e agenti; `<this skill>` e `<plugin root>` al loro posto. Gli hook usano solo eventi e forme che entrambi gli host supportano. Eseguito da `check.sh` per le variabili.

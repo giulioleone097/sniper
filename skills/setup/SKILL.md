@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Use when a project needs sniper's local rules. Writes the doctrine block into the project's AGENTS.md and makes CLAUDE.md import it, idempotently; own content is preserved and the session hook then injects nothing there. Not for editing the doctrine itself.
+description: Use when a project needs sniper's local rules. Writes the doctrine block into the project's AGENTS.md, makes CLAUDE.md import it, points AGENTS.md at the repository map and builds the map through the map skill; idempotent, own content preserved, the session hook then injects nothing there. Not for editing the doctrine itself.
 argument-hint: "[project-dir] [--no-map]"
 disable-model-invocation: true
 ---

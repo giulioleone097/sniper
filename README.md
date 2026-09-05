@@ -54,8 +54,10 @@ map? ──► intake? ──► grill? ──► scope ──► plan? ──�
   └──── debug ◄───────┘ (when a real failure appears)
 ```
 
-`plan` only runs for 4+ steps or more than one owner; otherwise `scope` hands
-straight to `build`. `simplify` runs on the changed code before `review`, so
+`map` runs once per repository and every later skill reads it before
+discovering; `intake` and `grill` are the two ways work reaches `scope` when it
+did not arrive as a clear task. `plan` only runs for 4+ steps or more than one
+owner; otherwise `scope` hands straight to `build`. `simplify` runs on the changed code before `review`, so
 review sees the lean diff. `learn` only runs when the fix's reasoning is not
 already in code, tests, or docs. `flow` runs the whole pipeline hands-off and
 stops before push/PR unless told otherwise.
@@ -122,8 +124,9 @@ Four detectors make the skills run the repository's own commands instead of gues
 - `SessionStart` and `SubagentStart` run `scripts/core-context.sh`, which
   injects `core/SNIPER.md` as `additionalContext` so the doctrine is active
   every turn and inside every subagent. `SubagentStart` has no matcher, so it
-  injects into every subagent in the session, not only sniper's; add
-  `"matcher": "sniper:.*"` to that entry in `hooks/hooks.json` to narrow it.
+  injects into every subagent in the session, not only sniper's; set
+  `SNIPER_SUBAGENT_MATCHER=<regex>` (unanchored, case-insensitive, for
+  example `^sniper`) to narrow it to the agent types that match.
 - `PreToolUse` on `Bash` runs `scripts/guard.sh`, which denies:
   - `--no-verify` as a token in a segment that also has `git`
   - `git push --force` / `-f` / a `+refspec` (e.g. `+main`), but not
@@ -144,19 +147,18 @@ Four detectors make the skills run the repository's own commands instead of gues
 To disable: `/plugin disable sniper`, or delete the entry in
 `hooks/hooks.json`.
 
-`SNIPER_SUBAGENT_MATCHER=<regex>` (unanchored, case-insensitive) limits the SubagentStart injection to the agent types that match, for example `^sniper`; unset injects into every subagent.
-
 ## Codex notes
 
 - Skills: same files, invoked as `$name` instead of `/sniper:name`.
 - Hooks: same `hooks/hooks.json`; trust it once in `/hooks` (see Install).
 - Agents: not bundled — `scripts/install-codex-agents.sh` generates
-  `sniper_scout`, `sniper_worker`, `sniper_reviewer` (hyphens become
-  underscores) as `~/.codex/agents/*.toml`; `build`/`review` spawn them
-  when installed, otherwise fall back to inline/sequential.
+  `sniper_scout`, `sniper_worker`, `sniper_reviewer`, `sniper_integrator`
+  (hyphens become underscores) as `~/.codex/agents/*.toml`; `build`,
+  `review`, `simplify`, `narrate` and `map` spawn them when installed,
+  otherwise fall back to inline/sequential.
 - No `disable-model-invocation` on Codex; each skill's sidecar
   `policy.allow_implicit_invocation` plays that role, `false` only on
-  `flow`'s `agents/openai.yaml`.
+  `flow` and `setup`, the two user-typed commands.
 
 Per project, run `/sniper:setup` (`$setup` on Codex): it writes the doctrine
 block into the repository's `AGENTS.md` (created, or appended between

@@ -1,6 +1,6 @@
 interface:
   display_name: "Learn"
-  short_description: "Record one durable learning after a non-obvious fix"
+  short_description: "Record one durable learning, or the rules a PR's reviewers asked for"
   default_prompt: "Use $learn on the fix we just proved: decide whether a non-obvious invariant or trap is missing from the code, tests, and docs, and record at most one, either under '## Code Review Rules' in the closest AGENTS.md or CLAUDE.md or as a short docs/solutions file. Show me the exact lines and write only after I confirm. Write nothing when the artifacts already explain it. Context: <what was non-obvious, or leave empty>."
   brand_color: "#D97757"
 policy:

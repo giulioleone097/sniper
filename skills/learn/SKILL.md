@@ -1,7 +1,7 @@
 ---
 name: learn
 argument-hint: "[--from-pr <n>]"
-description: Use when a proven fix uncovered an invariant, trap or decision the code, tests and docs will not explain, or the user asks for a session retrospective. Writes at most three lines under Code Review Rules in the closest AGENTS.md or CLAUDE.md, or a short docs/solutions file; nothing when artifacts already explain themselves.
+description: Use when a proven fix uncovered an invariant, trap or decision the code, tests and docs will not explain, when reviewers asked for something on a PR (--from-pr), or for a session retrospective. Writes at most three lines under Code Review Rules in the closest AGENTS.md or CLAUDE.md, or a short docs/solutions file; nothing when artifacts already explain themselves.
 ---
 
 1. Name the candidate in one sentence: the invariant, trap, or decision this work uncovered. Only a fix that is already proven qualifies. With `--from-pr <n>`, the candidates are what reviewers asked for on that pull request: read its reviews and inline comments through the tracker CLI (`gh api repos/<slug>/pulls/<n>/comments` and `/reviews`, `glab mr view <n> --comments`, `az repos pr` equivalents), group them by theme, and run each theme through steps 2 to 4 as its own candidate, quoting the comment and the reviewer as the provenance; a request made once on one line is a fix for that line, not a rule. When the user asked for a retrospective on the session rather than a rule about the code, the subject is the environment the next agent inherits: read `references/environment.md` and work its categories instead of steps 2 and 3, then rejoin at step 8.
