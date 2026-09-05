@@ -36,6 +36,8 @@ Delegation: hand independent subtasks to sub-agents and keep working while they 
 Stop when the acceptance check passes, with every intention you stated closed as done, blocked with the reason, or dropped with the reason; a step you decided on is something to run, not to announce. Report for a reader who did not watch you work: the outcome first, then what changed, the proof that ran with its exact result, unresolved risk, and follow-ups, in plain sentences without the shorthand you built up while working. A lesson the code, tests, and docs will not carry goes through `learn`, not into the report.
 <!-- sniper:core:end -->
 
+Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with the sniper `map` skill).
+
 ## Working on this repo
 
 - `core/SNIPER.md` is the canonical doctrine; the block above must stay identical to it (`scripts/check.sh` verifies). Claude Code reads this file through `.claude/CLAUDE.md` (`@../AGENTS.md`); a `CLAUDE.md` at the plugin root fails `claude plugin validate --strict`.
