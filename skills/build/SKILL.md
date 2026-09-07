@@ -1,6 +1,6 @@
 ---
 name: build
-description: Use when a goal card, plan task or clear build request exists and code must change. Detects the mode (feature, fix, refactor, migrate), edits surgically, tests only at agreed seams, proves the change, hands the diff to simplify. Not for an unexplained failure, which debug owns.
+description: Use when a goal card, plan task or clear build request exists and code must change. Edits surgically at agreed seams, proves the change, hands the diff to simplify. Not for a failure with no known cause.
 argument-hint: "[what to build, a plan task, or the goal card from scope]"
 ---
 

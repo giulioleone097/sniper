@@ -1,6 +1,6 @@
 ---
 name: narrate
-description: Use when a PR needs a body or a reviewer must approve without reading every file. Writes the approval dossier: verdict, plain-words changes, a map, then per domain the before/after shape, boundaries crossed with their consumers, decisions with rejected alternatives, executed evidence. Not for finding bugs.
+description: Use when a PR needs a body or a reviewer must approve without reading every file. Writes the approval dossier: verdict, plain-words changes, a map, one drill-down per domain with executed evidence. Not for finding bugs.
 argument-hint: "[pr-number | pr-url | branch] [--out file] [--post] [--walkthrough] [--no-run] [--lang it|en]"
 ---
 
@@ -56,6 +56,5 @@ argument-hint: "[pr-number | pr-url | branch] [--out file] [--post] [--walkthrou
 
 9. Rules. ✅ means executed evidence passes or the failures are proven pre-existing on the base branch; ⚠️ means evidence exists but a residual risk or an environment gap remains, named; ❌ means the PR itself prevents the check or a new failure is attributed to it. Every "Confini attraversati" line names a consumer and its proof. Every "Decisioni" line names the rejected alternative; a decision without one is a description, cut it. The dossier contains no task for the approver: what the author must fix is in the verdict, what the release process covers is in "Fuori dal perimetro" with its owner. This is comprehension, not review: no bug list, no severity table, no security findings - `review` owns those. Numbers stay in the evidence lines, the weight line or "N test verdi" form. A domain gets at most 45 lines outside its details block, its map at most 10 nodes and its shape at most 16; the whole dossier at most 900. A domain that cannot fill those lines with mechanism, boundaries and named evidence is two domains merged, or one that did not need narrating.
 
-10. `--out <file>` writes the dossier, otherwise print it. `--post`: show it, then only after the user confirms in this session replace the PR body with `gh pr edit <n> -R OWNER/REPO --body-file <file>`; a body without the `<!-- sniper:narrate -->` marker is the author's text, say so and ask first. `--walkthrough`: write `comments.json` (one entry per decision, `path`, `line`, `body` of at most three lines saying why), run `python3 <this skill>/scripts/pr-walkthrough.py OWNER/REPO <n> comments.json -C <repo>` to validate and show the payload (`-C` reads the diff locally; `gh pr diff` refuses PRs above 300 files), then only after the user confirms add `--post`.
-
+10. `--out`, `--post` or `--walkthrough` asked: read `<this skill>/references/posting.md`; nothing is posted before the user confirms in this session.
 Stop when the dossier is printed or written and any confirmed post has run. Do not review for defects, do not edit code, and do not narrate files outside the judgment bucket.

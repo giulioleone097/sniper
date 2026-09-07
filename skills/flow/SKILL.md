@@ -1,6 +1,6 @@
 ---
 name: flow
-description: Use when the user wants a task carried end to end with no check-ins. Runs map when the repository has none, intake when the argument is an item, then scope, plan when complex, build, simplify, review, prove, ship, learn, taking the recommended option at every decision and stopping before push unless asked. Not for exploratory work.
+description: Use when the user wants a task carried end to end with no check-ins. Runs map, intake, scope, plan, build, simplify, review, prove, ship and learn as needed, stopping before push unless asked. Not for exploratory work.
 argument-hint: "[task description] [--push] [--pr]"
 disable-model-invocation: true
 ---

@@ -1,6 +1,6 @@
 ---
 name: grill
-description: Use when the outcome is genuinely undecided or a design has open branches. Works the decision tree in rounds, asks the whole frontier at once with a recommended answer each, looks facts up itself, and hands scope a request with no holes. Not for a request whose shape is already clear.
+description: Use when the outcome is genuinely undecided or a design has open branches. Works the decision tree in rounds through the host's question tool, facts looked up itself. Not for a request whose shape is clear.
 argument-hint: "[the idea, plan, or design to grill]"
 ---
 

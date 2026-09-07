@@ -1,6 +1,6 @@
 ---
 name: map
-description: Use when a repository is new to this session, when setup runs, or when the map is older than the work. Drills into the repository and the ones that depend on it - layout, entry points, checks, hot spots, owners, reviewers and what they ask for in the last merged PRs - and writes docs/sniper/map.md and conventions.md so no session starts from zero. Not for reviewing a change.
+description: Use when a repository is new to this session or its map stamp is behind the work. Writes docs/sniper/map.md and conventions.md from git, the tracker and the reviewers' comments. Not for reviewing a change.
 argument-hint: "[repo path] [--refresh] [--prs N] [--linked]"
 ---
 

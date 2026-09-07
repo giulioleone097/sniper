@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Use when the user says ship it, commit this, or open a PR, or from flow. Commits proven work as atomic Conventional Commits, links the tracker item, and pushes or opens a PR only with --push or --pr, body from narrate, no attribution trailer. Not for force-pushing, skipping hooks or unproven work.
+description: Use when the user says ship it, commit this, or open a PR, or from flow. Commits proven work as atomic Conventional Commits and pushes or opens a PR only with --push or --pr. Not for unproven work.
 argument-hint: "[--push] [--pr]"
 ---
 

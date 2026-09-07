@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Use when a failure or unexplained behavior has no known cause. Builds a tight pass/fail signal, instruments the nearest boundary instead of guessing, fixes the canonical cause, and proves it with the same signal. Not for known changes, which build owns.
+description: Use when a failure or unexplained behavior has no known cause. Builds a pass/fail signal, instruments the boundary, fixes the canonical cause and proves it. Not for changes whose cause is known.
 argument-hint: "[failure, error text, failing test path, or the command that reproduces it]"
 ---
 

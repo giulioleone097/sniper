@@ -1,6 +1,6 @@
 ---
 name: scope
-description: Use when a request has no stated outcome or an unclear boundary, before build or plan. Locks it into a goal card: outcome, acceptance check, exclusions, material risk, proof, size; asks at most three questions, only where answers change the work. Not for designing or implementing.
+description: Use when a request has no stated outcome or an unclear boundary, before build or plan. Locks a goal card: outcome, acceptance, exclusions, risk, proof, size; at most three questions. Not for designing or implementing.
 argument-hint: "[task description]"
 ---
 

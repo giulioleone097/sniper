@@ -1,10 +1,10 @@
 ---
 name: simplify
-description: Use when a slice is built and before review, or with --repo to audit a tree read-only. Makes changed code smaller without changing behavior: reuse, stdlib, native, delete, yagni, shrink; per area when the change spans several, then an integrator proves nothing moved. Not for bugs or new behavior.
+description: Use when a slice is built and before review. Shrinks the changed code without changing behavior through six rungs, per area, and proves nothing moved; --repo audits a tree, --debt lists ceilings. Not for bugs.
 argument-hint: "[baseline | files] [--repo [path]] [--debt]"
 ---
 
-1. Resolve scope. `--debt` means the ledger: run `sh <plugin root>/scripts/debt.sh <repo>` (`<plugin root>` is the parent of the `skills/` directory this file lives in), print its rows as they come with the `no-trigger` ones first, end with its count line, and stop; a `ceiling:` comment that names no upgrade trigger is the one that rots. `--repo [path]` means the read-only audit: go to step 7. Otherwise the changed code: `git diff <baseline>...HEAD` when the caller named a baseline or the branch has a merge-base, else `git diff HEAD`. No diff and no files named: ask which files, do not guess.
+1. Resolve scope. `--repo [path]` or `--debt` means a read-only audit: go to step 7. Otherwise the changed code: `git diff <baseline>...HEAD` when the caller named a baseline or the branch has a merge-base, else `git diff HEAD`. No diff and no files named: ask which files, do not guess.
 
 2. Split into areas when the change spans more than one: `python3 <plugin root>/scripts/pr-partition.py BASE HEAD` (`<plugin root>` is the parent of the `skills/` directory this file lives in) for the judgment bucket, grouped per deployable unit, shared library, or contract surface. One area, or fewer than about 15 judgment files: skip to step 4 and do it here.
 
@@ -25,12 +25,7 @@ argument-hint: "[baseline | files] [--repo [path]] [--debt]"
 
 6. Prove nothing moved. One area edited: run its nearest existing check (`sh <plugin root>/scripts/checks.sh <path>`) and report the exact result. Two or more areas edited, or a cut that crossed a boundary: one `sniper-integrator` pass (Codex: `sniper_integrator`) with the range, the per-area proposals, `applied` set to every file you edited, the checks for those areas from `sh <plugin root>/scripts/checks.sh <area path>`, and the repositories that depend on this one from `sh <plugin root>/scripts/consumers.sh`. It runs each check, attributes a failure to the baseline before calling it new, confirms no guard was thinned and no test weakened, skipped or deleted, and names any exported symbol a cut removed that something outside the area, or in a consumer repository, still consumes. Not installed: do that here, in that order, and say you did. No check configured for an area: say that instead of implying one ran.
 
-7. `--repo [path]`: read-only audit of the tree, applying nothing. Rank attention by hot spots first, so the files that keep changing get read first:
-
-   `git log --oneline -n 300 --name-only --pretty=format: | sort | uniq -c | sort -rn | head -30`
-
-   Then hunt the same six rungs across those files, biggest cut first.
-
+7. `--repo` or `--debt` asked: read `<this skill>/references/audit.md` and stop there; both are read-only.
 8. Print one line per finding, tag first:
 
 ```
@@ -40,6 +35,6 @@ regression: <command> - pass | fail (also fails on baseline) | fail (new) | none
 behavior: <file> - preserved | <what changed>
 ```
 
-   Tags are the six rung names: `reuse:` `stdlib:` `native:` `delete:` `yagni:` `shrink:`. Print one `regression:` line per area check that ran, and a `behavior:` line only where the integrator found something other than preserved. `--repo` prints the same finding lines ranked biggest cut first, ends at `net: -<N> lines possible.`, and has neither line because it changed nothing. Nothing to cut in scope: print `Lean already.` alone.
+   Tags are the six rung names: `reuse:` `stdlib:` `native:` `delete:` `yagni:` `shrink:`. Print one `regression:` line per area check that ran, and a `behavior:` line only where the integrator found something other than preserved. Nothing to cut in scope: print `Lean already.` alone.
 
 9. Stop when the checklist finds nothing left in scope and the proof has run. Do not widen to untouched files, and do not run a second sweep hunting smaller wins.

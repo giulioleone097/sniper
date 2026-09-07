@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Use when work spans four or more tasks, several owners, or a change others depend on. Breaks a goal card into ordered tasks with owned paths, acceptance, proof and test seams; brief in chat under four tasks, docs/plans file otherwise; --tickets publishes them. Not for implementing.
+description: Use when work spans four or more tasks, several owners, or a change others depend on. Orders tasks with owned paths, acceptance, proof and seams; --tickets publishes them. Not for implementing.
 argument-hint: "[task text or goal card] [--tickets]"
 ---
 

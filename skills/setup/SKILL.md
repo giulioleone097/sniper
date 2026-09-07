@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Use when a project needs sniper's local rules. Writes the doctrine block into the project's AGENTS.md, makes CLAUDE.md import it, points AGENTS.md at the repository map and builds the map through the map skill; idempotent, own content preserved, the session hook then injects nothing there. Not for editing the doctrine itself.
+description: Use when a project needs sniper's local rules. Installs the doctrine block in AGENTS.md, the CLAUDE.md import and the map pointer, then builds the map. Not for editing the doctrine.
 argument-hint: "[project-dir] [--no-map]"
 disable-model-invocation: true
 ---
@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 2. Run `python3 <this skill>/scripts/upsert-agents.py <project-dir> <plugin root>/core/SNIPER.md --map` (drop `--map` with `--no-map`), where `<this skill>` is the directory this file lives in and `<plugin root>` is the parent of its `skills/` directory: the script sits in `scripts/` beside this file, `core/SNIPER.md` at the plugin root. It creates or refreshes only the block between `<!-- sniper:core:start -->` and `<!-- sniper:core:end -->` in `AGENTS.md`, and makes sure `CLAUDE.md` imports it with `@AGENTS.md`. With `--map` it also adds one navigation line after the block pointing at `docs/sniper/map.md` and `conventions.md`, which step 4 creates. Report the status lines it prints.
 
-3. When the script reports the fill marker present, replace it with the repository's own proof commands, three to six lines, one command each, taken from what the repository already declares: `package.json` scripts, `pyproject.toml`/`Makefile`/`justfile`, `nx`/`turbo` targets, the CI workflow. Prefer the exact CI commands. Do not invent commands and do not run them here. Leave the section alone when the marker is absent: the user owns it.
+3. When the script reports the fill marker present, replace it with the repository's own proof commands, three to six lines, one command each, taken from what the repository already declares: `package.json` scripts, `pyproject.toml`/`Makefile`/`justfile`, `nx`/`turbo` targets, the CI workflow. Prefer the exact CI commands, and when they run against disposable fixtures with no production access, say so in one line so the agent runs them and reruns affected ones without asking at each step. Do not invent commands and do not run them here. Leave the section alone when the marker is absent: the user owns it.
 
 4. Unless `--no-map`: invoke the `map` skill on the project (`sniper:map` through the Skill tool, `$map` on Codex) so `docs/sniper/map.md` and `conventions.md` exist and carry a stamp; a map that is already current is left alone.
 

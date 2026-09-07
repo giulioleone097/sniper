@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Use when context is running out or the work moves to another session, machine or person. Writes what a fresh session needs: goal card, branch and tree state, proven versus believed with the command, open work with the next action first, artifacts pointed at, secrets redacted. Not for approvers.
+description: Use when context is running out or the work moves to another session or person. Writes what a fresh session needs: state, proven versus believed, open work, artifacts pointed at, secrets redacted. Not for approvers.
 argument-hint: "[what the next session will focus on] [--out file]"
 ---
 

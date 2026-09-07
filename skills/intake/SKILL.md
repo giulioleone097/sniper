@@ -1,6 +1,6 @@
 ---
 name: intake
-description: Use when work arrives from outside: an issue, PR, work item, bug report or pasted text. Reads it from whatever tracker the repo has, reproduces the claim, checks whether it already exists or was rejected, and hands a goal card to scope. Not for work already carded or for reporting back, which narrate owns.
+description: Use when work arrives from outside: an issue, PR, work item or pasted report. Reads it from the repo's tracker, reproduces the claim, checks it is not already done or rejected, hands a card to scope. Not for carded work.
 argument-hint: "[issue number | url | file | pasted text] [--reply]"
 ---
 

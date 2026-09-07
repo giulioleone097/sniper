@@ -1,6 +1,6 @@
 ---
 name: review
-description: Use when a change, branch, PR or working tree needs review, or right after a build slice. One reviewer per area or lens, then an integrator that merges, settles contradictions, catches cross-area and cross-repo breakage, verifies each finding and runs the nearest checks. Not for code the diff did not touch.
+description: Use when a change, branch, PR or working tree needs review. One reviewer per area or lens, then an integrator that verifies findings, sweeps consumers and runs the checks. Not for code the diff did not touch.
 argument-hint: "[baseline] [--fix] [--pr]"
 ---
 
