@@ -17,7 +17,7 @@ sniper/
   .claude-plugin/plugin.json, marketplace.json   Claude Code manifest and marketplace ("sniper", source "./")
   .codex-plugin/plugin.json, .agents/plugins/marketplace.json   Codex manifest and marketplace
   core/SNIPER.md                    the doctrine, injected at SessionStart and SubagentStart
-  skills/<stage>/SKILL.md           5 stages, each a router under 120 lines
+  skills/<stage>/SKILL.md           5 stages and 2 named entry points (grill, simplify), each a router under 120 lines
   skills/<stage>/references/*.md    the branches, read only when their case applies, under 80 lines each
   skills/<stage>/agents/openai.yaml Codex sidecar, one per stage
   skills/setup/scripts/upsert-agents.py          doctrine block and map pointer in AGENTS.md
@@ -49,6 +49,7 @@ setup? ──► scope ──► build ──► review ──► ship
 - `build` routes by the card: complex size plans first (`--tickets` publishes), an unknown cause debugs first, then the mode reference (fix, refactor, migrate, UI), then implementation at seams and the proof set from the repository's own commands.
 - `review` shrinks first, then reviews per area and ends in the integrator, which verifies, sweeps consumers inside and outside the repository, and runs the checks with failures attributed to the baseline. `--repo` and `--debt` are read-only audits.
 - `ship` commits proven work, writes the dossier as the PR body, keeps one lesson, and hands off when a session stops early. `setup` installs the doctrine on the user's invocation and builds or refreshes the map on anyone's.
+- `grill` and `simplify` are entry points typed by name, not stages: grill interrogates an idea before any card exists and ends by asking whether to build, card only, or stop; simplify shrinks code nobody asked to review and never runs review. Both are thin: grill reads scope's `grill.md`, simplify reads review's `shrink.md`, so the logic lives once.
 
 ## Doctrine
 
@@ -65,8 +66,10 @@ Every SKILL.md: frontmatter `name`, `description` opening with `Use when`, under
 | `setup` | `map.md` | files written, map current |
 | `scope` | `intake.md`, `grill.md`, `asking.md` | card emitted and handed to build |
 | `build` | `plan.md`, `debug.md`, `prove.md`, `fix.md`, `refactor.md`, `migrate.md`, `ui-taste.md` | acceptance proven and handed to review |
-| `review` | `audit.md`, `platform-native.md` | one pass printed with `ship: ready` or what blocks |
+| `review` | `shrink.md`, `audit.md`, `platform-native.md` | one pass printed with `ship: ready` or what blocks |
 | `ship` | `narrate.md`, `shapes.md`, `posting.md`, `learn.md`, `environment.md`, `handoff.md` | commits exist and any requested push, PR, dossier or handoff ran |
+| `grill` | scope's `grill.md`, `asking.md` | settled tree printed, chosen handoff run |
+| `simplify` | review's `shrink.md`, `audit.md`, `platform-native.md` | nothing left to cut in scope, proof run |
 
 ## Agents
 

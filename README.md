@@ -48,10 +48,12 @@ fixtures, manifest JSON, doctrine sync, version parity).
 ## The flow
 
 ```
+grill ─┐
 setup? ──► scope ──► build ──► review ──► ship
              │          │          │
        intake, grill  plan, debug  shrink, reviewers,
        goal card      prove        integrator
+                              simplify (shrink alone)
 ```
 
 The loop runs itself: a request to change code goes through `scope`, `build`
@@ -60,15 +62,19 @@ through the host's skill tool. `ship` runs when you say ship, commit or PR, or
 when the request said to carry the work through. `setup` installs the doctrine
 in a project and builds its map; the map is refreshed by the model when its
 stamp falls behind. Type a stage name only to run one alone or with flags.
+`grill` and `simplify` are entry points you type by name: an idea interrogated
+before any card exists, a shrink pass on code nobody asked to review.
 
 ## Skills
 
-| stage | use when | what it does |
+| skill | use when | what it does |
 |---|---|---|
 | `setup` | a project needs sniper's local rules, or its map is missing or stale | doctrine block in AGENTS.md, CLAUDE.md import, map pointer (only when you typed it); `docs/sniper/map.md` and `conventions.md` from git, the tracker and the reviewers' comments, with a stamp; `--map` refreshes only |
 | `scope` | work arrives: a task, an issue, a PR, a report, an idea | intake for a tracker item (read, reproduce the claim, check already-done and already-rejected), grill for an undecided design (rounds through the host's question tool), then the goal card: outcome, acceptance, exclusions, risk, proof, size; hands to build |
 | `build` | a card exists and code must change, or a failure has no known cause | plan when complex (`--tickets` publishes), debug when the cause is unknown, mode references for fix, refactor, migrate and UI, one runnable check where none exists, proof from the repository's own commands; hands to review |
 | `review` | a change is built, or a branch, PR or tree needs review | shrink first (reuse, stdlib, native, delete, yagni, shrink, with the platform lookup and `ceiling:` on kept limits), one reviewer per area or lens, the integrator verifies, sweeps consumers in and out of the repository and runs the checks with failures attributed to the baseline; `--fix`, `--pr`, `--repo`, `--debt` |
+| `grill` | you say grill me, or bring an idea or design still undecided | the decision tree worked in rounds through the host's question tool, facts looked up itself, the recommendation first on every question; ends by asking build now, card only or stop, and hands the settled request to scope |
+| `simplify` | you ask to simplify, shrink or de-slop code outside a review, or `--repo` / `--debt` | the six rungs (reuse, stdlib, native, delete, yagni, shrink) per area, `slop` reviewers proposing when there are several, then the nearest check or the integrator proving nothing moved; never runs review |
 | `ship` | you say ship, commit, PR, dossier, handoff, or asked up front to carry it through | atomic Conventional Commits, tracker item linked, `--pr` with the approval dossier as body, `--dossier` alone, one durable lesson (`--learn`, `--from-pr <n>`), `--handoff` when stopping early; push only with `--push` |
 
 Every stage keeps its branches in `references/`: the root file is a router, read in full, and a branch is read only when its case applies.

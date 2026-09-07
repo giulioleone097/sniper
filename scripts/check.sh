@@ -37,15 +37,17 @@ done
 for d in "$ROOT"/skills/*/; do
   [ -f "$d/agents/openai.yaml" ] || { echo "rules: $d has no Codex sidecar (agents/openai.yaml)"; fail=1; }
 done
-# every references/ or scripts/ file a skill names must exist (beside the skill, at the plugin root, or under narrate)
+# every references/ or scripts/ file a skill names must exist: beside the skill, at the plugin root, or under the stage it names
 python3 - "$ROOT" <<'PYEOF' || fail=1
 import glob, os, re, sys
 root = sys.argv[1]; bad = 0
+pat = r'`(?:<this skill>/|<plugin root>/skills/([a-z]+)/)?(references/[a-z-]+\.md|scripts/[a-z_-]+\.(?:py|sh))`'
 for f in glob.glob(f"{root}/skills/*/SKILL.md"):
     d = os.path.dirname(f)
-    for m in set(re.findall(r'`(?:<this skill>/)?(references/[a-z-]+\.md|scripts/[a-z_-]+\.(?:py|sh))`', open(f).read())):
-        if not any(os.path.exists(os.path.join(x, m)) for x in (d, root, f"{root}/skills/ship", f"{root}/skills/build")):
-            print(f"rules: {f} names {m}, which does not exist"); bad += 1
+    for stage, m in set(re.findall(pat, open(f).read())):
+        where = [f"{root}/skills/{stage}"] if stage else [d, root]
+        if not any(os.path.exists(os.path.join(x, m)) for x in where):
+            print(f"rules: {f} names {m}, which does not exist under {where}"); bad += 1
 sys.exit(1 if bad else 0)
 PYEOF
 for s in "$ROOT"/scripts/*.sh; do sh -n "$s" || { echo "rules: $s does not parse"; fail=1; }; done

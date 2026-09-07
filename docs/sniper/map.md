@@ -2,7 +2,7 @@ stamp: 452f32d none 2026-09-05
 # sniper - map
 
 ## Cosa fa, in una frase
-Un plugin per Claude Code e Codex che porta un lavoro dall'arrivo (issue, PR, idea) alla consegna (commit, PR, dossier) attraverso cinque fasi che si chiamano da sole (setup, scope, build, review, ship), quattro agenti, sette rilevatori e un banco di prova agentico, con una dottrina anti-slop iniettata a ogni sessione.
+Un plugin per Claude Code e Codex che porta un lavoro dall'arrivo (issue, PR, idea) alla consegna (commit, PR, dossier) attraverso cinque fasi che si chiamano da sole (setup, scope, build, review, ship) più due ingressi digitati per nome (grill, simplify), quattro agenti, sette rilevatori e un banco di prova agentico, con una dottrina anti-slop iniettata a ogni sessione.
 
 ## Domini
 - Dottrina: `core/SNIPER.md`, iniettata da `scripts/core-context.sh` via `hooks/hooks.json` (SessionStart, SubagentStart); il blocco in `AGENTS.md` deve restare identico, `scripts/check.sh` lo verifica. Raggiunta da ogni sessione dei due host.

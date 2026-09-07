@@ -1,0 +1,7 @@
+interface:
+  display_name: "Grill"
+  short_description: "Interrogate an undecided idea or design in rounds, then hand the settled request to scope"
+  default_prompt: "Use $grill on this idea: work the decision tree in rounds, look the facts up yourself, ask me only the open decisions with your recommendation first, then hand the settled request to scope."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true

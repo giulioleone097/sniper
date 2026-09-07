@@ -1,0 +1,7 @@
+interface:
+  display_name: "Simplify"
+  short_description: "Shrink code without changing behavior, per area, and prove nothing moved"
+  default_prompt: "Use $simplify on this code: walk the rungs (reuse, stdlib, native, delete, yagni, shrink), cut only what keeps behavior, then run the nearest check and tell me what moved."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true
