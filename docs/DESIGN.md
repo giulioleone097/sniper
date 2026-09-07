@@ -17,40 +17,38 @@ sniper/
   .claude-plugin/plugin.json, marketplace.json   Claude Code manifest and marketplace ("sniper", source "./")
   .codex-plugin/plugin.json, .agents/plugins/marketplace.json   Codex manifest and marketplace
   core/SNIPER.md                    the doctrine, injected at SessionStart and SubagentStart
-  skills/<name>/SKILL.md            16 skills, each under 120 lines
-  skills/<name>/agents/openai.yaml  Codex sidecar, one per skill
-  skills/<name>/references/*.md     a genuinely conditional branch, under 80 lines
+  skills/<stage>/SKILL.md           5 stages, each a router under 120 lines
+  skills/<stage>/references/*.md    the branches, read only when their case applies, under 80 lines each
+  skills/<stage>/agents/openai.yaml Codex sidecar, one per stage
   skills/setup/scripts/upsert-agents.py          doctrine block and map pointer in AGENTS.md
-  skills/narrate/scripts/*.py       pr-contracts, pr-walkthrough, test-summary
+  skills/ship/scripts/*.py          pr-contracts, pr-walkthrough, test-summary (the dossier's evidence)
   agents/sniper-{scout,worker,reviewer,integrator}.md   one definition per role for both hosts
   hooks/hooks.json                  shared: SessionStart, SubagentStart, PreToolUse(Bash)
   scripts/core-context.sh, guard.sh, test-guard.sh   the hooks and the guard fixtures
   scripts/checks.sh, tracker.sh, consumers.sh, tokens.sh, repo-facts.sh, debt.sh, pr-partition.py   detectors
   scripts/install-codex-agents.sh, check.sh      Codex agents generation, one-command acceptance
   evals/run.py, tasks.py            the agentic benchmark
-  docs/sniper/map.md, conventions.md   the plugin's own map, built by its own skill
+  docs/sniper/map.md, conventions.md   the plugin's own map, built by its own setup
   AGENTS.md, .claude/CLAUDE.md      doctrine verbatim plus repo rules; CLAUDE.md imports it
   docs/DESIGN.md, docs/sources.md, README.md, LICENSE (MIT)
 ```
 
-Skills are invoked as `/sniper:<name>` in Claude Code and `$<name>` in Codex.
+Stages are invoked as `/sniper:<stage>` in Claude Code and `$<stage>` in Codex, and by each other through the host's skill tool.
 
 ## The flow
 
 ```
-map? ──► intake? ──► grill? ──► scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
-                                                                        handoff (any time the session ends early)
-  ▲                   │
-  └──── debug ◄───────┘ (when a real failure appears)
+setup? ──► scope ──► build ──► review ──► ship
+             │          │          │
+       intake, grill  plan, debug  shrink, reviewers,
+       goal card      prove        integrator
 ```
 
-- `map` once per repository, refreshed only for what moved since its stamp; every later skill reads it before discovering.
-- `intake` when the work arrives as an issue, PR, work item or pasted report; `grill` when the design is genuinely undecided; both hand a request to `scope`.
-- `plan` only for four or more tasks, several owners, or a change others depend on. Otherwise `scope` hands straight to `build`.
-- `simplify` runs on the changed code before `review`, so review sees the lean diff. Both split by area and end in the integrator.
-- `review` findings go back to `build`; one exact-diff pass, recheck only what a fix touched.
-- `narrate` writes the dossier `ship --pr` uses as the PR body. `learn` runs only when the reasoning would otherwise be lost, or on the comments a PR received.
-- `flow` runs the pipeline hands-off, taking the recommended option at every decision and stopping before push unless told otherwise; it never calls `grill`, and calls `handoff` when it stops early.
+- The loop runs itself: a request to change code goes through `scope`, `build` and `review` without a typed stage name; each stage invokes the next. `ship` runs on the user's word (ship, commit, PR) or when the request said to carry the work through. A question or a described problem gets an assessment, not the loop.
+- `scope` routes by what arrived: a tracker item goes through intake (read, reproduce, already-done and already-rejected checks), an undecided design through grill (rounds through the host's question tool), a clear task straight to the card.
+- `build` routes by the card: complex size plans first (`--tickets` publishes), an unknown cause debugs first, then the mode reference (fix, refactor, migrate, UI), then implementation at seams and the proof set from the repository's own commands.
+- `review` shrinks first, then reviews per area and ends in the integrator, which verifies, sweeps consumers inside and outside the repository, and runs the checks with failures attributed to the baseline. `--repo` and `--debt` are read-only audits.
+- `ship` commits proven work, writes the dossier as the PR body, keeps one lesson, and hands off when a session stops early. `setup` installs the doctrine on the user's invocation and builds or refreshes the map on anyone's.
 
 ## Doctrine
 
@@ -60,30 +58,19 @@ It is written against the current guidance of both vendors and re-audited when e
 
 ## Skills
 
-Every SKILL.md: frontmatter `name`, `description` opening with `Use when`, under 70 words, ending with what it is not for; body imperative, one output block, the stop condition last, under 120 lines; a genuinely conditional branch in `references/<branch>.md` under 80 lines; paths written as `<this skill>/…` or `<plugin root>/…` because neither host expands a variable in a skill body. Each skill ships `agents/openai.yaml` for Codex.
+Every SKILL.md: frontmatter `name`, `description` opening with `Use when`, under 70 words, ending with what it is not for; body imperative, one output block, the stop condition last, under 120 lines; every branch in `references/<branch>.md` under 80 lines, read only when its case applies; paths written as `<this skill>/…` or `<plugin root>/…` because neither host expands a variable in a skill body. Each stage ships `agents/openai.yaml` for Codex and is model-invocable, so the loop can chain; `setup` alone distinguishes the user's invocation (installs the doctrine) from the model's (`--map`, refreshes the map only).
 
-| skill | does | ends when |
+| stage | branches | ends when |
 |---|---|---|
-| `setup` | doctrine block into AGENTS.md, CLAUDE.md import, map pointer, then `map` | files written |
-| `map` | `repo-facts.sh` facts, reviewers' comments on the last merged PRs, optional code-graph or symbol server, `docs/sniper/map.md` and `conventions.md` with a stamp; `--linked` for consumer repositories | paths and stamp printed |
-| `intake` | item read through the tracker the repo has, claim reproduced, already-implemented and already-rejected checked, card through `scope`; `--reply` after confirmation | card or what is missing |
-| `grill` | decision tree in rounds through the host's question tool, facts looked up by a scout, settled tree handed to `scope` | frontier empty |
-| `scope` | goal card: outcome, acceptance, exclusions, risk, proof, size; at most three questions through the question tool | card emitted |
-| `plan` | tasks with owned paths, acceptance, proof, test seams; brief or `docs/plans/` file; `--tickets` publishes them | plan written |
-| `build` | mode detected, code located from the map, slices with seams, one runnable check where no test exists, proof through `prove`, diff to `simplify` | acceptance passes |
-| `debug` | pass/fail signal, boundary instrumented, canonical cause fixed and proven | mechanism proven |
-| `simplify` | six rungs per area with the platform lookup, `ceiling:` on kept limits, integrator proves nothing moved; `--repo` audits, `--debt` prints the ledger | nothing left in scope |
-| `review` | one reviewer per area or lens with the repository's conventions, integrator merges, catches cross-area and cross-repo breakage, runs the checks; `--fix`, `--pr` | one pass printed |
-| `prove` | smallest decisive set from `checks.sh`, results reused, status reported | status line |
-| `narrate` | partition, blast radius in and out of the repository, executed evidence attributed to the baseline, dossier with a map and a per-domain drill-down; `--post`, `--walkthrough` | dossier written |
-| `handoff` | where the work stands, proven versus believed, open work, artifacts pointed at, secrets redacted | file written |
-| `ship` | atomic commits, tracker item linked, push or PR only when asked, body from `narrate` | commits exist |
-| `learn` | one durable rule into Code Review Rules or `docs/solutions`, from a fix, a PR's reviewers (`--from-pr`), or a session retrospective | one learning or none |
-| `flow` | the pipeline hands-off | done or blocked |
+| `setup` | `map.md` | files written, map current |
+| `scope` | `intake.md`, `grill.md`, `asking.md` | card emitted and handed to build |
+| `build` | `plan.md`, `debug.md`, `prove.md`, `fix.md`, `refactor.md`, `migrate.md`, `ui-taste.md` | acceptance proven and handed to review |
+| `review` | `audit.md`, `platform-native.md` | one pass printed with `ship: ready` or what blocks |
+| `ship` | `narrate.md`, `shapes.md`, `posting.md`, `learn.md`, `environment.md`, `handoff.md` | commits exist and any requested push, PR, dossier or handoff ran |
 
 ## Agents
 
-`sniper-scout` (sonnet, read-only) locates code and returns `path:line` lines. `sniper-worker` (sonnet, opus on request) implements one owned slice under a contract and reports changed files, proof, blockers. `sniper-reviewer` (opus, read-only) reviews one area or lens and reports every finding with severity and confidence; its slop lens carries the six rungs plus `taste:` on UI diffs and never flags the one runnable check. `sniper-integrator` (opus, read-only) merges the per-area reports, settles contradictions by reading the code, sweeps consumers inside and outside the repository, verifies every finding, and runs the nearest checks with each failure attributed to the baseline before it is called new. The same four files generate the Codex custom agents.
+`sniper-scout` (sonnet, read-only) locates code and returns `path:line` lines. `sniper-worker` (sonnet, opus on request) implements one owned slice under a contract and reports changed files, proof, blockers. `sniper-reviewer` (opus, read-only) reviews one area or lens and reports every finding with severity and confidence; its slop lens carries the six rungs plus `taste:` on UI diffs and never flags the one runnable check. `sniper-integrator` (opus, read-only) merges the per-area reports of a review pass, settles contradictions by reading the code, sweeps consumers inside and outside the repository, verifies every finding, and runs the nearest checks with each failure attributed to the baseline before it is called new. The same four files generate the Codex custom agents.
 
 ## Hooks and guard
 
@@ -99,7 +86,7 @@ A question to the user goes through the host's question tool: `AskUserQuestion` 
 
 ## Codex
 
-`.codex-plugin/plugin.json` mirrors the Claude manifest and points at the same `skills/` and `hooks/hooks.json`. Codex cannot bundle agents, so `scripts/install-codex-agents.sh` generates `~/.codex/agents/sniper_{scout,worker,reviewer,integrator}.toml` from `agents/*.md`. Codex has no `disable-model-invocation`; the sidecar's `policy.allow_implicit_invocation` is `false` only for `flow` and `setup`. Codex expands `${CLAUDE_PLUGIN_ROOT}` in `hooks/hooks.json` only, presents skills to the model as absolute roots, and shortens descriptions to about 45 characters when many plugins are installed: hence host-neutral paths and trigger-first descriptions, both enforced by `check.sh`.
+`.codex-plugin/plugin.json` mirrors the Claude manifest and points at the same `skills/` and `hooks/hooks.json`. Codex cannot bundle agents, so `scripts/install-codex-agents.sh` generates `~/.codex/agents/sniper_{scout,worker,reviewer,integrator}.toml` from `agents/*.md`. Codex has no `disable-model-invocation`, and no sniper stage needs one; every sidecar allows implicit invocation so the loop can chain. Codex expands `${CLAUDE_PLUGIN_ROOT}` in `hooks/hooks.json` only, presents skills to the model as absolute roots, and shortens descriptions to about 45 characters when many plugins are installed: hence host-neutral paths and trigger-first descriptions, both enforced by `check.sh`.
 
 ## Evals
 

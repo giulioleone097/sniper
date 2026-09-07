@@ -1,7 +1,6 @@
----
-name: prove
-description: Use when work is about to be called complete or shipped. Runs the smallest decisive check set from the repository's own commands and reports DONE, DONE_WITH_CONCERNS, BLOCKED or NEEDS_CONTEXT. Not for editing code.
----
+# Prove: the smallest decisive check set
+
+Read at the end of every build, and from ship before committing.
 
 1. Take the acceptance check from the goal card if one exists; otherwise read the request and state the check that would fail if the change were wrong.
 2. Build the smallest decisive set per core's proof ladder: typecheck/lint, then the targeted test for the changed behavior, then one real exercise of the path (curl, CLI run, script) only when no test can reach it. Take the commands from the repository, not from memory: `sh <plugin root>/scripts/checks.sh <changed path>` (`<plugin root>` is the parent of the `skills/` directory this file lives in) prints the project's own typecheck, lint, test and build commands, or `none=1`. Narrow the test command to the changed behavior where the runner allows it. Stop adding checks once the set would catch a wrong change.

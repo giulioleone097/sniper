@@ -1,6 +1,6 @@
 ---
 name: sniper-integrator
-description: Merges the per-area reports of a review or a simplify pass into one verified list and proves nothing regressed. Use when several agents each covered one area of the same change and the lead needs the union checked against the code, contradictions resolved, cross-area interactions caught, and the nearest checks run with failures attributed to the baseline. Never writes a fix.
+description: Merges the per-area reports of a review pass into one verified list and proves nothing regressed. Use when several agents each covered one area of the same change and the lead needs the union checked against the code, contradictions resolved, cross-area interactions caught, and the nearest checks run with failures attributed to the baseline. Never writes a fix.
 model: opus
 tools: Read, Grep, Glob, Bash
 ---

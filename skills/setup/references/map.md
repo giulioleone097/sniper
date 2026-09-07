@@ -1,8 +1,6 @@
----
-name: map
-description: Use when a repository is new to this session or its map stamp is behind the work. Writes docs/sniper/map.md and conventions.md from git, the tracker and the reviewers' comments. Not for reviewing a change.
-argument-hint: "[repo path] [--refresh] [--prs N] [--linked]"
----
+# Map: the repository and the ones that depend on it
+
+Read on every setup, and whenever `docs/sniper/map.md` is missing or its stamp is behind HEAD.
 
 1. Read what exists first. `docs/sniper/map.md` and `docs/sniper/conventions.md` carry a header line `stamp: <commit> <last PR> <date>`; without `--refresh`, a map whose commit is still an ancestor of HEAD and whose PR number is the latest merged is current: print its path and stop. With `--refresh`, or when the stamp is behind, read only what moved since the stamp: `git log <stamp>..HEAD`, PRs above the stamped number. A rebuild from nothing happens once per repository.
 
@@ -35,6 +33,6 @@ stamp: <commit> <last merged PR> <yyyy-mm-dd>
 
 7. `--linked`: run steps 2 to 6 on each consumer repository that is checked out, writing its own `docs/sniper/` there, and add one line per linked repository to this map. Not checked out: named as unread.
 
-8. Hand the durable part on. A convention that would change how a reviewer here judges code goes through `learn` into the closest AGENTS.md as a Code Review Rule, three lines at most; the map itself is pointed at from AGENTS.md by `setup`, never copied into it.
+8. Hand the durable part on. A convention that would change how a reviewer here judges code goes through ship's `learn.md` into the closest AGENTS.md as a Code Review Rule, three lines at most; the map itself is pointed at from AGENTS.md by the setup steps, never copied into it.
 
 Print the two paths and the stamp, then stop. The map describes; it does not review, fix or refactor anything.

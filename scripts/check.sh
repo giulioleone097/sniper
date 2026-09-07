@@ -44,7 +44,7 @@ root = sys.argv[1]; bad = 0
 for f in glob.glob(f"{root}/skills/*/SKILL.md"):
     d = os.path.dirname(f)
     for m in set(re.findall(r'`(?:<this skill>/)?(references/[a-z-]+\.md|scripts/[a-z_-]+\.(?:py|sh))`', open(f).read())):
-        if not any(os.path.exists(os.path.join(x, m)) for x in (d, root, f"{root}/skills/narrate")):
+        if not any(os.path.exists(os.path.join(x, m)) for x in (d, root, f"{root}/skills/ship", f"{root}/skills/build")):
             print(f"rules: {f} names {m}, which does not exist"); bad += 1
 sys.exit(1 if bad else 0)
 PYEOF

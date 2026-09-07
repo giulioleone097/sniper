@@ -55,7 +55,7 @@ def upsert_claude(path: Path) -> str:
     return "import appended"
 
 
-POINTER = "Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with the sniper `map` skill)."
+POINTER = "Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with `setup --map`)."
 
 
 def upsert_pointer(path: Path) -> str:

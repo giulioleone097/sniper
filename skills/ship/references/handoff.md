@@ -1,8 +1,6 @@
----
-name: handoff
-description: Use when context is running out or the work moves to another session or person. Writes what a fresh session needs: state, proven versus believed, open work, artifacts pointed at, secrets redacted. Not for approvers.
-argument-hint: "[what the next session will focus on] [--out file]"
----
+# Handoff: stopping before the work is done
+
+Read when the session ends early, or when the user asks for a handoff.
 
 1. Take the argument as what the next session is for. Empty: hand off the work as it stands.
 

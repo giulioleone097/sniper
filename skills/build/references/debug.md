@@ -1,8 +1,6 @@
----
-name: debug
-description: Use when a failure or unexplained behavior has no known cause. Builds a pass/fail signal, instruments the boundary, fixes the canonical cause and proves it. Not for changes whose cause is known.
-argument-hint: "[failure, error text, failing test path, or the command that reproduces it]"
----
+# Debug: a failure with no known cause
+
+Read when the request is a failure or unexplained behavior whose cause is not yet known; build continues once the mechanism is proven.
 
 1. Write the symptom exactly as observed: expected value, actual value, exact trigger, environment. Keep it separate from any cause you already suspect.
 
@@ -31,7 +29,7 @@ argument-hint: "[failure, error text, failing test path, or the command that rep
 
 10. Done when the causal chain from trigger to symptom is stated with no gaps and every step carries `file:line` evidence. "Somehow X leads to Y" is a gap, not a chain.
 
-11. Fix only when the request authorizes a fix. Repair at the point every caller routes through, per core; add a regression test only at a seam that reproduces the real bug pattern, and report the absence as a finding when no such seam exists. Then remove all instrumentation (grep the tag) and invoke `sniper:prove` with the Skill tool, or `$prove` on Codex.
+11. Fix only when the request authorizes a fix. Repair at the point every caller routes through, per core; add a regression test only at a seam that reproduces the real bug pattern, and report the absence as a finding when no such seam exists. Then remove all instrumentation (grep the tag) and return to `build`, which proves the fix through `references/prove.md`.
 
 12. Report:
 

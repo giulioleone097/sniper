@@ -48,42 +48,30 @@ fixtures, manifest JSON, doctrine sync, version parity).
 ## The flow
 
 ```
-map? ──► intake? ──► grill? ──► scope ──► plan? ──► build ──► simplify ──► review ──► prove ──► narrate ──► ship ──► learn?
-                                                                        handoff (any time the session ends early)
-  ▲                   │
-  └──── debug ◄───────┘ (when a real failure appears)
+setup? ──► scope ──► build ──► review ──► ship
+             │          │          │
+       intake, grill  plan, debug  shrink, reviewers,
+       goal card      prove        integrator
 ```
 
-`map` runs once per repository and every later skill reads it before
-discovering; `intake` and `grill` are the two ways work reaches `scope` when it
-did not arrive as a clear task. `plan` only runs for 4+ steps or more than one
-owner; otherwise `scope` hands straight to `build`. `simplify` runs on the changed code before `review`, so
-review sees the lean diff. `learn` only runs when the fix's reasoning is not
-already in code, tests, or docs. `flow` runs the whole pipeline hands-off and
-stops before push/PR unless told otherwise.
+The loop runs itself: a request to change code goes through `scope`, `build`
+and `review` without anyone typing a stage name, each stage invoking the next
+through the host's skill tool. `ship` runs when you say ship, commit or PR, or
+when the request said to carry the work through. `setup` installs the doctrine
+in a project and builds its map; the map is refreshed by the model when its
+stamp falls behind. Type a stage name only to run one alone or with flags.
 
 ## Skills
 
-Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
-
-| skill | when | output |
+| stage | use when | what it does |
 |---|---|---|
-| `setup` | first time in a repository, or after a core update | local `AGENTS.md` + `CLAUDE.md` carrying the doctrine block; the hook then injects nothing there |
-| `map` | a repository is new to the session, setup runs, or the map's stamp is behind the work | drills into the repository and the ones that depend on it: layout, entry points, checks, hot spots, owners, who reviews and what they ask for in the last merged PRs; writes `docs/sniper/map.md` and `conventions.md` with a stamp and refreshes only what moved since; uses a code-graph or symbol server when the host exposes one, git and the scripts otherwise |
-| `intake` | the work arrived from outside: an issue, a pull request, a work item, a bug report, a pasted paragraph | reads the item from whichever tracker the repository has (gh, glab, az, or files under `docs/tickets/`), reproduces the claim against the code, checks whether it is already implemented or already decided against, then emits the goal card through `scope`; `--reply` posts what it found back after your confirmation, and it never changes the item's state on its own |
-| `grill` | the outcome is genuinely undecided, or a design has open branches | a decision tree worked in rounds: every question you can ask now, each with the recommended answer, facts looked up by a scout instead of asked; ends with the settled tree, the branches left open on purpose, and the request handed to `scope`. Rounds go through the host's question tool (`AskUserQuestion`, `request_user_input`) with the recommendation first. Needs a human, so `flow` never calls it |
-| `scope` | before touching code, to lock the outcome | goal card (<= 10 lines) |
-| `plan` | work has 4+ steps or more than one owner | chat brief or `docs/plans/<date>-<slug>.md` |
-| `build` | implementing under a locked goal card | changed files + proof line |
-| `debug` | a real failure needs a proven root cause | cause in one line + evidence + fix |
-| `review` | a change, branch, PR, or working tree needs reviewing | area-by-area review: one reviewer per affected area (or per lens on a single-area diff), then one integrator that merges the reports, settles contradictions against the code, catches the breakages that cross areas, verifies every finding, and runs the nearest check per area with failures attributed to the baseline; prints one line per surviving issue plus the regression lines, `--fix` applies P0-P2 and re-proves them |
-| `simplify` | a slice is built, or a whole tree needs a read-only audit | six rungs (reuse, stdlib, native, delete, yagni, shrink) applied to the changed code, split per area when the change spans several, then an integrator that proves nothing moved: checks re-run and attributed, no guard thinned, no test weakened, no exported symbol cut that something outside still consumes; `--repo` audits read-only, ranked by git hot spots; `--debt` prints the `ceiling:` ledger |
-| `prove` | acceptance needs the smallest decisive check | exact commands + `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT` |
-| `narrate` | a PR body is needed, or a reviewer must approve without reading every file | approval dossier in the PR's language: verdict, what changes in plain words, a map of the change (lanes, unchanged neighbours, the one edge that matters), then a deep drill-down per affected domain or repository - why it was touched, what the change does, the before/after shape, every boundary crossed with the consumer that absorbs it, the decisions with their rejected alternative, executed evidence with base attribution, residual risk - plus what lies outside this verification and who covers it; no task is ever handed to the approver; commands and the engineer's reading guide fold into collapsible sections |
-| `ship` | committing, pushing, or opening a PR | commit shas, PR url |
-| `learn` | a non-obvious fix needs its reasoning captured | file path, or "nothing to record"; `--from-pr <n>` turns what reviewers asked for on a pull request into candidate rules, each through the same counterfactual |
-| `handoff` | the context is running out, or the work moves to another session, machine, or person | the document a fresh session needs: goal card as it stands, branch and tree state, what is proven and by which command, what is open with the next action first, artifacts pointed at rather than restated, every secret redacted |
-| `flow` | running the whole pipeline hands-off | final report |
+| `setup` | a project needs sniper's local rules, or its map is missing or stale | doctrine block in AGENTS.md, CLAUDE.md import, map pointer (only when you typed it); `docs/sniper/map.md` and `conventions.md` from git, the tracker and the reviewers' comments, with a stamp; `--map` refreshes only |
+| `scope` | work arrives: a task, an issue, a PR, a report, an idea | intake for a tracker item (read, reproduce the claim, check already-done and already-rejected), grill for an undecided design (rounds through the host's question tool), then the goal card: outcome, acceptance, exclusions, risk, proof, size; hands to build |
+| `build` | a card exists and code must change, or a failure has no known cause | plan when complex (`--tickets` publishes), debug when the cause is unknown, mode references for fix, refactor, migrate and UI, one runnable check where none exists, proof from the repository's own commands; hands to review |
+| `review` | a change is built, or a branch, PR or tree needs review | shrink first (reuse, stdlib, native, delete, yagni, shrink, with the platform lookup and `ceiling:` on kept limits), one reviewer per area or lens, the integrator verifies, sweeps consumers in and out of the repository and runs the checks with failures attributed to the baseline; `--fix`, `--pr`, `--repo`, `--debt` |
+| `ship` | you say ship, commit, PR, dossier, handoff, or asked up front to carry it through | atomic Conventional Commits, tracker item linked, `--pr` with the approval dossier as body, `--dossier` alone, one durable lesson (`--learn`, `--from-pr <n>`), `--handoff` when stopping early; push only with `--push` |
+
+Every stage keeps its branches in `references/`: the root file is a router, read in full, and a branch is read only when its case applies.
 
 ## Agents
 
@@ -96,7 +84,7 @@ Invoke as `/sniper:<name>` in Claude Code, `$<name>` in Codex.
   `slop`, or `safety`) against a baseline diff; reports every finding with a
   confidence score, never fixes anything itself.
 - `sniper-integrator` — opus, never edits files. Merges the per-area reports of a
-  `review` or `simplify` pass into one verified list, settles contradictions by
+  `review` pass into one verified list, settles contradictions by
   reading the code, catches what crosses areas, and runs the nearest checks with
   every failure attributed to the baseline before it is called new.
 
@@ -106,13 +94,13 @@ Four detectors make the skills run the repository's own commands instead of gues
 
 | Script | Answers | Used by |
 |---|---|---|
-| `scripts/checks.sh <path>` | the project's own typecheck, lint, test and build commands for that path (nx targets, package scripts, pyproject, .NET, cargo, go, make), or `none=1` | `prove`, `review`, `simplify`, the integrator |
-| `scripts/tracker.sh [repo]` | the forge, the CLI and whether it is logged in, from the origin remote alone (GitHub/gh, GitLab/glab, Azure DevOps/az, else files under `docs/tickets/`) | `intake`, `plan --tickets`, `ship` |
+| `scripts/checks.sh <path>` | the project's own typecheck, lint, test and build commands for that path (nx targets, package scripts, pyproject, .NET, cargo, go, make), or `none=1` | `build` (prove), `review`, the integrator |
+| `scripts/tracker.sh [repo]` | the forge, the CLI and whether it is logged in, from the origin remote alone (GitHub/gh, GitLab/glab, Azure DevOps/az, else files under `docs/tickets/`) | `scope` (intake), `build` (plan), `ship` |
 | `scripts/tokens.sh <ui path>` | the design tokens the repository already defines, with counts: custom properties, colours, fonts, sizes, theme keys | `build` on UI work, the reviewer's `taste:` tag |
-| `scripts/consumers.sh [repo]` | what depends on this repository outside its tree: the names it publishes (package, module, crate, assembly, remote) and every sibling checkout or workspace member whose manifest names one of them | `review`, `simplify`, `narrate`, the integrator's cross-repo sweep |
-| `scripts/repo-facts.sh [repo] [months] [prs]` | the facts a map starts from, read-only: layout, languages, hot spots, authors, commit conventions, checks, instruction files, and through `gh` the merged-PR cadence, reviewers and inline commenters (bots kept apart) | `map` |
-| `scripts/debt.sh [repo]` | the ledger of declared shortcuts: every `ceiling:` comment with its limit and upgrade trigger, `no-trigger` on the ones that will rot | `simplify --debt`, `map` |
-| `scripts/pr-partition.py BASE HEAD` | the diff split into judgment, tests, mechanical, generated, docs and config, so only judgment code is read | `narrate`, `review`, `simplify` |
+| `scripts/consumers.sh [repo]` | what depends on this repository outside its tree: the names it publishes (package, module, crate, assembly, remote) and every sibling checkout or workspace member whose manifest names one of them | `review`, `ship` (dossier), the integrator's cross-repo sweep |
+| `scripts/repo-facts.sh [repo] [months] [prs]` | the facts a map starts from, read-only: layout, languages, hot spots, authors, commit conventions, checks, instruction files, and through `gh` the merged-PR cadence, reviewers and inline commenters (bots kept apart) | `setup` (map) |
+| `scripts/debt.sh [repo]` | the ledger of declared shortcuts: every `ceiling:` comment with its limit and upgrade trigger, `no-trigger` on the ones that will rot | `review --debt`, `setup` (map) |
+| `scripts/pr-partition.py BASE HEAD` | the diff split into judgment, tests, mechanical, generated, docs and config, so only judgment code is read | `review`, `ship` (dossier) |
 
 `scripts/check.sh` is the plugin's own acceptance: four strict validations, the guard fixtures, manifest parity, doctrine sync, and the repository rules executed (skill bodies under 120 lines, references under 80, no host env var inside a skill, every script parses, both detectors answer on this repo).
 
@@ -154,11 +142,11 @@ To disable: `/plugin disable sniper`, or delete the entry in
 - Agents: not bundled — `scripts/install-codex-agents.sh` generates
   `sniper_scout`, `sniper_worker`, `sniper_reviewer`, `sniper_integrator`
   (hyphens become underscores) as `~/.codex/agents/*.toml`; `build`,
-  `review`, `simplify`, `narrate` and `map` spawn them when installed,
-  otherwise fall back to inline/sequential.
-- No `disable-model-invocation` on Codex; each skill's sidecar
-  `policy.allow_implicit_invocation` plays that role, `false` only on
-  `flow` and `setup`, the two user-typed commands.
+  `review`, `ship` and `setup` spawn them when installed, otherwise fall
+  back to inline/sequential.
+- No `disable-model-invocation` anywhere: every stage is model-invocable so
+  the loop can chain; `setup` guards its doctrine write with the `--map`
+  argument the model passes when it only refreshes the map.
 
 Per project, run `/sniper:setup` (`$setup` on Codex): it writes the doctrine
 block into the repository's `AGENTS.md` (created, or appended between

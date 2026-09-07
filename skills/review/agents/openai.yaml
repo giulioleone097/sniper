@@ -1,7 +1,7 @@
 interface:
   display_name: "Review"
-  short_description: "Review a change area by area, then one integrator verifies and proves no regression"
-  default_prompt: "Use $review on the exact diff: correctness, over-engineering, and silent-failure safety, then verify each finding against the code and print one line per surviving issue. Baseline: <ref, or leave empty for the branch merge-base>. Add --fix to apply P0-P2 findings, --pr to post one comment after I confirm."
-  brand_color: "#D97757"
+  short_description: "Shrink the change, review it per area, verify through an integrator, prove no regression"
+  default_prompt: "Use $review on this diff: shrink what can be shrunk without changing behavior, review per area, let the integrator verify and run the checks, then tell me whether it is ready to ship."
+  brand_color: "#1A1A1A"
 policy:
   allow_implicit_invocation: true

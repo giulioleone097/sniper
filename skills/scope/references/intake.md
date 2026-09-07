@@ -1,8 +1,6 @@
----
-name: intake
-description: Use when work arrives from outside: an issue, PR, work item or pasted report. Reads it from the repo's tracker, reproduces the claim, checks it is not already done or rejected, hands a card to scope. Not for carded work.
-argument-hint: "[issue number | url | file | pasted text] [--reply]"
----
+# Intake: work that arrived from outside
+
+Read when the argument is an issue number, a URL, a work item, a pasted bug report or a transcript rather than a task description.
 
 1. Read the source. `sh <plugin root>/scripts/tracker.sh` (`<plugin root>` is the parent of the `skills/` directory this file lives in) names the forge, the CLI and whether it is authenticated. A bare number or a URL is then fetched with the CLI the script named:
 
@@ -23,9 +21,9 @@ argument-hint: "[issue number | url | file | pasted text] [--reply]"
    - **Already implemented.** Search by the domain concept the item describes, not by its wording, starting from `docs/sniper/map.md` when it exists; the feature may exist under another name. Found: say where it lives and stop.
    - **Already decided against.** Read the repository's own record of rejected work when it keeps one (a decisions or out-of-scope directory, closed items the CLI can list). Found: say which decision, and let the user reopen it deliberately rather than by accident.
 
-5. Emit the card. Everything the item says becomes one of: outcome, acceptance, out of scope, risk. Where the item is precise, quote it; where it is vague, resolve it per core and mark the reading as an assumption. Then invoke `scope` with what you have so the card comes out in its shape - `scope` decides the size and what comes next.
+5. Emit the card. Everything the item says becomes one of: outcome, acceptance, out of scope, risk. Where the item is precise, quote it; where it is vague, resolve it per core and mark the reading as an assumption. Then go back to the card steps with what you have; they decide the size and what comes next.
 
-6. Too thin to act on: name exactly what is missing, as questions the reporter can answer, and never as "please provide more information". Say what you established yourself so nobody redoes it. Several open design branches rather than missing facts: that is `grill`, not a question list.
+6. Too thin to act on: name exactly what is missing, as questions the reporter can answer, and never as "please provide more information". Say what you established yourself so nobody redoes it. Several open design branches rather than missing facts: that is `grill.md`, not a question list.
 
 7. `--reply` posts what you found back on the item - reproduction result, what already exists, or the questions - after showing the text and getting the user's confirmation in this session. One comment, no attribution trailer, and never a state change (no close, no label, no assignment) unless the user asked for that specific change.
 
@@ -34,7 +32,7 @@ source: <forge>#<n> | <path> | pasted
 claim: reproduced (<command>) | not reproduced (<what happened>) | not testable (<why>)
 already: implemented at <path:line> | rejected in <path> | new
 missing: <question> | none
-next: scope | grill | stop (<why>)
+next: card | grill | stop (<why>)
 ```
 
 Stop once the card exists, or once you have said what is missing. Do not plan, do not write code, and do not change the item's state on your own initiative.

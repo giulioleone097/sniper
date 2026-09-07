@@ -1,8 +1,6 @@
----
-name: learn
-argument-hint: "[--from-pr <n>]"
-description: Use when a proven fix uncovered something the code and docs will not explain, when reviewers asked for it on a PR (--from-pr), or for a session retrospective. Writes one durable rule, or nothing. Not for routine changes.
----
+# Learn: one durable lesson
+
+Read at the end of every ship, with `--from-pr <n>`, or when the user asks for a retrospective.
 
 1. Name the candidate in one sentence: the invariant, trap, or decision this work uncovered. Only a fix that is already proven qualifies. With `--from-pr <n>`, the candidates are what reviewers asked for on that pull request: read its reviews and inline comments through the tracker CLI (`gh api repos/<slug>/pulls/<n>/comments` and `/reviews`, `glab mr view <n> --comments`, `az repos pr` equivalents), group them by theme, and run each theme through steps 2 to 4 as its own candidate, quoting the comment and the reviewer as the provenance; a request made once on one line is a fix for that line, not a rule. When the user asked for a retrospective on the session rather than a rule about the code, the subject is the environment the next agent inherits: read `references/environment.md` and work its categories instead of steps 2 and 3, then rejoin at step 8.
 
@@ -18,7 +16,7 @@ description: Use when a proven fix uncovered something the code and docs will no
 
 7. More than three lines: `docs/solutions/<slug>.md` instead, at most 40 lines, four headings in this order: symptom, cause, fix, how to recognize it next time. Slug names the symptom, not the fix, because the symptom is what the next engineer will search for.
 
-8. Show the target path and the exact lines before touching the file, and write only after the user confirms in this session. No user to answer — a hands-off `flow` run, a non-interactive session — print `proposed (not written):` followed by that path and those lines, and stop.
+8. Show the target path and the exact lines before touching the file, and write only after the user confirms in this session. No user to answer — a hands-off a hands-off run run, a non-interactive session — print `proposed (not written):` followed by that path and those lines, and stop.
 
 9. Print what was written:
 

@@ -1,7 +1,7 @@
 interface:
   display_name: "Ship"
-  short_description: "Commit proven changes; push and open a PR only if asked"
-  default_prompt: "Use $ship on the current change: require a prove status of DONE or DONE_WITH_CONCERNS, split into atomic Conventional Commits, and only push or open a PR if I pass --push or --pr. Never add agent attribution to commits or PRs."
-  brand_color: "#D97757"
+  short_description: "Commit proven work, write the dossier, keep the lesson; push or PR only if asked"
+  default_prompt: "Use $ship: commit the proven changes as atomic commits; add --push or --pr only when I asked; --dossier for the approval dossier alone, --handoff when stopping early."
+  brand_color: "#1A1A1A"
 policy:
   allow_implicit_invocation: true

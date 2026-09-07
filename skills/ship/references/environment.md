@@ -15,4 +15,4 @@ Rank candidates by what actually cost time in that session, and present them bef
 
 Two rules decide where a fix lands. Implementation carries the context pressure, so it gets navigation pointers and cheaper tools; review sees only a diff, so it gets the standards. And a steering file earns its lines by changing behavior: an instruction that no session has ever acted on is deleted, not reworded.
 
-Write the accepted candidate the way `learn` writes anything: the smallest durable change, in the file that owns it, shown to the user before it is written.
+Write the accepted candidate the way this reference writes anything: the smallest durable change, in the file that owns it, shown to the user before it is written.

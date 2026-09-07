@@ -1,8 +1,6 @@
----
-name: narrate
-description: Use when a PR needs a body or a reviewer must approve without reading every file. Writes the approval dossier: verdict, plain-words changes, a map, one drill-down per domain with executed evidence. Not for finding bugs.
-argument-hint: "[pr-number | pr-url | branch] [--out file] [--post] [--walkthrough] [--no-run] [--lang it|en]"
----
+# Narrate: the approval dossier
+
+Read when a PR body is needed (`ship --pr`), or when the user asks for the dossier alone.
 
 1. Resolve the range. A PR number or URL: `gh pr view <pr> --json number,url,headRefName,baseRefName,headRefOid,mergeable`, then `git fetch origin +refs/heads/<base>:refs/remotes/origin/<base> +refs/pull/<n>/head:refs/remotes/origin/pr/<n>`; range `merge-base(origin/<base>, origin/pr/<n>)..origin/pr/<n>`. A branch or nothing: current branch against the merge-base with the default branch. Record `OWNER/REPO`, `<n>`, `BASE`, `HEAD`, `mergeable`.
 

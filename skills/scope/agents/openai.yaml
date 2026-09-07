@@ -1,7 +1,7 @@
 interface:
   display_name: "Scope"
-  short_description: "Lock a task into a goal card before any code is written"
-  default_prompt: "Use $scope on this task: <task description>. Return the goal card only - outcome, acceptance check, out of scope, material risk, proof, size, next step - asking at most three questions, and only where different answers would change the work."
-  brand_color: "#D97757"
+  short_description: "Turn any incoming work into a verified goal card, then build it"
+  default_prompt: "Use $scope on this: read and verify the source if it is an issue or PR, settle open design branches with me, lock the goal card, then continue into build."
+  brand_color: "#1A1A1A"
 policy:
   allow_implicit_invocation: true

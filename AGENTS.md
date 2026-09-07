@@ -7,7 +7,9 @@ SNIPER CORE. Active every turn. System, user, and repository instructions outran
 
 Lock the goal before editing: one line with the observable outcome, the check that proves it, and what is out of scope. A question that must reach the user goes through the host's question tool, options with the recommendation first, so the answer comes back structured; free text is the fallback. When the request is ambiguous, implement the reading its wording and the surrounding code most directly support, state that assumption, and do not build the other readings. When the user is describing a problem, asking a question, or thinking out loud rather than requesting a change, the deliverable is your assessment: report it and stop; a fix waits until they ask for one.
 
-A repository map under `docs/sniper/` (written by `map`, pointed at from AGENTS.md) is where discovery starts when the task needs any: read it when the change is not already obvious from the request, not before every edit, and trust it until its stamp is behind HEAD. What a session learns that the map lacks goes back into it or into `learn`, never only into the transcript.
+A repository map under `docs/sniper/` (written by `setup`, pointed at from AGENTS.md) is where discovery starts when the task needs any: read it when the change is not already obvious from the request, not before every edit, and trust it until its stamp is behind HEAD. What a session learns that the map lacks goes back into it or into ship's learn step, never only into the transcript.
+
+The loop runs itself. A request to change code goes through `scope` (the card), `build` (the change, proven) and `review` (shrunk, verified, no regression) without being told; each stage invokes the next through the host's skill tool, and the user types a stage name only to run one alone or with flags. `ship` runs when the user says ship, commit or PR, or when the request said to carry the work through; `setup` refreshes the map when its stamp is behind. A question, a problem described, or thinking out loud gets an assessment, not the loop.
 
 Ladder. Trace the real flow end to end first, then stop at the first rung that holds:
 1. Does it need to exist? Speculative need: skip it and say so in one line.
@@ -33,10 +35,10 @@ Edits: surgical edits over whole-file rewrites. Batch independent tool calls in 
 
 Delegation: hand independent subtasks to sub-agents and keep working while they run; step in when one goes off track or lacks context. Delegate work that is large or parallel, not a second look at your own work, and read what comes back as a claim to verify, not a result to relay.
 
-Stop when the acceptance check passes, with every intention you stated closed as done, blocked with the reason, or dropped with the reason; a step you decided on is something to run, not to announce. Report for a reader who did not watch you work: the outcome first, then what changed, the proof that ran with its exact result, unresolved risk, and follow-ups, in plain sentences without the shorthand you built up while working. A lesson the code, tests, and docs will not carry goes through `learn`, not into the report.
+Stop when the acceptance check passes, with every intention you stated closed as done, blocked with the reason, or dropped with the reason; a step you decided on is something to run, not to announce. Report for a reader who did not watch you work: the outcome first, then what changed, the proof that ran with its exact result, unresolved risk, and follow-ups, in plain sentences without the shorthand you built up while working. A lesson the code, tests, and docs will not carry goes through ship's learn step, not into the report.
 <!-- sniper:core:end -->
 
-Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with the sniper `map` skill).
+Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with `setup --map`).
 
 ## Working on this repo
 
@@ -49,6 +51,6 @@ Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.m
 
 ## Code Review Rules
 
-- A skill that invokes another skill must not target one carrying `disable-model-invocation: true`; the Skill tool cannot call it. Safe path: only `flow` carries that flag.
+- A skill that invokes another skill must not target one carrying `disable-model-invocation: true`; the Skill tool cannot call it. Safe path: no sniper skill carries that flag; `setup` guards its doctrine write with the `--map` argument instead.
 - `hooks/hooks.json` is shared by Claude Code and Codex. Safe path: use only events and output shapes both hosts support (`SessionStart`, `SubagentStart` with `additionalContext`; `PreToolUse` with `permissionDecision`), and check developers.openai.com/codex/hooks before adding one.
 - Codex shortens a skill description to about 45 characters when many plugins are installed, and neither host expands a variable inside a skill body. Safe path: open every description with `Use when`, keep it under 70 words, and write paths as `<this skill>/…` or `<plugin root>/…`.

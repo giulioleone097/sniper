@@ -1,7 +1,0 @@
-interface:
-  display_name: "Narrate"
-  short_description: "Turn a diff or PR into an approval dossier with a map and a per-domain drill-down"
-  default_prompt: "Use $narrate on this PR: verdict, what changes in plain words, a map of the change, then per domain the before/after shape, the boundaries crossed with the consumer that absorbs each one, the decisions with their rejected alternative, and the executed evidence. Do not post anything until I confirm."
-  brand_color: "#1A1A1A"
-policy:
-  allow_implicit_invocation: true
