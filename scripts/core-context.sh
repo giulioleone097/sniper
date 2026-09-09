@@ -23,16 +23,21 @@ try:
 except Exception:
     pass
 
-# A project that carries the block (installed by /sniper:setup) already loads it as
-# project instructions; injecting again would cost the doctrine twice.
-if event == "SessionStart":
-    cwd = data.get("cwd") if isinstance(data, dict) else None
+# A project that carries the block (installed by /sniper:setup) already loads it as project
+# instructions, and non-fork subagents receive the same instruction files; injecting again would
+# cost the doctrine twice. The hook runs in the session cwd, which may be a subdirectory, so the
+# block is looked for up the tree to the filesystem root.
+cwd = data.get("cwd") if isinstance(data, dict) else None
+d = os.path.abspath(cwd) if cwd else None
+while d:
     for name in ("AGENTS.md", "CLAUDE.md"):
         try:
-            if cwd and "<!-- sniper:core:start -->" in open(os.path.join(cwd, name)).read():
+            if "<!-- sniper:core:start -->" in open(os.path.join(d, name)).read():
                 sys.exit(0)
         except Exception:
             pass
+    parent = os.path.dirname(d)
+    d = parent if parent != d else None
 
 # SNIPER_SUBAGENT_MATCHER: an unanchored, case-insensitive regex; when set, subagents whose
 # agent_type does not match get no doctrine. Unset means every subagent, as before. A bad

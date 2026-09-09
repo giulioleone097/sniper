@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Use when a project needs sniper's local rules, or when docs/sniper/map.md is missing or its stamp is behind HEAD. Installs the doctrine block and the map pointer only on the user's own invocation; builds or refreshes the repository map either way. Not for reviewing a change.
+description: Use when the user asks to install project rules, or discovery needs a missing or outdated map. Installs the doctrine only on explicit invocation; otherwise refreshes relevant map facts. Not for routine edits with known locations.
 argument-hint: "[project-dir] [--map] [--refresh] [--prs N] [--linked]"
 ---
 
@@ -12,7 +12,7 @@ argument-hint: "[project-dir] [--map] [--refresh] [--prs N] [--linked]"
 
 4. When the script reports the fill marker present, replace it with the repository's own proof commands, three to six lines, one command each, taken from what the repository already declares: `package.json` scripts, `pyproject.toml`, `Makefile`, `nx` or `turbo` targets, the CI workflow; `sh <plugin root>/scripts/checks.sh <project-dir>` names them. Prefer the exact CI commands, and when they run against disposable fixtures with no production access, say so in one line so the agent runs them and reruns affected ones without asking at each step. Do not invent commands and do not run them here. Leave the section alone when the marker is absent: the user owns it.
 
-5. Map: read `references/map.md` and follow it; a map whose stamp is current is left alone, otherwise only what moved since the stamp is read.
+5. Map: read `references/map.md`; use a targeted refresh when changed facts affect this task. An older stamp alone does not require a full survey.
 
 6. Print:
 

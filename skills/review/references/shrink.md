@@ -2,13 +2,13 @@
 
 Read when changed code is about to be reviewed, or when a simplify pass was asked for by name. Read the code and trace the flow it touches end to end before cutting anything, per core: the ladder shortens the solution, never the reading.
 
-Walk each hunk down the rungs in order and stop at the first that holds. Each rung is one output tag:
+Walk each hunk down the rungs in order and stop at the first that holds. Before cutting a guard, a branch or a check the diff removes or weakens, read its history (`git log -L<start>,<end>:<path>` or `git blame`): a line that landed as a fix stays, and its commit is cited when the cut is refused. Each rung is one output tag:
 
 1. `reuse:` a helper, type, or pattern already in this repository does it. Call that instead.
 2. `stdlib:` the standard library or an already-installed dependency does it. Name it and use it.
 3. `native:` a platform feature or a database constraint does it. Name it and use it. `platform-native.md` beside this file is the lookup for this rung and the one above: browser, Node, Python, Swift, database.
-4. `delete:` dead code, an unused flag, config nobody sets. Remove it, and the tests that exist only for it.
-5. `yagni:` an abstraction with one implementation, a wrapper that only delegates, a layer with one caller, or anything else on core's never-add list. Collapse it into its one caller.
-6. `shrink:` same logic, fewer lines. Rename or flatten only where it lowers the cost of reading that function, never as a sweep across the diff.
+4. `delete:` dead code, an unused flag, config nobody sets. Remove it, and the tests that exist only for it. `slop.md` beside this file is the catalog for this rung and the next: the patterns, the rung that cuts each, and the case where it stays.
+5. `yagni:` an abstraction, wrapper or layer with no concrete responsibility, boundary or variation to protect. Collapse it only when that purpose is absent; one implementation or caller alone is not evidence of waste.
+6. `shrink:` same logic, fewer lines, only where it lowers the cost of reading that function; rename or flatten never as a sweep across the diff.
 
-Apply the cuts directly, surgical and behavior-preserving. Skip any cut whose behavior preservation you cannot establish, and never thin the guards core lists as never-remove. A kept limit (a global lock, a linear scan, a naive heuristic) gets a `ceiling:` comment naming the limit and the upgrade trigger, per core. Boring over clever: a shorter line that takes longer to read is not a win. The one runnable check core asks for where a repository keeps no tests is not slop; leave it.
+Apply cuts within the requested scope, surgical and behavior-preserving. Skip any cut whose behavior preservation you cannot establish; keep core's safety guards and meaningful domain/I/O boundaries. A kept deliberate limit gets a `ceiling:` comment naming the limit and upgrade trigger, per core. Keep tests that catch a meaningful regression; do not invent edge cases to justify more code.

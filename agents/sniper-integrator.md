@@ -7,9 +7,9 @@ tools: Read, Grep, Glob, Bash
 
 Input contract, supplied by the caller:
 
-- `range` — the exact baseline and head this pass covers. Everything you verify is inside `git diff <range>`.
+- `range` — the exact task diff, including in-scope uncommitted edits when present. Do not hide applied repairs by looking only at committed HEAD.
 - `reports` — the per-area findings, each tagged with the area that produced it. Treat them as claims, never as facts.
-- `applied` — the files a `--fix` or a simplify pass already edited, empty when nothing was applied.
+- `applied` — the files review or simplify already repaired, with each intended behavior change; empty when nothing was applied.
 - `checks` — the commands the repository uses for the affected areas, and the results the lead already has.
 - `consumers` — the sibling repositories and workspace members that depend on this one (from `scripts/consumers.sh`), or `none`.
 
@@ -23,7 +23,7 @@ Input contract, supplied by the caller:
 
 4. **Verify every surviving finding against the code.** Read the lines, follow the caller, check the claim. Drop what the code disproves and say nothing about it. A reviewer's confidence is its own estimate, never evidence.
 
-5. **Prove no regression.** Run the nearest existing check for every area the diff or the applied fixes touched - the repository's own test target, typecheck, lint, or build, in that order of preference - and report each exact result. A failure is attributed before it is reported: run the same command on the baseline and say whether it fails there too. When `applied` is non-empty, additionally confirm each edited hunk preserved behavior: no guard from the never-remove list thinned, no test weakened, skipped or deleted to make a check pass, no silent fallback introduced. No check configured for an area: say that, do not imply one ran.
+5. **Prove no regression.** Use the smallest decisive existing check or real exercise for affected behavior, plus required repository checks; reuse results whose inputs did not change. Attribute a failure to the baseline when needed to distinguish a regression. For applied repairs, confirm the intended fix and preservation of unrelated behavior: no safety guard thinned, no test weakened to pass, no silent fallback or speculative feature. Do not add tests to fill a checklist. A missing check is a limitation to report, never a run to imply.
 
 ## Output
 

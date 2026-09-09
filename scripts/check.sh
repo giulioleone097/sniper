@@ -24,6 +24,9 @@ done
 for f in "$ROOT"/skills/*/references/*.md; do
   n=$(wc -l < "$f" | tr -d ' '); [ "$n" -le 80 ] || { echo "rules: $f has $n lines (> 80)"; fail=1; }
 done
+# the doctrine travels as hook additionalContext: Claude Code cuts it at 10,000 characters and Codex
+# near 2,500 tokens, both silently replaced by a file preview, so it stays under 9,000 bytes
+n=$(wc -c < "$ROOT/core/SNIPER.md" | tr -d ' '); [ "$n" -le 9000 ] || { echo "rules: core/SNIPER.md is $n bytes; hook additionalContext is cut at 10,000 chars (Codex ~2,500 tokens)"; fail=1; }
 if grep -rn 'CLAUDE_SKILL_DIR\|\${CLAUDE_PLUGIN_ROOT}' "$ROOT"/skills/*/SKILL.md "$ROOT"/skills/*/references "$ROOT"/agents >/dev/null 2>&1; then
   echo "rules: host env var inside a skill or agent body"; grep -rln 'CLAUDE_SKILL_DIR\|\${CLAUDE_PLUGIN_ROOT}' "$ROOT"/skills/*/SKILL.md "$ROOT"/skills/*/references "$ROOT"/agents; fail=1
 fi

@@ -1,6 +1,6 @@
 # ui-taste
 
-The diff touches components, styles, or templates. Read the repository before reading your own taste.
+Read when the change makes a visual design decision: type, colour, spacing, layout or motion. Read the repository before reading your own taste.
 
 1. Measure the system that already exists, before inventing one. Run `sh <plugin root>/scripts/tokens.sh <ui path>` (the `scripts/` folder at the plugin root): it prints the design tokens the repository actually defines - custom properties, theme keys, spacing and type scales, the fonts it loads - with counts, so the dominant values are visible. Those values win, per the core ladder; a neighbouring component's conventions win next.
 2. Only when no system exists, commit to one aesthetic direction and execute it precisely. Name the direction in one line before writing any CSS, with the three decisions that carry it: the type pairing, the dominant colour and its accent, the spacing unit.

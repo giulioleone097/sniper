@@ -12,6 +12,6 @@ Read-only audit of the tree, applying nothing. Rank attention by hot spots first
 
    `git log --oneline -n 300 --name-only --pretty=format: | sort | uniq -c | sort -rn | head -30`
 
-   Then hunt the same six rungs across those files, biggest cut first.
+   Then walk those files down the six rungs of `shrink.md` beside this file, biggest cut first.
 
 Print the same finding lines as the default path, ranked biggest cut first, and end at `net: -<N> lines possible.`; there is no `regression:` line because nothing changed.

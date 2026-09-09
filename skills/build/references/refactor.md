@@ -3,7 +3,7 @@
 Behavior is identical before and after. Anything that changes behavior is a different task.
 
 1. State the behavior-preservation boundary: which public interfaces, failure modes, ordering guarantees, and compatibility promises must not move.
-2. Establish the proof before the first structural edit, and run the same proof after. No baseline, no refactor: find or write that check first.
+2. Establish how to compare behavior before the structural edit, using an existing check or real exercise, then compare after. Add a persistent test only under core's indispensability rule; if the behavior cannot be checked, report that limitation before changing it.
 3. Move one ownership boundary at a time. Keep every intermediate state buildable and testable.
 4. Keep feature work, bug fixes, and dependency bumps out of the diff; list them as follow-ups.
 5. Rename with the language's own tooling, or a codemod above five occurrences. Never hand-edit a bulk rename.

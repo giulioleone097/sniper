@@ -1,28 +1,26 @@
 ---
 name: build
 description: Use when a goal card or a clear build request exists and code must change, or a failure has no known cause. Plans when complex, implements surgically at agreed seams, fixes the canonical cause, proves the change, and hands the diff to review. Not for reviewing.
-argument-hint: "[goal card | what to build | the failure] [--no-review]"
+argument-hint: "[goal card | what to build | the failure] [--tickets] [--no-review]"
 ---
 
-1. Take the goal card from `scope` when this session has one. Otherwise write a one-line card: observable outcome, the check that proves it, what stays out. When the wording is ambiguous, implement the reading the request and the surrounding code most directly support, state that assumption in one line, and build nothing else.
+1. Take the goal card from `scope` or from the argument when one exists; otherwise lock the goal per core in one line, stating any chosen reading. An issue number, a URL, an image, a handoff or grill file is scope's input, not a card: invoke `scope` with it (Skill tool `sniper:scope`, `$scope` on Codex) and stop here; its intake reads the source, emits the card and invokes `build` with it.
 
-2. Route. A failure or unexplained behavior with no known cause: read `<this skill>/references/debug.md` (`<this skill>` is the directory this file lives in) and continue here once the mechanism is proven. Size `complex`, four or more tasks, several owners, or a change others depend on: read `references/plan.md`, write the plan, then continue task by task. Otherwise detect the mode: `feature` (behavior that does not exist yet) runs on these steps alone; `fix`, `refactor` and `migrate` read `references/<mode>.md`; any change touching components, styles or templates reads `references/ui-taste.md` before the first line of UI code.
+2. Route. A small understood change follows core's short path; finish it here, including local review and fixes, without another skill handoff. A failure with no known cause: read `<this skill>/references/debug.md` (`<this skill>` is the directory this file lives in). `Size: complex`, several owners, a change others depend on, or `--tickets` (publishes the plan's tasks): read `references/plan.md`. Load `references/fix.md`, `references/refactor.md` or `references/migrate.md` only for the applicable work, and `references/ui-taste.md` only when making visual design decisions.
 
-3. Locate the code. `docs/sniper/map.md` names the entry points and checks per domain when the repository has one; skip this step when the files are already named or already read. Otherwise dispatch one `sniper-scout` with the entry point or the symptom, and read only the `path:line` candidates it returns (Codex: `sniper_scout`; without it, locate inline with grep).
+3. Locate only what is still unknown. Start at named files or the relevant map entry; a bounded search is normally enough. Use a `sniper-scout` (Codex: `sniper_scout`) when discovery is substantial and independent of useful work you can continue locally.
 
-4. Cut the work into slices, each with an outcome, owned paths, and an acceptance check. Walk the core ladder before writing anything new: the reuse rung usually collapses a slice into a few lines.
+4. Cut the work into slices (a plan's tasks, when one exists), each with an outcome, owned paths, and an acceptance check. Walk the core ladder before writing anything new: the reuse rung usually collapses a slice into a few lines.
 
-5. Name the seams you will test before writing any test. A seam is the public boundary where the behavior is observable; confirm the list when the goal card did not already fix it. When to add a test at all is per core. Then work one seam, one test, one implementation, next slice. Run each new test before the code that satisfies it and watch it fail: a test that passes on its first run proves nothing yet, and the failure message is the last chance to notice it is testing the wrong thing. Reject three shapes: a test that mocks internal collaborators or asserts private state; an assertion that recomputes the expected value the way the code does; all tests written up front before any implementation. Expected values come from a known-good literal, a worked example, or the spec.
+5. A test that passes core's indispensability rule runs red before green: the failing run is the last chance to catch a wrong test. When the code already exists, run the red in a detached worktree of `HEAD` (`git worktree add --detach <dir> HEAD`, `<dir>` under `mktemp -d`, the test copied in, removed afterwards) rather than by reverting tracked files in place, which puts the tree's other edits at risk. Take expected values from the contract or a worked example; do not ask for routine test-design approval.
 
-6. Implement inline. This is the normal path: most work is a handful of edits and belongs in this session.
+6. Implement the local slice or a trivial edit inline; keep independently assignable work available for economical delegation in the next step.
 
-7. Fan out only when two or more slices own disjoint paths and each is more than a handful of tool calls. Dispatch `sniper-worker` through the Agent tool (Codex: `sniper_worker`), passing `model: opus` only for a genuinely complex slice, and give each one: outcome, owned paths (touch nothing else), acceptance, the proof to run, and the checkpoint. Keep implementing your own slice while they run; without custom agents, run the slices sequentially here.
+7. Delegate independently assignable slices to `sniper-worker` subagents (Codex: `sniper_worker`) under core's delegation rule, adding the slice's acceptance check to each contract. Parallel writers need disjoint paths; when their builds, generated files or test runs would collide in one tree, each gets its own `git worktree add --detach <dir> HEAD`, `<dir>` under `mktemp -d` so nothing leaks into the repository, seeded with the lead's uncommitted work including new files (`git add -A -N && git diff HEAD | git -C <dir> apply --index`; a clean tree needs no seed), with the project's install step run there when the proof needs ignored inputs such as `node_modules`, `.venv` or `target`. The lead integrates each result with `git -C <dir> add -N -- <owned paths> && git -C <dir> diff -- <owned paths> | git apply`, then `git worktree remove --force <dir>`. A worker that returns `blocked:` or `too-big:` is re-dispatched with something changed (the missing context, a more capable model, or a split), never the same contract to the same model twice, and never absorbed silently: the report names what changed.
 
-8. Implement every behavior the request asks for, completely. Adjacent findings stay untouched and become follow-ups, per core.
+8. Prove the acceptance check: run the proof command the card names exactly as written and capture its own exit status with the decisive output line (a trailing `| tail` reports tail's status, not the command's); when the card names none, `references/prove.md` chooses the check set.
 
-9. Prove the acceptance check: `references/prove.md`. Report its verdict as it came back.
-
-10. Report:
+9. Report:
 
 ```
 <path> — <what changed>
@@ -31,4 +29,4 @@ status: DONE | DONE_WITH_CONCERNS: <c> | BLOCKED: <b> | NEEDS_CONTEXT: <w>
 follow-ups: <one line each, or "none">
 ```
 
-Then invoke `review` on the diff (Skill tool `sniper:review`, `$review` on Codex) unless `--no-review` was given. Do not commit here; that is ship's step, and it runs when asked.
+Then invoke `review` on the actual task diff (Skill tool `sniper:review`, `$review` on Codex) unless the short path already completed local review or `--no-review` was given; the flag skips only that handoff, and the short path's local review still runs. Do not commit here; that is ship's step, and it runs when asked.

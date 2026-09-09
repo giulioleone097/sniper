@@ -2,8 +2,8 @@
 """sniper evals: does the plugin change what a real headless Claude Code session leaves behind?
 
 Each cell is one `claude -p` session in a temp workspace seeded with a starter file, run
-in a bare session (nothing from the user's settings or other plugins) with either no plugin
-(baseline) or sniper loaded through --plugin-dir. What the session leaves on disk is scored
+in a bare session (nothing from the user's settings or other plugins) with no plugin
+(baseline), current sniper, or an optional previous plugin directory. Disk output is scored
 deterministically by evals/tasks.py; the delta between arms is the point.
 
   python3 run.py --selftest             prove every scorer: good passes, bad is caught. No API.
@@ -14,7 +14,9 @@ deterministically by evals/tasks.py; the delta between arms is the point.
 Nothing here is installed, indexed or written outside evals/runs/.
 """
 import argparse
+import contextlib
 import datetime
+import io
 import json
 import os
 import shutil
@@ -30,18 +32,22 @@ from tasks import TASKS  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 RUNS = Path(__file__).resolve().parent / "runs"
 CELL_TIMEOUT = 300
-# The agent writes code and stops; execution is what the scorer does, identically for every arm.
-NO_RUN = ("Edit the file in place, include a test only if you normally would for a change like this, "
-          "do not run servers or install anything. Only what you write is measured.")
-ARMS = ("baseline", "sniper")
+INSTRUCTIONS = ("Edit the files in place and use existing checks where useful. "
+                "Do not run servers or install anything. Only files and CLI metrics are scored.")
+ARMS = ("baseline", "sniper", "previous")
 
 
 def selftest():
     failed = 0
     for name, t in TASKS.items():
-        for label, expect_pass in (("good", True), ("bad", False)):
+        references = [("good", t["good"]), ("bad", t["bad"]), *t.get("good_variants", {}).items()]
+        for label, reference in references:
+            expect_pass = label != "bad"
             with tempfile.TemporaryDirectory() as d:
-                (Path(d) / t["file"]).write_text(t[label])
+                for fname, content in t["seed"].items():
+                    (Path(d) / fname).write_text(content)
+                for fname, content in (reference if isinstance(reference, dict) else {t["file"]: reference}).items():
+                    (Path(d) / fname).write_text(content)
                 r = t["score"](Path(d))
                 axis = "correct" if t["axis"] == "correct" else "safe"
                 ok = bool(r[axis]) == expect_pass and (r["correct"] == 1)
@@ -49,23 +55,34 @@ def selftest():
                     ok = r["correct"] == 1 and r["safe"] == 0
                 print(f"{'ok  ' if ok else 'FAIL'} {name:15s} {label:4s} {r}")
                 failed += 0 if ok else 1
+    # Missing and partial CLI costs previously appeared as free runs.
+    rows = [dict(task="report", arm="baseline", correct=1, safe=1, src_loc=1, wrote_test=False)] * 2
+    with contextlib.redirect_stdout(io.StringIO()) as output:
+        summary = aggregate(rows)
+    ok = summary[0]["total_cost_usd"] == {"median": None, "available": 0, "total": 2} and "unavailable(0/2)" in output.getvalue()
+    partial = [dict(rows[0], total_cost_usd=0.25), rows[1]]
+    with contextlib.redirect_stdout(io.StringIO()) as output:
+        summary = aggregate(partial)
+    ok = ok and summary[0]["total_cost_usd"] == {"median": 0.25, "available": 1, "total": 2} and "0.250(1/2)" in output.getvalue()
+    print(f"{'ok  ' if ok else 'FAIL'} missing/partial cost reporting")
+    failed += not ok
     print(f"selftest: {'ok' if not failed else f'{failed} failing'}")
     return failed == 0
 
 
-def run_cell(task, arm, model, keep_dir):
+def run_cell(task, arm, model, keep_dir, plugin_dir):
     work = Path(tempfile.mkdtemp(prefix=f"sniper-eval-{task}-{arm}-"))
     for fname, content in TASKS[task]["seed"].items():
         (work / fname).write_text(content)
     # --bare: no user settings, memory, other plugins or hooks, so both arms start equal. Hooks off
     # means the doctrine is not injected by the plugin's own hook: the sniper arm carries it as an
     # appended system prompt, and its skills and agents through --plugin-dir.
-    cmd = ["claude", "-p", TASKS[task]["prompt"] + "\n\n" + NO_RUN, "--bare",
+    cmd = ["claude", "-p", TASKS[task]["prompt"] + "\n\n" + INSTRUCTIONS, "--bare",
            "--output-format", "json", "--max-turns", "12", "--dangerously-skip-permissions"]
     if model:
         cmd += ["--model", model]
-    if arm == "sniper":
-        cmd += ["--plugin-dir", str(ROOT), "--append-system-prompt-file", str(ROOT / "core" / "SNIPER.md")]
+    if plugin_dir is not None:
+        cmd += ["--plugin-dir", str(plugin_dir), "--append-system-prompt-file", str(plugin_dir / "core" / "SNIPER.md")]
     env = dict(os.environ)
     try:
         p = subprocess.run(cmd, cwd=work, capture_output=True, text=True, timeout=CELL_TIMEOUT, env=env)
@@ -78,9 +95,12 @@ def run_cell(task, arm, model, keep_dir):
     except subprocess.TimeoutExpired:
         meta = {"timeout": True}
     score = TASKS[task]["score"](work)
-    src = sum(1 for f in work.glob("*.py") if not f.name.startswith("test_") for _ in f.read_text().splitlines() if _.strip())
-    tests = any(f.name.startswith("test_") for f in work.glob("*.py"))
-    row = dict(task=task, arm=arm, model=model or "default", **score, src_loc=src, wrote_test=tests, **meta)
+    code = list(work.rglob("*.py"))
+    checks = {f for f in code if f.name.startswith("test_") or f.name == "check.py" or "tests" in f.relative_to(work).parts}
+    src = sum(1 for f in code if f not in checks for line in f.read_text().splitlines() if line.strip())
+    tests = any(f.relative_to(work).as_posix() not in TASKS[task]["seed"] for f in checks)
+    row = dict(task=task, arm=arm, model=model or "default", plugin_dir=str(plugin_dir) if plugin_dir else None,
+               **score, src_loc=src, wrote_test=tests, **meta)
     dest = keep_dir / f"{task}-{arm}-{datetime.datetime.now().strftime('%H%M%S%f')}"
     shutil.copytree(work, dest)
     (dest / "result.json").write_text(json.dumps(row, indent=2))
@@ -92,12 +112,20 @@ def aggregate(rows):
     by = {}
     for r in rows:
         by.setdefault((r["task"], r["arm"]), []).append(r)
-    print(f"{'task':15s} {'arm':9s} {'n':>2s} {'correct':>8s} {'safe':>5s} {'src_loc':>8s} {'tests':>6s} {'cost':>7s}")
+    summaries = []
+    print(f"{'task':15s} {'arm':9s} {'n':>2s} {'correct':>8s} {'safe':>5s} {'src_loc':>8s} {'tests':>6s} cost_usd duration_ms turns (median; available/total)")
     for (task, arm), rs in sorted(by.items()):
         n = len(rs)
-        cost = [r.get("total_cost_usd") or 0 for r in rs]
+        metrics, display = {}, []
+        for key in ("total_cost_usd", "duration_ms", "num_turns"):
+            values = [r[key] for r in rs if r.get(key) is not None]
+            median = statistics.median(values) if values else None
+            metrics[key] = dict(median=median, available=len(values), total=n)
+            display.append((f"{median:.3f}" if median is not None else "unavailable") + f"({len(values)}/{n})")
+        summaries.append(dict(task=task, arm=arm, **metrics))
         print(f"{task:15s} {arm:9s} {n:2d} {sum(r['correct'] for r in rs)/n:8.2f} {sum(r['safe'] for r in rs)/n:5.2f} "
-              f"{statistics.median(r['src_loc'] for r in rs):8.0f} {sum(r['wrote_test'] for r in rs)/n:6.2f} {statistics.median(cost):7.3f}")
+              f"{statistics.median(r['src_loc'] for r in rs):8.0f} {sum(r['wrote_test'] for r in rs)/n:6.2f} " + " ".join(display))
+    return summaries
 
 
 def rescore(stamp_dir):
@@ -116,7 +144,8 @@ def main():
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--rescore")
     ap.add_argument("--tasks", default=",".join(TASKS))
-    ap.add_argument("--arms", default=",".join(ARMS))
+    ap.add_argument("--arms", help="comma-separated baseline,sniper,previous; previous is included by default when supplied")
+    ap.add_argument("--previous-plugin", type=Path, help="previous plugin directory to compare using the same model and tasks")
     ap.add_argument("--runs", type=int, default=1)
     ap.add_argument("--model", default=None)
     a = ap.parse_args()
@@ -125,19 +154,29 @@ def main():
     if a.rescore:
         rescore(a.rescore)
         return
+    tasks = a.tasks.split(",")
+    arms = a.arms.split(",") if a.arms else list(ARMS if a.previous_plugin else ARMS[:2])
+    if set(tasks) - TASKS.keys() or set(arms) - set(ARMS) or a.runs < 1:
+        ap.error("choose known tasks and arms, with --runs at least 1")
+    if "previous" in arms and a.previous_plugin is None:
+        ap.error("the previous arm requires --previous-plugin")
+    if a.previous_plugin:
+        a.previous_plugin = a.previous_plugin.resolve()
+        if not all((a.previous_plugin / f).is_file() for f in ("core/SNIPER.md", ".claude-plugin/plugin.json")):
+            ap.error("--previous-plugin must contain core/SNIPER.md and .claude-plugin/plugin.json")
     if not selftest():
         sys.exit("scorers failed their selftest; not spending on a live run")
     keep = RUNS / datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     keep.mkdir(parents=True)
     rows = []
-    for task in a.tasks.split(","):
-        for arm in a.arms.split(","):
+    for task in tasks:
+        for arm in arms:
             for _ in range(a.runs):
-                row = run_cell(task, arm, a.model, keep)
+                row = run_cell(task, arm, a.model, keep, {"baseline": None, "sniper": ROOT, "previous": a.previous_plugin}[arm])
                 rows.append(row)
                 print(json.dumps(row))
     (keep / "aggregate.json").write_text(json.dumps(rows, indent=2))
-    aggregate(rows)
+    (keep / "summary.json").write_text(json.dumps(aggregate(rows), indent=2))
     print(f"kept under {keep}")
 
 

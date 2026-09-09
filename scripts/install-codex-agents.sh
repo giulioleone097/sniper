@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper: install the three agents as Codex custom agents.
+# sniper: install the agents as Codex custom agents.
 # Codex plugins cannot bundle agents, so this generates ~/.codex/agents/<name>.toml
 # from agents/*.md: Claude Code and Codex share one agent definition.
 # Re-run after editing an agent. Any error: exit 1 with the reason.
@@ -13,6 +13,7 @@ import glob, os, re, sys
 
 src, dest = sys.argv[1], sys.argv[2]
 effort = {"opus": "high", "sonnet": "medium", "haiku": "low"}
+models = {"opus": "gpt-5.6-terra", "sonnet": "gpt-5.6-luna", "haiku": "gpt-5.6-luna"}
 
 for path in sorted(glob.glob(os.path.join(src, "*.md"))):
     text = open(path).read()
@@ -30,6 +31,7 @@ for path in sorted(glob.glob(os.path.join(src, "*.md"))):
         'description = "' + fm["description"].replace('"', '\\"') + '"',
     ]
     if fm.get("model") in effort:
+        lines.append(f'model = "{models[fm["model"]]}"')
         lines.append(f'model_reasoning_effort = "{effort[fm["model"]]}"')
     if tools and not re.search(r"\b(Edit|Write)\b", tools):
         lines.append('sandbox_mode = "read-only"')

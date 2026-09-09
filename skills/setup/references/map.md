@@ -1,8 +1,8 @@
 # Map: the repository and the ones that depend on it
 
-Read on every setup, and whenever `docs/sniper/map.md` is missing or its stamp is behind HEAD.
+Read on setup, or when discovery needs a missing or outdated part of `docs/sniper/map.md`.
 
-1. Read what exists first. `docs/sniper/map.md` and `docs/sniper/conventions.md` carry a header line `stamp: <commit> <last PR> <date>`; without `--refresh`, a map whose commit is still an ancestor of HEAD and whose PR number is the latest merged is current: print its path and stop. With `--refresh`, or when the stamp is behind, read only what moved since the stamp: `git log <stamp>..HEAD`, PRs above the stamped number. A rebuild from nothing happens once per repository.
+1. Read what exists first. The map and conventions carry `stamp: <commit> <last PR> <date>`. When relevant changes since that stamp invalidate facts needed now, inspect and refresh those facts only, then stop. Otherwise reuse them. An older ancestor or unchanged PR count alone proves neither freshness nor staleness. `--refresh` or a missing map uses the discovery steps below; do not rebuild for a routine edit.
 
 2. Facts before judgment: `sh <plugin root>/scripts/repo-facts.sh <repo> 12 <N>` (`<plugin root>` is the parent of the `skills/` directory this file lives in; `N` from `--prs`, default 30) prints layout, languages, hot spots, authors, commit conventions, checks, merged-PR cadence, who reviews and who leaves inline comments. Add `sh <plugin root>/scripts/checks.sh` per top-level project, `scripts/tracker.sh` for the forge, `scripts/consumers.sh` for the repositories that depend on this one, `scripts/tokens.sh` on the UI tree when there is one, `scripts/debt.sh` for the declared shortcuts.
 
