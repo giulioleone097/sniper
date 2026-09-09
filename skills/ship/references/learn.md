@@ -16,7 +16,7 @@ Read at the end of every ship, with `--from-pr <n>`, or when the user asks for a
 
 7. More than three lines: `docs/solutions/<slug>.md` instead, at most 40 lines, four headings in this order: symptom, cause, fix, how to recognize it next time. Slug names the symptom, not the fix, because the symptom is what the next engineer will search for.
 
-8. Show the target path and the exact lines before touching the file, and write only after the user confirms in this session. No user to answer — a hands-off a hands-off run run, a non-interactive session — print `proposed (not written):` followed by that path and those lines, and stop.
+8. Show the target path and the exact lines before touching the file, and write only after the user confirms in this session. No user to answer (a hands-off or non-interactive run): print `proposed (not written):` followed by that path and those lines, and stop.
 
 9. Print what was written:
 

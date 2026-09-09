@@ -1,6 +1,6 @@
 # Shapes for a dossier
 
-One map for the whole change; then per domain its own map **and** its own before/after shape. Smallest view that carries the point: a shape needing a paragraph of explanation is the wrong shape, a shape without real names and real numbers is decoration, and a picture of only the changed nodes says nothing about blast radius - the neighbours that did **not** change stay in.
+One map for the whole change; then one diagram per domain: its before/after shape, or its own map when the change is who talks to whom, both only when neither alone carries the point. Smallest view that carries the point, and a shape at most sixteen lines: a shape needing a paragraph of explanation is the wrong shape, a shape without real names and real numbers is decoration, and a picture of only the changed nodes says nothing about blast radius - the neighbours that did **not** change stay in.
 
 ## The map, once, after the plain-words list
 
@@ -73,8 +73,7 @@ flowchart LR
 
 ## Rules
 
-- Unchanged neighbours stay in: faded on the map, a leading space in a `diff` fence. A domain map shares nodes with the big map - that is the point - but two domain maps must not be the same picture retitled, and no shape repeats another's nodes.
-- No findings in a shape - no severity, no bug, no security note. This is the comprehension layer; `review` owns defects.
-- No folder tree as architecture, and no level added because the previous one existed: system context, then containers, a component view only when an affected container's internals matter.
+- Two domain maps must not be the same picture retitled, and no shape repeats another's nodes.
+- No level added because the previous one existed: system context, then containers, a component view only when an affected container's internals matter.
 
 Distilled from humanlayer/skills `show-me` (view catalogue, diff-shaped views) and coldtea `pr-lens` (lanes, hero edge, unchanged neighbours, no findings lens, C4-inspired view choice).
