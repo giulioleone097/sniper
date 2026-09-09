@@ -6,12 +6,12 @@
 #
 # Prints one key=value per line, in the order a proof ladder runs them:
 #   project=<dir that owns the path>
-#   typecheck=<cmd> | lint=<cmd> | test=<cmd> | build=<cmd>     only the ones that exist
+#   typecheck=<cmd> | lint=<cmd> | test=<cmd> | build=<cmd> | e2e=<cmd>   only the ones that exist
 #   none=1                                                      when nothing is configured
 # Every command is printed for the caller to run from `project=`; nothing runs here.
 
-start=$(cd "${1:-.}" 2>/dev/null && pwd -P) || { echo "none=1"; exit 0; }
-[ -f "$start" ] && start=$(dirname "$start")
+arg="${1:-.}"; [ -f "$arg" ] && arg=$(dirname "$arg")
+start=$(cd "$arg" 2>/dev/null && pwd -P) || { echo "none=1"; exit 0; }
 
 dir="$start"
 while [ "$dir" != "/" ]; do
@@ -35,7 +35,7 @@ if [ -f "$dir/project.json" ] && command -v python3 >/dev/null 2>&1; then
   name=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1])).get('name',''))" "$dir/project.json" 2>/dev/null)
   targets=$(python3 -c "import json,sys;print(' '.join(json.load(open(sys.argv[1])).get('targets',{}).keys()))" "$dir/project.json" 2>/dev/null)
   if [ -n "$name" ] && [ -f "$root/nx.json" ]; then
-    for t in typecheck lint test build; do
+    for t in typecheck lint test build e2e; do
       case " $targets " in *" $t "*) emit "$t" "cd $root && npx nx run $name:$t";; esac
     done
   fi
@@ -52,6 +52,12 @@ if [ "$found" -eq 0 ] && [ -f "$dir/package.json" ] && command -v python3 >/dev/
     esac
   done
   case " $scripts " in *" typecheck "*|*" typecheck:"*) ;; *) [ -f "$dir/tsconfig.json" ] && emit typecheck "npx tsc --noEmit -p $dir/tsconfig.json";; esac
+fi
+
+# end-to-end harness beside the project: real screenshots and videos come from here
+if [ -f "$dir/package.json" ]; then
+  ls "$dir"/playwright.config.* >/dev/null 2>&1 && emit e2e "npx playwright test"
+  ls "$dir"/cypress.config.* >/dev/null 2>&1 && emit e2e "npx cypress run"
 fi
 
 # python project

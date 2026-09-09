@@ -1,0 +1,7 @@
+interface:
+  display_name: "Optimize"
+  short_description: "Push one measured number toward a target with parallel hypotheses, keeping only what beats the baseline"
+  default_prompt: "Use $optimize on this: take my metric command and target, run rounds of distinct hypotheses in parallel worktrees, keep only what beats the baseline beyond noise, and stop at the target or after two dry rounds."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true

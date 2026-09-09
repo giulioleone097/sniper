@@ -1,0 +1,7 @@
+interface:
+  display_name: "Handoff"
+  short_description: "Write where the work stands, what is proven, what is open and which skill the next session calls first"
+  default_prompt: "Use $handoff on this session: write where the work stands, separate proven from believed, list what is open as work, point at artifacts instead of repeating them, and name the skill the next session calls first."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true
