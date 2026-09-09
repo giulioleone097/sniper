@@ -1,6 +1,6 @@
 {
   "name": "sniper",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code and Codex.",
   "author": {
     "name": "Giulio Leone",
@@ -14,7 +14,7 @@
     "code-review",
     "simplification",
     "anti-slop",
-    "tdd",
+    "minimal-implementation",
     "quality"
   ],
   "skills": "./skills/",
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Sniper",
     "shortDescription": "Lock the outcome, ship the shortest safe path",
-    "longDescription": "Development, optimization and review flow for Claude Code and Codex: lock the requested outcome, take the shortest safe effective path, prove only changed behavior, and stop. Five stages that call each other: setup (doctrine and repository map), scope (intake, grill, goal card), build (plan, debug, implement, prove), review (shrink, per-area review, integrator, no regression), ship (commit, dossier, lesson, handoff).",
+    "longDescription": "Development, optimization and review for Claude Code and Codex. Small understood changes use a direct implement, review, fix and prove path. Broader work uses scope, build and review with subagents when useful. Preserve meaningful architecture boundaries, add only indispensable tests, and fix real defects within scope. Ship only when authorized.",
     "developerName": "Giulio Leone",
     "category": "Developer Tools",
     "capabilities": [
@@ -35,7 +35,9 @@
       "Scope this task before we touch code.",
       "Build the change under the current goal card.",
       "Review this diff for correctness, slop, and safety.",
-      "Run the flow end to end and stop before push."
+      "Run the flow end to end and stop before push.",
+      "Optimize this metric toward the target with parallel hypotheses; keep only what beats the baseline.",
+      "Hand off this session for the next one."
     ],
     "brandColor": "#1A1A1A"
   }
