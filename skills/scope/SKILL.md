@@ -20,7 +20,7 @@ argument-hint: "[task | issue number | url | file | pasted text] [--card-only] [
 
 8. Write Out of scope as the adjacent work being left alone: the neighbouring bug, the rename, the cleanup, the second reading rejected in step 4.
 
-9. Measure the reach when the change touches a shared contract (an exported symbol, a schema, an endpoint, a config key, a message): `git grep -w` for its consumers at HEAD, and `sh <plugin root>/scripts/consumers.sh` (`<plugin root>` is the parent of the `skills/` directory this file lives in) for repositories outside this one. Then name at most one material risk: data loss, authorization, a public contract with its consumer counts, a migration, a concurrency window. None: write `none`.
+9. Measure the reach when the change touches a shared contract (an exported symbol, a schema, an endpoint, a config key, a message): `git grep -w` for its consumers at HEAD, and `sh <plugin root>/scripts/consumers.sh` (`<plugin root>` is the parent of the `skills/` directory this file lives in) for repositories outside this one; a grill file's `reach:` lines are reused instead while the contracts they name are unchanged at HEAD. Then name at most one material risk: data loss, authorization, a public contract with its consumer counts, a migration, a concurrency window. None: write `none`.
 
 10. Set Size. `surgical` = one file, one obvious edit, no new seam. `normal` = a few files under one owner. `complex` = four or more tasks, more than one owner, or a change others depend on (schema, interface, migration); a contract with consumers in another repository is complex, one with consumers in this repository is at least normal.
 
