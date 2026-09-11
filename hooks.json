@@ -1,5 +1,4 @@
 {
-  "description": "sniper hooks for Devin (plugin-root convention; Claude and Codex read hooks/hooks.json, Cursor reads hooks/cursor-hooks.json). The doctrine arrives via the plugin AGENTS.md rule, so no SessionStart entry is needed; PreToolUse on the shell tool denies a fixed list of destructive git/rm commands before they run. ${CLAUDE_PLUGIN_ROOT:-.} covers hosts that expand the variable and those that run hook commands from the plugin root.",
   "PreToolUse": [
     {
       "matcher": "^(exec|Bash|Shell|write_to_process)$",

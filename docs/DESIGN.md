@@ -26,7 +26,7 @@ sniper/
   skills/setup/scripts/upsert-agents.py          doctrine block and map pointer in AGENTS.md
   skills/ship/scripts/*.py          pr-contracts, pr-walkthrough, test-summary (the dossier's evidence)
   agents/sniper-{scout,worker,reviewer,integrator}.md   one definition per role for all hosts (tools:, allowed-tools:, readonly: union)
-  hooks/hooks.json                  Claude Code + Codex: SessionStart, SubagentStart, PreToolUse(Bash)
+  hooks/claude-hooks.json                  Claude Code + Codex: SessionStart, SubagentStart, PreToolUse(Bash)
   hooks.json                        Devin (plugin-root convention): PreToolUse(exec|write_to_process)
   hooks/cursor-hooks.json           Cursor: beforeShellExecution; doctrine comes via the .mdc rule
   scripts/core-context.sh, guard.sh, test-guard.sh   the hooks and the guard fixtures
@@ -85,7 +85,7 @@ Every SKILL.md: frontmatter `name`, `description` opening with `Use when`, under
 
 ## Hooks and guard
 
-One hooks file per host family — the events and output shapes differ, so no file is shared across families: `hooks/hooks.json` for Claude Code and Codex (`SessionStart`, `SubagentStart` with `additionalContext`, `PreToolUse` with `permissionDecision`), `hooks.json` at the plugin root for Devin (`PreToolUse` on `exec`/`write_to_process`; Devin has no `SubagentStart` and its doctrine arrives via the plugin's always-on `AGENTS.md`), `hooks/cursor-hooks.json` for Cursor (`beforeShellExecution`; the doctrine arrives via `rules/sniper-core.mdc`, and Cursor's `subagentStart` answers `permission` only, so it is not wired).
+One hooks file per host family — the events and output shapes differ, so no file is shared across families: `hooks/claude-hooks.json` for Claude Code and Codex (`SessionStart`, `SubagentStart` with `additionalContext`, `PreToolUse` with `permissionDecision`), `hooks.json` at the plugin root for Devin (`PreToolUse` on `exec`/`write_to_process`; Devin has no `SubagentStart` and its doctrine arrives via the plugin's always-on `AGENTS.md`), `hooks/cursor-hooks.json` for Cursor (`beforeShellExecution`; the doctrine arrives via `rules/sniper-core.mdc`, and Cursor's `subagentStart` answers `permission` only, so it is not wired).
 
 `core-context.sh` injects the doctrine, prints nothing at either event when an AGENTS.md or CLAUDE.md from the session directory up to the root already carries the block (non-fork subagents receive those files too), when a host-global rules file (`~/.config/devin/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`) carries it — Cursor payloads are recognised by their fields and skip that check since Cursor reads none of those files — and honours `SNIPER_SUBAGENT_MATCHER` to narrow which subagents receive it. Its payload carries both `hookSpecificOutput.additionalContext` (Claude, Codex, Devin) and top-level `additional_context` (Cursor); each host reads the field it knows.
 
@@ -103,7 +103,7 @@ A question to the user goes through the host's question tool: `AskUserQuestion` 
 
 ## Codex
 
-`.codex-plugin/plugin.json` mirrors the Claude manifest and points at the same `skills/` and `hooks/hooks.json`. Codex cannot bundle agents, so `scripts/install-codex-agents.sh` generates `~/.codex/agents/sniper_{scout,worker,reviewer,integrator}.toml` from `agents/*.md`. Codex has no `disable-model-invocation`, and no sniper stage needs one; every sidecar allows implicit invocation so the loop can chain. Codex expands `${CLAUDE_PLUGIN_ROOT}` in `hooks/hooks.json` only, presents skills to the model as absolute roots, and shortens descriptions to about 45 characters when many plugins are installed: hence host-neutral paths and trigger-first descriptions, both enforced by `check.sh`.
+`.codex-plugin/plugin.json` mirrors the Claude manifest and points at the same `skills/` and `hooks/claude-hooks.json`. Codex cannot bundle agents, so `scripts/install-codex-agents.sh` generates `~/.codex/agents/sniper_{scout,worker,reviewer,integrator}.toml` from `agents/*.md`. Codex has no `disable-model-invocation`, and no sniper stage needs one; every sidecar allows implicit invocation so the loop can chain. Codex expands `${CLAUDE_PLUGIN_ROOT}` in `hooks/claude-hooks.json` only, presents skills to the model as absolute roots, and shortens descriptions to about 45 characters when many plugins are installed: hence host-neutral paths and trigger-first descriptions, both enforced by `check.sh`.
 
 ## Devin
 
@@ -111,7 +111,7 @@ A question to the user goes through the host's question tool: `AskUserQuestion` 
 
 ## Cursor
 
-`.cursor-plugin/plugin.json` declares `skills`, `rules`, `agents` and `hooks` explicitly so no convention file is needed beyond it — `hooks/hooks.json` stays Claude-shaped for its own hosts and Cursor never parses it as its own. `rules/sniper-core.mdc` is the doctrine verbatim between the same markers `AGENTS.md` uses, `alwaysApply: true`; `check.sh` keeps it in sync with `core/SNIPER.md`. Agent files carry `readonly: true` for the read-only roles; `model:` values are Claude/Devin names Cursor may not resolve, so the user-level installer rewrites them to `inherit` and the plugin bundle leaves them to fall back.
+`.cursor-plugin/plugin.json` declares `skills`, `rules`, `agents` and `hooks` explicitly so no convention file is needed beyond it — `hooks/claude-hooks.json` stays Claude-shaped for its own hosts and Cursor never parses it as its own. `rules/sniper-core.mdc` is the doctrine verbatim between the same markers `AGENTS.md` uses, `alwaysApply: true`; `check.sh` keeps it in sync with `core/SNIPER.md`. Agent files carry `readonly: true` for the read-only roles; `model:` values are Claude/Devin names Cursor may not resolve, so the user-level installer rewrites them to `inherit` and the plugin bundle leaves them to fall back.
 
 ## Evals
 
