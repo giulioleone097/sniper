@@ -1,6 +1,8 @@
 #!/bin/sh
-# sniper guard: PreToolUse(Bash) hook. Denies a fixed list of destructive
-# git/rm commands anywhere in tool_input.command, including after &&, ;, |.
+# sniper guard: pre-execution shell hook for Claude Code (PreToolUse Bash),
+# Codex (same), Devin (PreToolUse exec/write_to_process) and Cursor
+# (beforeShellExecution). Denies a fixed list of destructive git/rm commands
+# anywhere in the command string, including after &&, ;, |.
 # See docs/DESIGN.md "Hooks" for the rule table. Any parse or unexpected
 # error: print nothing, exit 0 -- never trap the user.
 
@@ -11,12 +13,22 @@ def allow():
     sys.exit(0)
 
 def deny(reason):
+    msg = "sniper guard: " + reason
+    # one payload, every host reads the fields it knows:
+    # Claude Code/Codex -> hookSpecificOutput.permissionDecision
+    # Devin             -> decision + reason
+    # Cursor            -> permission + user_message/agent_message
     payload = {
+        "decision": "block",
+        "reason": msg,
+        "permission": "deny",
+        "user_message": msg,
+        "agent_message": msg,
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",
-            "permissionDecisionReason": "sniper guard: " + reason,
-        }
+            "permissionDecisionReason": msg,
+        },
     }
     sys.stdout.write(json.dumps(payload))
     sys.exit(0)
@@ -24,9 +36,21 @@ def deny(reason):
 try:
     raw = sys.stdin.read()
     data = json.loads(raw)
-    cmd = data.get("tool_input", {}).get("command", "")
 except Exception:
     allow()
+
+# Claude/Devin send tool_input.command; Devin write_to_process sends
+# text_input/bytes_input; Cursor beforeShellExecution sends command at top level.
+ti = data.get("tool_input") if isinstance(data, dict) else None
+if not isinstance(ti, dict):
+    ti = {}
+cmd = (
+    ti.get("command")
+    or ti.get("text_input")
+    or ti.get("bytes_input")
+    or (data.get("command") if isinstance(data, dict) else None)
+    or ""
+)
 
 if not isinstance(cmd, str) or not cmd.strip():
     allow()

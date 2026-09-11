@@ -1,6 +1,7 @@
 # sniper
 
-One plugin for the whole development loop, for Claude Code and Codex. Lock the
+One plugin for the whole development loop, for Claude Code, Codex, Devin and
+Cursor. Lock the
 outcome, take the shortest safe path, prove only changed behavior, stop. Five
 stages carry setup through ship, four entry points are typed by name (grill,
 simplify, handoff, optimize); four agents cover locating, bounded
@@ -42,10 +43,37 @@ Generates `sniper_scout`, `sniper_worker`, `sniper_reviewer`, and
 `sniper_integrator` as Codex custom
 agents from `agents/*.md`. Restart Codex after running it.
 
+### Devin
+
+```
+devin plugins install giulioleone097/sniper   # or the local checkout path
+```
+
+Skills answer to `/sniper:<stage>`; the doctrine rides the plugin's always-on
+`AGENTS.md` and the guard runs on `PreToolUse` via the root `hooks.json`. Where
+the plugin manager is unavailable (`devin auth login` required), install at
+user level instead:
+
+```
+sh /path/to/sniper/scripts/install-devin.sh     # --remove reverts
+```
+
+### Cursor
+
+Install from **Customize → Plugins** pointing at `giulioleone097/sniper` (or a
+local checkout). The `.cursor-plugin/plugin.json` manifest wires skills,
+`rules/sniper-core.mdc` (the doctrine, `alwaysApply`), agents and
+`hooks/cursor-hooks.json` (`beforeShellExecution` → the guard). At user level:
+
+```
+sh /path/to/sniper/scripts/install-cursor.sh    # --remove reverts
+```
+
 ### Checks
 
 `sh scripts/check.sh` — the one-command acceptance run (validates, guard
-fixtures, manifest JSON, doctrine sync, version parity).
+fixtures, manifest JSON, doctrine sync, four-manifest version parity, per-host
+hook event rules).
 
 ## The flow
 
@@ -123,20 +151,34 @@ Four detectors make the skills run the repository's own commands instead of gues
 | `scripts/debt.sh [repo]` | the ledger of declared shortcuts: every `ceiling:` comment with its limit and upgrade trigger, `no-trigger` on the ones that will rot | `review --debt`, `setup` (map) |
 | `scripts/pr-partition.py BASE HEAD` | the diff split into judgment, tests, mechanical, generated, docs and config, so only judgment code is read | `review`, `ship` (dossier) |
 
-`scripts/check.sh` is the plugin's own acceptance: four strict validations, the guard fixtures, manifest parity, doctrine sync, and the repository rules executed (skill bodies under 120 lines, references under 80, no host env var inside a skill, every script parses, both detectors answer on this repo).
+`scripts/check.sh` is the plugin's own acceptance: four strict validations, the guard fixtures, manifest parity, doctrine sync, per-host hook event rules, and the repository rules executed (skill bodies under 120 lines, references under 80, no host env var inside a skill, every script parses, both detectors answer on this repo).
 
 ## Hooks
 
-`hooks/hooks.json` is shared by Claude Code and Codex, both scripts POSIX
-`sh` + `python3 -c` (no node, no jq):
+One hooks file per host family — the events and the output shape differ, so
+they do not share a file. All scripts are POSIX `sh` + `python3 -c` (no node,
+no jq):
 
-- `SessionStart` and `SubagentStart` run `scripts/core-context.sh`, which
-  injects `core/SNIPER.md` as `additionalContext` so the doctrine is active
+- `hooks/hooks.json` — Claude Code and Codex. `SessionStart` and
+  `SubagentStart` run `scripts/core-context.sh`, which injects
+  `core/SNIPER.md` as `additionalContext` so the doctrine is active
   every turn and inside every subagent. `SubagentStart` has no matcher, so it
   injects into every subagent in the session, not only sniper's; set
   `SNIPER_SUBAGENT_MATCHER=<regex>` (unanchored, case-insensitive, for
   example `^sniper`) to narrow it to the agent types that match.
-- `PreToolUse` on `Bash` runs `scripts/guard.sh`, which denies:
+  `PreToolUse` on `Bash` runs `scripts/guard.sh`.
+- `hooks.json` (plugin root) — Devin. `PreToolUse` on `exec` /
+  `write_to_process` runs the guard; the doctrine rides the plugin's always-on
+  `AGENTS.md` rule instead of a session hook.
+- `hooks/cursor-hooks.json` — Cursor. `beforeShellExecution` runs the guard;
+  the doctrine rides `rules/sniper-core.mdc` (`alwaysApply`).
+
+The guard and the context script answer every host with one payload — each
+host reads the fields it knows (`permissionDecision` for Claude/Codex,
+`decision`/`reason` for Devin, `permission`/`user_message` and
+`additional_context` for Cursor) — and both read the command from whichever
+field the host sends (`tool_input.command`, `text_input`/`bytes_input`, or
+top-level `command`). The guard denies:
   - `--no-verify` as a token in a segment that also has `git`
   - `git push --force` / `-f` / a `+refspec` (e.g. `+main`), but not
     `--force-with-lease`
@@ -153,8 +195,9 @@ Four detectors make the skills run the repository's own commands instead of gues
   `rm -rf dist`, and `git push --force-with-lease`. Any parse or script error
   prints nothing and allows the command — the guard never traps the user.
 
-To disable: `/plugin disable sniper`, or delete the entry in
-`hooks/hooks.json`.
+To disable: `/plugin disable sniper` (Claude), `codex plugin remove sniper`
+(Codex), `devin plugins remove sniper` (Devin), or remove the host's entry in
+its hooks file.
 
 ## Codex notes
 
@@ -180,6 +223,24 @@ its tokens once. Teammates without the plugin get the same rules from the file.
 Re-run after a core update; the block is replaced, your sections stay.
 
 - Codex substitutes `${CLAUDE_PLUGIN_ROOT}` in `hooks/hooks.json` only. Inside a skill body neither host expands a variable, and Codex presents skills to the model as absolute skill roots, so every path in a skill is written relative to the file that names it (`<this skill>/scripts/…`, `<plugin root>/scripts/…`); `scripts/check.sh` fails on any `CLAUDE_SKILL_DIR` or `${CLAUDE_PLUGIN_ROOT}` inside a skill or agent.
+
+## Devin and Cursor notes
+
+- Devin reads the plugin's `AGENTS.md` as an always-on rule (the doctrine),
+  `agents/*.md` as custom subagents (it uses the `allowed-tools` field, and
+  `sniper:`-prefixed profile names), and the root `hooks.json` — its only
+  plugin hooks convention. There is no `SubagentStart` on Devin, so subagents
+  there rely on their own prompts.
+- Cursor reads `.cursor-plugin/plugin.json`; `rules/sniper-core.mdc` carries
+  the doctrine with `alwaysApply` (its body must stay identical to
+  `core/SNIPER.md` — `check.sh` verifies). Agent frontmatter `readonly: true`
+  keeps scout/reviewer/integrator read-only; `model:` pins are
+  Claude/Devin names — on Cursor the installers rewrite them to `inherit`,
+  and the plugin bundle leaves them for the model picker to resolve.
+- Both installers (`install-devin.sh`, `install-cursor.sh`) exist because the
+  plugin managers are not always reachable; they copy skills as `sniper-<stage>`
+  (rewriting `sniper:` references to `sniper-`), merge hook entries without
+  touching others, and are idempotent and reversible (`--remove`).
 
 ## Evals
 

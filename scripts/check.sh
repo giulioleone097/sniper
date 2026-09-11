@@ -60,19 +60,58 @@ sh "$ROOT/scripts/debt.sh" "$ROOT" | grep -qE '^(markers=|none=1)' || { echo "ru
 python3 "$ROOT/evals/run.py" --selftest >/dev/null 2>&1 || { echo "rules: evals selftest failed (a scorer no longer separates good from bad)"; fail=1; }
 [ "$fail" -eq 0 ] && echo "rules: ok"
 
+# hooks and installer shape per host: each hooks file may name only the events
+# its host fires, and every user-level installer must exist and parse
+python3 - "$ROOT" <<'PYEOF' || fail=1
+import json, os, sys
+root = sys.argv[1]
+bad = 0
+EVENTS = {
+    "hooks/hooks.json": {"SessionStart", "SubagentStart", "PreToolUse"},          # Claude Code + Codex
+    "hooks.json": {"PreToolUse", "PostToolUse", "PermissionRequest",              # Devin (plugin root)
+                   "UserPromptSubmit", "Stop", "PostCompaction", "SessionStart", "SessionEnd"},
+    "hooks/cursor-hooks.json": {"sessionStart", "sessionEnd", "preToolUse",       # Cursor
+                   "postToolUse", "postToolUseFailure", "subagentStart", "subagentStop",
+                   "beforeShellExecution", "afterShellExecution", "beforeMCPExecution",
+                   "afterMCPExecution", "beforeReadFile", "afterFileEdit", "beforeSubmitPrompt",
+                   "preCompact", "stop", "afterAgentResponse", "afterAgentThought",
+                   "beforeTabFileRead", "afterTabFileEdit", "workspaceOpen"},
+}
+for path, allowed in EVENTS.items():
+    body = json.load(open(f"{root}/{path}"))
+    inner = body.get("hooks")
+    if isinstance(inner, dict):
+        events = set(inner.keys())
+    else:
+        events = set(body.keys()) - {"description", "version"}  # Devin bare format
+    unknown = events - allowed
+    if unknown:
+        print(f"rules: {path} names events its host never fires: {sorted(unknown)}"); bad += 1
+for f in ("scripts/install-devin.sh", "scripts/install-cursor.sh",
+          "scripts/install-codex-agents.sh", "rules/sniper-core.mdc"):
+    if not os.path.exists(f"{root}/{f}"):
+        print(f"rules: {f} missing"); bad += 1
+sys.exit(1 if bad else 0)
+PYEOF
+
 python3 - "$ROOT" <<'EOF' || fail=1
 import json, re, sys
 root = sys.argv[1]
 for f in (".claude-plugin/plugin.json", ".claude-plugin/marketplace.json",
-          ".codex-plugin/plugin.json", ".agents/plugins/marketplace.json", "hooks/hooks.json"):
+          ".codex-plugin/plugin.json", ".agents/plugins/marketplace.json",
+          ".devin-plugin/plugin.json", ".cursor-plugin/plugin.json",
+          "hooks/hooks.json", "hooks.json", "hooks/cursor-hooks.json"):
     json.load(open(f"{root}/{f}"))
 core = open(f"{root}/core/SNIPER.md").read().strip()
-m = re.search(r"<!-- sniper:core:start -->\n(.*?)\n<!-- sniper:core:end -->", open(f"{root}/AGENTS.md").read(), re.S)
-if not m or m.group(1).strip() != core:
-    sys.exit("doctrine: AGENTS.md block differs from core/SNIPER.md")
-v = [json.load(open(f"{root}/{f}"))["version"] for f in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json")]
-if v[0] != v[1]:
-    sys.exit(f"version mismatch: {v[0]} vs {v[1]}")
+for f in ("AGENTS.md", "rules/sniper-core.mdc"):
+    m = re.search(r"<!-- sniper:core:start -->\n(.*?)\n<!-- sniper:core:end -->", open(f"{root}/{f}").read(), re.S)
+    if not m or m.group(1).strip() != core:
+        sys.exit(f"doctrine: {f} block differs from core/SNIPER.md")
+v = [json.load(open(f"{root}/{f}"))["version"] for f in (
+    ".claude-plugin/plugin.json", ".codex-plugin/plugin.json",
+    ".devin-plugin/plugin.json", ".cursor-plugin/plugin.json")]
+if len(set(v)) != 1:
+    sys.exit(f"version mismatch: {v}")
 print(f"manifests, doctrine sync, version {v[0]}: ok")
 EOF
 

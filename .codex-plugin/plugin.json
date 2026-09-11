@@ -1,7 +1,7 @@
 {
   "name": "sniper",
-  "version": "1.4.0",
-  "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code and Codex.",
+  "version": "1.5.0",
+  "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code, Codex, Devin and Cursor.",
   "author": {
     "name": "Giulio Leone",
     "url": "https://github.com/giulioleone097"
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Sniper",
     "shortDescription": "Lock the outcome, ship the shortest safe path",
-    "longDescription": "Development, optimization and review for Claude Code and Codex. Small understood changes use a direct implement, review, fix and prove path. Broader work uses scope, build and review with subagents when useful. Preserve meaningful architecture boundaries, add only indispensable tests, and fix real defects within scope. Ship only when authorized.",
+    "longDescription": "Development, optimization and review for Claude Code, Codex, Devin and Cursor. Small understood changes use a direct implement, review, fix and prove path. Broader work uses scope, build and review with subagents when useful. Preserve meaningful architecture boundaries, add only indispensable tests, and fix real defects within scope. Ship only when authorized.",
     "developerName": "Giulio Leone",
     "category": "Developer Tools",
     "capabilities": [
