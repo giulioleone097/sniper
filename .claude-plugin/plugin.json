@@ -16,5 +16,6 @@
     "anti-slop",
     "minimal-implementation",
     "quality"
-  ]
+  ],
+  "hooks": "./hooks/claude-hooks.json"
 }

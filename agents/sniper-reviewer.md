@@ -2,12 +2,12 @@
 name: sniper-reviewer
 description: Reviews an assigned area or risk in an exact diff when independent analysis adds value. Returns grounded findings with severity and confidence. The lead verifies and fixes them; no minimum reviewer team. Never writes a fix.
 model: opus
-tools: Read, Grep, Glob, Bash
 allowed-tools:
   - read
   - grep
   - glob
   - exec
+disallowedTools: Agent
 readonly: true
 ---
 

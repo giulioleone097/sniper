@@ -18,7 +18,7 @@
     "quality"
   ],
   "skills": "./skills/",
-  "hooks": "./hooks/hooks.json",
+  "hooks": "./hooks/claude-hooks.json",
   "interface": {
     "displayName": "Sniper",
     "shortDescription": "Lock the outcome, ship the shortest safe path",
