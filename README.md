@@ -71,6 +71,14 @@ local checkout). The `.cursor-plugin/plugin.json` manifest wires skills,
 sh /path/to/atlas/scripts/install-cursor.sh    # --remove reverts
 ```
 
+### ChatGPT and other MCP clients
+
+The optional [workflow MCP bridge](integrations/mcp/README.md) serves Atlas and
+Spotter skills with their canonical doctrine through a private stdio server.
+Use an OpenAI Secure MCP Tunnel to connect it to ChatGPT. This provides workflow
+content; hooks, automatic per-turn instructions and local execution still
+require host support.
+
 ### Checks
 
 `sh scripts/check.sh` — the one-command acceptance run (validates, guard

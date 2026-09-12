@@ -1,0 +1,6 @@
+[project]
+name = "atlas-workflows-mcp"
+version = "0.1.0"
+description = "Read-only MCP access to Atlas and Spotter workflow packages"
+requires-python = ">=3.11"
+dependencies = ["mcp>=2,<3", "pyyaml>=6,<7"]
