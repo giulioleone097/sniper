@@ -58,6 +58,36 @@ def upsert_claude(path: Path) -> str:
 POINTER = "Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with `setup --map`)."
 
 
+def remove_agents(path: Path) -> str:
+    if not path.exists() or START not in path.read_text():
+        return "absent"
+    text = path.read_text()
+    new = re.sub(re.escape(START) + r".*?" + re.escape(END) + r"\n*", "", text, count=1, flags=re.S)
+    new = new.replace(POINTER + "\n", "").replace(POINTER, "")
+    if FILL in new:
+        path.unlink()
+        return "deleted (skeleton untouched)"
+    path.write_text(re.sub(r"\n{3,}", "\n\n", new))
+    return "block removed"
+
+
+def remove_claude(path: Path) -> str:
+    nested = path.parent / ".claude" / "CLAUDE.md"
+    if not path.exists() and nested.exists():
+        path = nested
+    if not path.exists():
+        return "absent"
+    text = path.read_text()
+    new = re.sub(r"^@(\.\./|\./)?AGENTS\.md\s*\n?", "", text, flags=re.M)
+    if new == text:
+        return "unchanged"
+    if not new.strip():
+        path.unlink()
+        return "deleted"
+    path.write_text(new)
+    return "import removed"
+
+
 def upsert_pointer(path: Path) -> str:
     """One navigation line after the doctrine block, so AGENTS.md points at the map instead of holding it."""
     text = path.read_text()
@@ -75,10 +105,15 @@ def upsert_pointer(path: Path) -> str:
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     flags = {a for a in sys.argv[1:] if a.startswith("--")}
-    if len(args) != 2:
+    if len(args) != (1 if "--remove" in flags else 2):
         sys.exit(__doc__)
-    project, core_file = Path(args[0]).resolve(), Path(args[1])
-    core = core_file.read_text()
+    project = Path(args[0]).resolve()
+    if "--remove" in flags:
+        print(f"AGENTS.md: {remove_agents(project / 'AGENTS.md')}")
+        print(f"CLAUDE.md: {remove_claude(project / 'CLAUDE.md')}")
+        print("docs/sniper/: left for manual deletion")
+        return
+    core = Path(args[1]).read_text()
     print(f"AGENTS.md: {upsert_agents(project / 'AGENTS.md', core, project.name)}")
     print(f"CLAUDE.md: {upsert_claude(project / 'CLAUDE.md')}")
     if "--map" in flags:

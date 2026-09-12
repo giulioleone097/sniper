@@ -1,12 +1,12 @@
 ---
 name: setup
-description: Use when the user asks to install project rules, or discovery needs a missing or outdated map. Installs the doctrine only on explicit invocation; otherwise refreshes relevant map facts. Not for routine edits with known locations.
-argument-hint: "[project-dir] [--map] [--refresh] [--prs N] [--linked]"
+description: Use when the user asks to install or remove project rules, or discovery needs a missing or outdated map. Installs the doctrine only on explicit invocation; otherwise refreshes relevant map facts. Not for routine edits with known locations.
+argument-hint: "[project-dir] [--map] [--refresh] [--prs N] [--linked] [--remove]"
 ---
 
 1. Resolve the project directory: the argument, else the git top level of the current directory, else the current directory. Refuse a home directory or `/`.
 
-2. `--map` means the model invoked this to refresh the map: skip to step 5 and touch nothing else. Without `--map` the user typed it: continue.
+2. `--map` means the model invoked this to refresh the map: skip to step 5 and touch nothing else. `--remove` means the user asked to take sniper back out: run `python3 <this skill>/scripts/upsert-agents.py <project-dir> --remove` — it deletes the doctrine block from `AGENTS.md` (the whole file when it is still the untouched skeleton) and the `CLAUDE.md` import, reports each status, and leaves `docs/sniper/` for manual deletion — then print the result block and stop. Without `--map` or `--remove` the user typed it: continue.
 
 3. Run `python3 <this skill>/scripts/upsert-agents.py <project-dir> <plugin root>/core/SNIPER.md --map`, where `<this skill>` is the directory this file lives in and `<plugin root>` is the parent of its `skills/` directory. It creates or refreshes only the block between `<!-- sniper:core:start -->` and `<!-- sniper:core:end -->` in `AGENTS.md`, makes sure `CLAUDE.md` imports it with `@AGENTS.md` (or `.claude/CLAUDE.md` with `@../AGENTS.md` when the project keeps it there), and adds one navigation line after the block pointing at `docs/sniper/map.md` and `conventions.md`. Report the status lines it prints.
 
@@ -19,7 +19,7 @@ argument-hint: "[project-dir] [--map] [--refresh] [--prs N] [--linked]"
 ```
 <project-dir>
 AGENTS.md: created | block appended | block refreshed | unchanged | untouched (--map)
-CLAUDE.md: created | import appended | unchanged | untouched (--map)
+CLAUDE.md: created | import appended | unchanged | deleted | untouched (--map)
 Working on this repo: <n> commands written | left as is
 map: written | refreshed | current
 ```
