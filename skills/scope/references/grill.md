@@ -12,7 +12,7 @@ Read when the request has open design branches: more than three questions surviv
 
 5. Wait for the answers. The tool returns them keyed by question; never answer your own round, never continue to the next round on assumptions.
 
-6. Each answer reshapes the tree: settled decisions push the frontier outward and unblock what depended on them. Recompute and ask the next round. A question whose answer depends on another still open in this round belongs to the next round, not this one.
+6. Each answer reshapes the tree: settled decisions push the frontier outward and unblock what depended on them. Recompute and ask the next round. A question whose answer depends on another still open in this round belongs to the next round, not this one. An answer that resolves a term of vocabulary, not just a decision, goes through `glossary.md` right there: it lands in the target repository's `CONTEXT.md` before the next round is asked, and a use of that term contradicting an existing entry becomes the next question instead of a settled premise.
 
 7. Stop when the frontier is empty: every branch visited, nothing silently assumed. Then print the settled tree, one entry per decision with the reach and risk of what was chosen, and hand off. A reach or risk line with nothing to say is omitted. When the settled choices reach more than one domain, one map follows the tree in the grammar of `<plugin root>/skills/ship/references/shapes.md`, "The map": lanes as the reader's mental model, the nodes the work would change, the untouched neighbours that prove the reach; no per-domain diagram, since nothing has changed yet.
 

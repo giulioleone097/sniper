@@ -8,7 +8,7 @@ argument-hint: "[task | issue number | url | file | pasted text] [--card-only] [
 
 2. Route by what arrived. An issue number, a URL, a work item, a pasted report, a transcript, an image, a handoff or grill file: read `<this skill>/references/intake.md` (`<this skill>` is the directory this file lives in) and come back here with what it established. A task whose outcome is genuinely undecided, with open design branches rather than missing facts: read `references/grill.md`, settle the tree with the user, and come back with the settled decisions. A task whose outcome, boundary and acceptance you could already write: continue.
 
-3. Find the facts yourself: start at the files or symbols already identified. Use the relevant part of `docs/sniper/map.md` when discovery is needed; otherwise one bounded search for the flow. Never ask the user for something the repository can answer.
+3. Find the facts yourself: start at the files or symbols already identified. Use the relevant part of `docs/sniper/map.md` when discovery is needed; otherwise one bounded search for the flow. A `CONTEXT.md` at the repo root, when present, is settled vocabulary: consult it before asking. Never ask the user for something the repository can answer.
 
 4. Draft the card from what you found. Resolve ambiguity per core, and put the chosen reading in the card as `Assuming <reading>.` inside Outcome.
 

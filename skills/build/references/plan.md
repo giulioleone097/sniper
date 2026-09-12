@@ -3,7 +3,7 @@
 Read when the card's size is complex.
 
 1. The goal card is the input; plan from it.
-2. Read the code the work touches before decomposing anything. List the files each task will create or modify and what each one owns after the change.
+2. Read the code the work touches before decomposing anything. List the files each task will create or modify and what each one owns after the change. Name new files, symbols and task titles from the repo's `CONTEXT.md` when one exists.
 3. Choose proof from existing checks or real exercises. Plan a new test only when indispensable under core's rule, naming the meaningful regression existing checks miss. Otherwise use `New test: none`; the existence or absence of a test suite alone decides nothing.
 4. Cut a task where a reviewer could reject it and still accept its neighbour. Fold setup, configuration, and docs into the task whose deliverable needs them. Every task ends in something independently provable.
 5. Assign owned paths per task. Tasks that can run beside each other must have prefix-disjoint path sets; when two tasks want the same file, order them with `After` rather than splitting the file to fake independence.

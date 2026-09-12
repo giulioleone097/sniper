@@ -29,6 +29,8 @@ stamp: <commit> <last merged PR> <yyyy-mm-dd>
 ## Fonti             scripts, servers and PRs this map was built from
 ```
 
+   Note whether the repo keeps a `CONTEXT.md` or `CONTEXT-MAP.md` glossary; record its path under `Fonti` when present, or `none` when absent.
+
    And `docs/sniper/conventions.md`, same stamp: one theme per section, the rule in one sentence, the reviewer quotes with PR numbers that prove it, and the reference PRs. Conventions a linter enforces are named as enforced and not repeated as prose.
 
 7. `--linked`: run steps 2 to 6 on each consumer repository that is checked out, writing its own `docs/sniper/` there, and add one line per linked repository to this map. Not checked out: named as unread.
