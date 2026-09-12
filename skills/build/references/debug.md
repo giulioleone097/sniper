@@ -8,7 +8,7 @@ Read when the request is a failure or unexplained behavior whose cause is not ye
    1. A failing test at whatever seam reaches the bug.
    2. A curl or HTTP script against the running service.
    3. A CLI invocation on a fixture input, diffed against known-good output.
-   4. A headless browser script asserting on DOM, console, or network.
+   4. A headless browser script asserting on DOM, console, or network — or the repo's e2e harness itself run with recording on (`<plugin root>/skills/ship/references/evidence.md` step 2 names the switches) when the symptom lives in a UI flow.
    5. A replay of a captured payload, trace, or event log through the path in isolation.
 
    Otherwise invent the cheapest thing that goes red on this symptom (bisection, differential run, fuzz loop).
@@ -23,7 +23,7 @@ Read when the request is a failure or unexplained behavior whose cause is not ye
 
 7. Inspect the nearest boundary where the hypotheses diverge: the closest place showing correct state on one side and the symptom on the other. Change one variable per probe.
 
-8. After two uninformative attempts, instrument that boundary instead of guessing again. A debugger or REPL breakpoint beats ten logs; tag every temporary log with one unique prefix (`[DBG-a4f2]`) so removal is a single grep. For a slow path, measure a baseline and bisect — logs mislead on performance.
+8. After two uninformative attempts, instrument that boundary instead of guessing again. A debugger or REPL breakpoint beats ten logs; when logging, write structured lines to a per-run timestamped file in a scratch dir (`debug-<slug>-<ts>.log`), keep the last three to five runs and prune older — a file you can diff across runs beats a console you scroll, and you analyze the file, never the transcript. Tag every temporary log with one unique prefix (`[DBG-a4f2]`) so removal is a single grep. For a slow path, measure a baseline and bisect — logs mislead on performance.
 
 9. Keep credentials in environment variables, and write `<REDACTED>` in place of any token, header, or connection string in output you quote.
 
