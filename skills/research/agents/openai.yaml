@@ -1,0 +1,7 @@
+interface:
+  display_name: "Research"
+  short_description: "Delegate a question to a background subagent that digs up primary sources and writes cited findings to one Markdown file"
+  default_prompt: "Use $research on this question: spin up a background subagent to investigate it against primary sources only, follow every claim back to the source that owns it, and write the findings to one cited Markdown file."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true

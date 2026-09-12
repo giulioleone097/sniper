@@ -1,0 +1,7 @@
+interface:
+  display_name: "Prototype"
+  short_description: "Build a throwaway prototype outside the versioned tree to answer a design question before real work starts"
+  default_prompt: "Use $prototype on this design question: pick the logic or UI branch, build the throwaway artifact in a scratch dir outside the versioned tree, let me exercise it, then report the verdict and hand it to grill or scope."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true
