@@ -6,11 +6,11 @@ Read at the end of every ship, with `--from-pr <n>`, or when the user asks for a
 
 2. Apply the counterfactual. Delete that sentence from the world: would the next engineer, reading the final code, tests, types, comments, and existing docs, repeat the mistake or redo the investigation? If no, print `nothing to record` and stop. Effort spent, diff size, and having been invoked do not qualify a learning.
 
-3. Reject the candidate when it is advice true of software in general, a restatement of what the code already says, a one-off unlikely to recur, style a linter enforces, or something the target file already says. An existing entry that the work proved wrong is a rewrite of that entry, not a second one.
+3. Reject the candidate when it is advice true of software in general, a restatement of what the code already says, a one-off unlikely to recur, style a linter enforces, or something any rule-bearing file in the tree already says — check the skill or reference that owns the subject before appending to a rules section, not just the target file. An existing entry that the work proved wrong is a rewrite of that entry, not a second one.
 
 4. One learning per run. A session that produced several gets several runs, one at a time, so each keeps its own counterfactual.
 
-5. Pick the target: the closest AGENTS.md or CLAUDE.md covering the changed path, nested file over root.
+5. Pick the target: the file that already owns the rule's subject. A rule about how a skill behaves belongs in that skill's body or reference when this repository is the plugin's own; a rule about a process a project document already governs belongs in that document; otherwise the closest AGENTS.md or CLAUDE.md covering the changed path, nested file over root.
 
 6. Three lines or fewer: the entry belongs under `## Code Review Rules` in that file, creating the section at the end of the file when it is missing. Shape each line `<invariant>. Safe path: <what to do instead>.` A rule without a concrete safe path is noise the next review has to ignore.
 
