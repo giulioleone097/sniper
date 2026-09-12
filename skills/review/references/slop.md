@@ -14,6 +14,7 @@ Read from shrink when walking the `delete:` and `yagni:` rungs, and handed to a 
 - A factory, builder or registry for one product: `yagni:`.
 - Configuration, a flag or an option nobody sets outside its default: `delete:`, plumbing included. Stays when the value is read from the environment, CI or a deploy manifest, whose setters live outside this tree, unless those files (`.env*`, pipeline config, manifests, deploy checkouts) are in reach and show it unset; `git grep -w` alone does not prove nobody sets it.
 - Parameters, hooks or `**kwargs` added for a caller that does not exist: `yagni:`.
+- A prop, parameter or branch kept optional or widened only so tests, stories, mocks or demos can express states live callers never enter: `yagni:` narrowed to the live call sites (`git grep -w` on them, not on the support code), the support code adapting. Stays when a real caller exercises the wide case.
 - A layer that passes data through unchanged (service to repository to client, one line each): `yagni:` down to the layer that does something.
 
 ## Noise
