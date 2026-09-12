@@ -1,6 +1,6 @@
 {
   "name": "atlas",
-  "version": "2.0.0",
+  "version": "2.0.2+codex.20260912132622",
   "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code, Codex, Devin and Cursor.",
   "author": {
     "name": "Giulio Leone",
@@ -34,11 +34,11 @@
     "defaultPrompt": [
       "Scope this task before we touch code.",
       "Build the change under the current goal card.",
-      "Review this diff for correctness, slop, and safety.",
-      "Run the flow end to end and stop before push.",
-      "Optimize this metric toward the target with parallel hypotheses; keep only what beats the baseline.",
-      "Hand off this session for the next one."
+      "Review this diff for correctness, slop, and safety."
     ],
-    "brandColor": "#1A1A1A"
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png",
+    "logoDark": "./assets/icon.png"
   }
 }

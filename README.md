@@ -1,5 +1,7 @@
 # atlas
 
+<img src="assets/icon.png" alt="Atlas icon" width="128" />
+
 One plugin for the whole development loop, for Claude Code, Codex, Devin and
 Cursor. Lock the
 outcome, take the shortest safe path, prove only changed behavior, stop. Five
@@ -81,7 +83,7 @@ hook event rules).
 atlasme ─┐
 setup? ──► scope ──► build ──► review ──► ship
              │          │          │
-       intake, grill  plan, debug  shrink, reviewers,
+       intake, atlasme  plan, debug  shrink, reviewers,
        goal card      prove        integrator
                               simplify (shrink alone)
 
@@ -108,7 +110,7 @@ parallel hypotheses that keep only what beats the baseline.
 | skill | use when | what it does |
 |---|---|---|
 | `setup` | a project needs atlas's local rules, or its map is missing or stale | doctrine block in AGENTS.md, CLAUDE.md import, map pointer (only when you typed it); `docs/atlas/map.md` and `conventions.md` from git, the tracker and the reviewers' comments, with a stamp; `--map` refreshes only |
-| `scope` | work arrives: a task, an issue, a PR, a report, a screenshot, a handoff or atlasme file, an idea | intake for a tracker item, an image or a resume file (forge and CLI from `tracker.sh`, read, reproduce the claim, check already-done and already-rejected, reuse what a handoff proved and honour what it decided; `--reply` posts the result or the questions back on the item after your confirmation), grill for an undecided design, reach of a touched contract measured (`git grep`, `consumers.sh`) or reused from the atlasme file before Risk and Size, then the goal card with its Source line (forge#n, PR, path, pasted, or `request`); typed with no argument and no request in the conversation it offers to resume the latest handoff; hands to build |
+| `scope` | work arrives: a task, an issue, a PR, a report, a screenshot, a handoff or atlasme file, an idea | intake for a tracker item, an image or a resume file (forge and CLI from `tracker.sh`, read, reproduce the claim, check already-done and already-rejected, reuse what a handoff proved and honour what it decided; `--reply` posts the result or the questions back on the item after your confirmation), atlasme for an undecided design, reach of a touched contract measured (`git grep`, `consumers.sh`) or reused from the atlasme file before Risk and Size, then the goal card with its Source line (forge#n, PR, path, pasted, or `request`); typed with no argument and no request in the conversation it offers to resume the latest handoff; hands to build |
 | `build` | a card exists and code must change, or a failure has no known cause | an issue, URL, image, handoff or atlasme file goes back through `scope` first; plan when complex (a brief in chat, a file under `docs/plans/` for four or more tasks, several owners or a risk surface; `--tickets` publishes), debug when the cause is unknown, mode references for fix, refactor and migrate, UI taste when a visual decision is made, parallel workers in their own worktrees (seeded with your uncommitted work, integrated back as a diff) when their builds or tests would collide, indispensable tests only, run red before green in a detached worktree of `HEAD` when the code already exists, the card's proof command run as written, else proof from the repository's own commands and a real picture for a UI change; hands to review unless `--no-review`, which skips only that handoff |
 | `review` | a change is built, or a branch, PR or tree needs review, or reviewers left comments | the task's diff, or on a clean branch the diff against the default branch; shrink within scope (the slop catalog names what to cut and what stays), economical reviewers only when useful, verify reports and fix real in-scope defects by default, sweep consumers in and out of the repository when external contracts change, checks with failures attributed to the baseline; `--pr` posts one thread per finding at its line in the branch's PR (drafted to a file when there is no PR, CLI or login), `--address <pr>` checks out the PR's head when the tree is clean and answers the reviewers' threads from the code (fixed, landing through `ship --push`; rebutted with evidence; or follow-up); `--fix`, `--read-only` (cuts and fixes as proposals, nothing applied), `--repo`, `--debt` |
 | `atlasme` | you say grill me, or bring an idea, plan, file, issue or PR still undecided | typed bare, asks what to grill; reads a document or item first and grills only what it leaves open; the decision tree worked in rounds through the host's question tool, facts looked up itself, every option costed by its reach at HEAD (domains from the map, consumers counted, linked repositories, a code-graph impact query when exposed), the recommendation first on every question; the settled tree carries reach and risk per decision and one map when more than one domain is reached; ends by asking build now, card only or stop; card only, stop and `--out` write the settled tree to disk so `scope <file>` resumes it |

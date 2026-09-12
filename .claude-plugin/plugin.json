@@ -1,7 +1,7 @@
 {
   "name": "atlas",
   "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code, Codex, Devin and Cursor.",
-  "version": "2.0.0",
+  "version": "2.0.2+codex.20260912132622",
   "author": {
     "name": "Giulio Leone",
     "url": "https://github.com/giulioleone097"
