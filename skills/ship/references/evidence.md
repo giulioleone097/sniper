@@ -1,6 +1,6 @@
 # Evidence: real end-to-end screenshots and videos in the dossier
 
-Read from narrate when the change touches a UI flow or the repository ships an end-to-end harness.
+Read from `dossier.md` when the change touches a UI flow or the repository ships an end-to-end harness.
 
 1. Find the harness. `sh <plugin root>/scripts/checks.sh <ui path>` (`<plugin root>` is the parent of the `skills/` directory this file lives in) prints `e2e=` for Playwright and Cypress; otherwise look for Detox, Maestro, `docker-compose` or an `e2e/` folder under the touched projects. None: the dossier says so once, under "Fuori dal perimetro", and no picture is faked.
 

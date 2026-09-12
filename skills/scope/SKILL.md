@@ -6,7 +6,7 @@ argument-hint: "[task | issue number | url | file | pasted text] [--card-only] [
 
 1. Take the argument as the work; empty, the request already stated in this conversation is the work. Neither: look for the most recent handoff or atlasme file (`docs/handoff-*.md` and `docs/atlasme-*.md`); found, offer through the host's question tool to resume it, start something else, or stop, and continue with the answer; none, emit `blocked: task missing` and stop.
 
-2. Route by what arrived. An issue number, a URL, a work item, a pasted report, a transcript, an image, a handoff or atlasme file: read `<this skill>/references/intake.md` (`<this skill>` is the directory this file lives in) and come back here with what it established. A task whose outcome is genuinely undecided, with open design branches rather than missing facts: read `references/grill.md`, settle the tree with the user, and come back with the settled decisions. A task whose outcome, boundary and acceptance you could already write: continue.
+2. Route by what arrived. An issue number, a URL, a work item, a pasted report, a transcript, an image, a handoff or atlasme file: read `<this skill>/references/intake.md` (`<this skill>` is the directory this file lives in) and come back here with what it established. A task whose outcome is genuinely undecided, with open design branches rather than missing facts: read `references/atlasme.md`, settle the tree with the user, and come back with the settled decisions. A task whose outcome, boundary and acceptance you could already write: continue.
 
 3. Find the facts yourself: start at the files or symbols already identified. Use the relevant part of `docs/atlas/map.md` when discovery is needed; otherwise one bounded search for the flow. A `CONTEXT.md` at the repo root, when present, is settled vocabulary: consult it before asking. Never ask the user for something the repository can answer.
 
@@ -14,7 +14,7 @@ argument-hint: "[task | issue number | url | file | pasted text] [--card-only] [
 
 5. Test every remaining unknown against one bar: would a different answer change which files change, what acceptance means, or whether the work is safe? Decide everything below that bar yourself and say nothing about it.
 
-6. More than three survive, or a survivor is a design decision rather than a missing fact: `references/grill.md`. Otherwise ask the survivors through the host's question tool, contract in `references/asking.md`.
+6. More than three survive, or a survivor is a design decision rather than a missing fact: `references/atlasme.md`. Otherwise ask the survivors through the host's question tool, contract in `references/asking.md`.
 
 7. Write Acceptance as a single check that fails when the outcome is absent. "Works correctly" is not a check; "GET /orders/9 returns 404 instead of 500" is.
 

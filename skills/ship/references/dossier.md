@@ -1,4 +1,4 @@
-# Narrate: the approval dossier
+# Dossier: the approval document
 
 Read when a PR body is needed (`ship --pr`), or when the user asks for the dossier alone.
 

@@ -17,7 +17,7 @@ Read during a grill round the moment a term resolves: a name, a boundary, a dist
 
    Group entries loosely under a `## <area>` heading only once several already share one; a single term needs no heading of its own.
 
-5. Keep the file a pure glossary. No implementation detail, no rationale for why a term won over another, no spec prose, no scratch notes, no decision log. A choice worth keeping past this session — the rejected alternative a future reader would otherwise re-litigate — is not glossary content: grill's own step for that hands it to ship's learn step. Never create an ADR directory or file for it; that path does not exist here.
+5. Keep the file a pure glossary. No implementation detail, no rationale for why a term won over another, no spec prose, no scratch notes, no decision log. A choice worth keeping past this session — the rejected alternative a future reader would otherwise re-litigate — is not glossary content: `atlasme.md`'s own step for that hands it to ship's learn step. Never create an ADR directory or file for it; that path does not exist here.
 
 6. A term that only rewords an entry already there, or a synonym the file already lists under `_Avoid_` for something else, is a rewrite of that entry, not a new one.
 

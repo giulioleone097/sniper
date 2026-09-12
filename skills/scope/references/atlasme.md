@@ -1,4 +1,4 @@
-# Grill: settle an undecided design
+# Atlasme: settle an undecided design
 
 Read when the request has open design branches: more than three questions survive, or a survivor is a decision rather than a missing fact.
 
@@ -10,7 +10,7 @@ Read when the request has open design branches: more than three questions surviv
 
 4. Ask the whole frontier in one round through the host's question tool, one entry per decision, shaped by `asking.md` beside this file, which also carries the per-call limits and the no-tool fallback.
 
-5. Wait for the answers. The tool returns them keyed by question; never answer your own round, never continue to the next round on assumptions.
+5. Resolve the question batch through `asking.md`'s interaction lifecycle. Blocking tools return answers; an asynchronous acknowledgement leaves the batch pending until the user's later reply. Never answer your own round or continue to the next round on assumptions.
 
 6. Each answer reshapes the tree: settled decisions push the frontier outward and unblock what depended on them. Recompute and ask the next round. A question whose answer depends on another still open in this round belongs to the next round, not this one. An answer that resolves a term of vocabulary, not just a decision, goes through `glossary.md` right there: it lands in the target repository's `CONTEXT.md` before the next round is asked, and a use of that term contradicting an existing entry becomes the next question instead of a settled premise.
 

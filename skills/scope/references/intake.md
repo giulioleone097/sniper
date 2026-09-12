@@ -25,9 +25,9 @@ Read when the argument is an issue number, a URL, a work item, a pasted bug repo
    - **Already implemented.** Search by the domain concept the item describes, not by its wording, starting from `docs/atlas/map.md` when it exists; the feature may exist under another name. Found: say where it lives and stop.
    - **Already decided against.** Read the repository's own record of rejected work when it keeps one (a decisions or out-of-scope directory, closed items the CLI can list). Found: say which decision, and let the user reopen it deliberately rather than by accident.
 
-5. Map the item onto the card fields: everything it says becomes outcome, acceptance, out of scope or risk, quoted where it is precise. What it leaves vague is the caller's: scope's card steps resolve it and set the size; grill grills it.
+5. Map the item onto the card fields: everything it says becomes outcome, acceptance, out of scope or risk, quoted where it is precise. What it leaves vague is the caller's: scope's card steps resolve it and set the size; atlasme settles its open decisions.
 
-6. Too thin to act on: name exactly what is missing, as questions the reporter can answer, and never as "please provide more information". Say what you established yourself so nobody redoes it. Several open design branches rather than missing facts: that is `grill.md`, not a question list.
+6. Too thin to act on: name exactly what is missing, as questions the reporter can answer, and never as "please provide more information". Say what you established yourself so nobody redoes it. Several open design branches rather than missing facts: that is `atlasme.md`, not a question list.
 
 7. `--reply` posts what you found back on the item - reproduction result, what already exists, or the questions - after showing the text and getting the user's confirmation in this session. One comment, no agent attribution (the forge already records the author), and never a state change (no close, no label, no assignment) unless the user asked for that specific change.
 
@@ -36,7 +36,7 @@ source: <forge>#<n> | <path> | pasted
 claim: reproduced (<command>) | not reproduced (<what happened>) | not testable (<why>)
 already: implemented at <path:line> | rejected in <path> | new
 missing: <question> | none
-next: card | grill | stop (<why>)
+next: card | atlasme | stop (<why>)
 ```
 
-Stop once the block is printed: `next: card` returns to the caller's steps with what intake established, `next: grill` goes to `grill.md`, `next: stop` ends with the reason. Do not plan, do not write code, and do not change the item's state on your own initiative.
+Stop once the block is printed: `next: card` returns to the caller's steps with what intake established, `next: atlasme` goes to `atlasme.md`, `next: stop` ends with the reason. Do not plan, do not write code, and do not change the item's state on your own initiative.

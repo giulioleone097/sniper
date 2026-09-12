@@ -6,7 +6,7 @@ Un plugin per Claude Code, Codex, Devin e Cursor che porta un lavoro dall'arrivo
 
 ## Domini
 - Dottrina: `core/ATLAS.md`, iniettata da `scripts/core-context.sh` via `hooks/hooks.json` (SessionStart, SubagentStart) su Claude Code e Codex; su Devin arriva via `AGENTS.md` del plugin (regola sempre attiva), su Cursor via `rules/atlas-core.mdc` (alwaysApply). I blocchi in `AGENTS.md` e nel `.mdc` devono restare identici al core, `scripts/check.sh` lo verifica.
-- Fasi: `skills/<stage>/SKILL.md` (<= 120 righe, router; descrizione che apre con "Use when", <= 70 parole) con `agents/openai.yaml` per Codex e `references/` (<= 80 righe) per ogni ramo: intake, grill, asking e `glossary.md` in scope; plan, debug, prove, e2e e i modi in build; shrink, slop, security, platform-native, audit e pr in review; narrate, shapes, evidence, posting, learn, environment in ship; map in setup; deepen in improve; handoff, optimize, intel, question, howto e prototype senza rami, il corpo è la procedura. Raggiunte dagli host per nome e l'una dall'altra; Codex accorcia la descrizione a ~45 caratteri.
+- Fasi: `skills/<stage>/SKILL.md` (<= 120 righe, router; descrizione che apre con "Use when", <= 70 parole) con `agents/openai.yaml` per Codex e `references/` (<= 80 righe) per ogni ramo: intake, atlasme, asking e `glossary.md` in scope; plan, debug, prove, e2e e i modi in build; shrink, slop, security, platform-native, audit e pr in review; dossier, shapes, evidence, posting, learn, environment in ship; map in setup; deepen in improve; handoff, optimize, intel, question, howto e prototype senza rami, il corpo è la procedura. Raggiunte dagli host per nome e l'una dall'altra; Codex accorcia la descrizione a ~45 caratteri.
 - Innesto del glossario: `atlasme` risolve un termine e lo innesta inline nel `CONTEXT.md` del repository bersaglio via `skills/scope/references/glossary.md`; `scope`, `build` e `setup` leggono `CONTEXT.md` come vocabolario già stabilito.
 - Agenti: `agents/atlas-{scout,worker,reviewer,integrator}.md` dichiarano un tier (`sonnet`/`opus`); il modello per host sta in `agents/models.json`, letto dagli installer. Frontmatter unione (`tools:` Claude, `allowed-tools:` Devin, `readonly:` Cursor); su Codex generati in `~/.codex/agents/*.toml` da `scripts/install-codex-agents.sh`, su Devin caricati come subagent del plugin (`atlas:<name>`), su Cursor con `model:` riscritto a `inherit` dall'installer.
 - Guardie: `scripts/guard.sh` (nega `--no-verify`, force push, `reset --hard`, scarti dell'intero albero, `rm -rf` della radice; legge `tool_input.command`, `text_input`/`bytes_input` o `command` e risponde con l'unione delle forme deny dei quattro host); fixture in `scripts/test-guard.sh`. File hook per famiglia: `hooks/hooks.json` (Claude+Codex), `hooks.json` alla radice (Devin), `hooks/cursor-hooks.json` (Cursor, dichiarato nel manifest).
@@ -17,7 +17,7 @@ Un plugin per Claude Code, Codex, Devin e Cursor che porta un lavoro dall'arrivo
 
 ## Flusso principale
 ```
-setup? -> scope (intake | grill | card) -> build (plan? | debug? | modo | prove) -> review (shrink, review locale o subagent utili, integrazione se serve) -> ship (commit, dossier, lesson)
+setup? -> scope (intake | atlasme | card) -> build (plan? | debug? | modo | prove) -> review (shrink, review locale o subagent utili, integrazione se serve) -> ship (commit, dossier, lesson)
 ```
 Fuori ciclo, per nome: `handoff` scrive dove sta il lavoro in `docs/handoff-*.md`, `scope <file>` lo riprende e `ship` lo cancella a lavoro committato; `optimize` spinge una metrica verso un target con round di ipotesi parallele in worktree, misurate contro una baseline presa in un worktree di `HEAD`, poi passa il diff tenuto a `review`.
 Il ciclo sceglie il percorso: i cambi piccoli e compresi usano implementazione, review, fix e prova; i lavori ampi o incerti passano da `scope`, `build` e `review`. La review usa subagent economici solo quando aggiungono valore, senza un team minimo, e attribuisce le regressioni alla baseline dopo aver verificato i report.
@@ -41,7 +41,7 @@ Lo stamp riflette `HEAD` (`e6f1fc1`, 2026-09-08). Le modifiche di policy 1.2.0 e
 `sh scripts/debt.sh .`: quattro `ceiling:` nei rilevatori (tokens.sh 400 fogli di stile, consumers.sh profondità 4, repo-facts.sh tre chiamate gh per PR, tracker.sh host non loggato letto come forge=none), tutti con trigger di upgrade.
 
 ## Punti caldi
-I quattro manifesti `.*-plugin/plugin.json` (ogni rilascio bumpa tutti e quattro), `README.md` e `docs/DESIGN.md` (ogni rilascio li aggiorna), `skills/ship/references/narrate.md` (il documento più riscritto: dossier v1 -> v6).
+I quattro manifesti `.*-plugin/plugin.json` (ogni rilascio bumpa tutti e quattro), `README.md` e `docs/DESIGN.md` (ogni rilascio li aggiorna), `skills/ship/references/dossier.md` (il documento più riscritto: dossier v1 -> v6).
 
 ## Persone
 Un solo autore nella finestra: Giulio Leone. Nessuna PR merged: il lavoro arriva su `main` per push diretto.

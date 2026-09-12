@@ -35,6 +35,6 @@ stamp: <commit> <last merged PR> <yyyy-mm-dd>
 
 7. `--linked`: run steps 2 to 6 on each consumer repository that is checked out, writing its own `docs/atlas/` there, and add one line per linked repository to this map. Not checked out: named as unread.
 
-8. Hand the durable part on. A convention that would change how a reviewer here judges code goes through ship's `learn.md` into the closest AGENTS.md as a Code Review Rule, three lines at most; the map itself is pointed at from AGENTS.md by the setup steps, never copied into it.
+8. Hand the durable part on. A convention that would change how a reviewer here judges code goes through `<plugin root>/skills/ship/references/learn.md` into the closest AGENTS.md as a Code Review Rule, three lines at most; the map itself is pointed at from AGENTS.md by the setup steps, never copied into it.
 
 Print the two paths and the stamp, then stop. The map describes; it does not review, fix or refactor anything.
