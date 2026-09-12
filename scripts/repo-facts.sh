@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper: the facts a repository map starts from, read-only, from git and the tracker
+# atlas: the facts a repository map starts from, read-only, from git and the tracker
 # the repo already has. Nothing is installed, indexed or written.
 #
 #   sh repo-facts.sh [repo] [months] [prs]     defaults: . 12 30 ; prs=0 skips the tracker
@@ -42,7 +42,8 @@ git ls-files | grep -iE '(^|/)(tests?|__tests__|specs?)/' | sed -E 's#((^|/)(tes
 git ls-files | grep -E '^(\.github/workflows/|\.gitlab-ci\.yml|azure-pipelines|\.circleci/|Jenkinsfile|\.pre-commit-config|\.eslintrc|eslint\.config|\.prettierrc|ruff\.toml|\.editorconfig|mypy\.ini|\.golangci|rustfmt\.toml|\.clang-format|Directory\.Build\.props|nx\.json|turbo\.json)' | head -15
 
 echo "[instructions]"
-git ls-files | grep -iE '(^|/)(AGENTS\.md|AGENTS\.override\.md|CLAUDE\.md|CONTRIBUTING\.md|CODEOWNERS|adr/|decisions/|docs/solutions/|docs/sniper/)' | head -15
+# docs/sniper/ kept: maps installed before the sniper->atlas rename still count as instruction files
+git ls-files | grep -iE '(^|/)(AGENTS\.md|AGENTS\.override\.md|CLAUDE\.md|CONTRIBUTING\.md|CODEOWNERS|adr/|decisions/|docs/solutions/|docs/atlas/|docs/sniper/)' | head -15
 
 # tracker-backed sections (GitHub through gh; other forges are read by the skill itself)
 # ceiling: three gh calls per PR, upgrade to one GraphQL query when prs grows past ~50

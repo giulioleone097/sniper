@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper: print the design tokens a repository actually defines, with counts, so UI
+# atlas: print the design tokens a repository actually defines, with counts, so UI
 # work reuses the system that exists instead of inventing one. Read-only.
 #
 #   sh tokens.sh [path]     path defaults to . ; scans css/scss/less/ts/js/json under it

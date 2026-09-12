@@ -1,13 +1,13 @@
 {
-  "name": "sniper",
+  "name": "atlas",
   "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code, Codex, Devin and Cursor.",
-  "version": "1.9.1",
+  "version": "2.0.0",
   "author": {
     "name": "Giulio Leone",
     "url": "https://github.com/giulioleone097"
   },
-  "homepage": "https://github.com/giulioleone097/sniper",
-  "repository": "https://github.com/giulioleone097/sniper",
+  "homepage": "https://github.com/giulioleone097/atlas",
+  "repository": "https://github.com/giulioleone097/atlas",
   "license": "MIT",
   "keywords": [
     "workflow",

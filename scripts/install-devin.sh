@@ -1,9 +1,9 @@
 #!/bin/sh
-# sniper install-devin: user-level install for Devin CLI/Desktop, for machines
-# where `devin plugins install giulioleone097/sniper` is unavailable (the plugin
+# atlas install-devin: user-level install for Devin CLI/Desktop, for machines
+# where `devin plugins install giulioleone097/atlas` is unavailable (the plugin
 # manager needs `devin auth login`). Mirrors the plugin: skills land as
-# ~/.config/devin/skills/sniper-<stage> with `sniper:` cross-refs rewritten to
-# `sniper-`, agents land in ~/.config/devin/agents/ verbatim (their frontmatter
+# ~/.config/devin/skills/atlas-<stage> with `atlas:` cross-refs rewritten to
+# `atlas-`, agents land in ~/.config/devin/agents/ verbatim (their frontmatter
 # already carries allowed-tools), the doctrine block goes into the global
 # AGENTS.md, and the hooks merge into ~/.config/devin/config.json.
 # Idempotent: re-run after pulling updates. Revert with --remove.
@@ -13,10 +13,11 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DEVIN_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/devin"
 
 if [ "$1" = "--remove" ]; then
-  for d in "$DEVIN_DIR"/skills/sniper-*/; do
+  # sniper-* dirs/agents: left by the pre-rename installer; --remove reverts those too
+  for d in "$DEVIN_DIR"/skills/atlas-*/ "$DEVIN_DIR"/skills/sniper-*/; do
     [ -d "$d" ] && rm -rf "$d"
   done
-  rm -f "$DEVIN_DIR"/agents/sniper-*.md
+  rm -f "$DEVIN_DIR"/agents/atlas-*.md "$DEVIN_DIR"/agents/sniper-*.md
   ROOT="$ROOT" DEVIN_DIR="$DEVIN_DIR" python3 - <<'PYEOF'
 import json, os, re
 devin = os.environ["DEVIN_DIR"]
@@ -24,7 +25,8 @@ devin = os.environ["DEVIN_DIR"]
 agents = os.path.join(devin, "AGENTS.md")
 if os.path.exists(agents):
     t = open(agents).read()
-    t = re.sub(r"\n?# sniper\n\n<!-- sniper:core:start -->.*?<!-- sniper:core:end -->\n?", "\n", t, flags=re.S)
+    # blocks installed before the rename carry # sniper + sniper: markers
+    t = re.sub(r"\n?# (?:atlas|sniper)\n\n<!-- (?:atlas|sniper):core:start -->.*?<!-- (?:atlas|sniper):core:end -->\n?", "\n", t, flags=re.S)
     if t.strip():
         open(agents, "w").write(t.rstrip() + "\n")
     else:
@@ -48,25 +50,25 @@ if os.path.exists(cfg_path):
         cfg.pop("hooks", None)
     open(cfg_path, "w").write(json.dumps(cfg, indent=2) + "\n")
 PYEOF
-  echo "sniper: removed from $DEVIN_DIR"
+  echo "atlas: removed from $DEVIN_DIR"
   exit 0
 fi
 
 mkdir -p "$DEVIN_DIR/skills" "$DEVIN_DIR/agents"
 
-# skills: one dir per stage, prefixed sniper- so they never collide with other
-# global skills; `sniper:` cross-references become `sniper-` and the display
+# skills: one dir per stage, prefixed atlas- so they never collide with other
+# global skills; `atlas:` cross-references become `atlas-` and the display
 # name follows the directory.
 for d in "$ROOT"/skills/*/; do
   stage="$(basename "$d")"
-  dest="$DEVIN_DIR/skills/sniper-$stage"
+  dest="$DEVIN_DIR/skills/atlas-$stage"
   rm -rf "$dest"
   cp -R "$d" "$dest"
   python3 - "$dest" "$stage" "$DEVIN_DIR" "$ROOT" <<'PYEOF'
 import os, re, sys
 dest, stage, devin, root = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-# only stage invocations (`sniper:<stage>`) become `sniper-<stage>`; markers
-# like <!-- sniper:core:start --> or <!-- sniper:narrate --> must not move.
+# only stage invocations (`atlas:<stage>`) become `atlas-<stage>`; markers
+# like <!-- atlas:core:start --> or <!-- atlas:narrate --> must not move.
 stages = "|".join(sorted(d for d in os.listdir(os.path.join(root, "skills"))
                          if os.path.isdir(os.path.join(root, "skills", d))))
 for base, _, files in os.walk(dest):
@@ -77,18 +79,18 @@ for base, _, files in os.walk(dest):
             # cross-skill paths land on the installed prefixed dirs; every
             # other <plugin root> resolves to the live clone (scripts/, core/)
             t = re.sub(rf"<plugin root>/skills/({stages})/",
-                       rf"{devin}/skills/sniper-\1/", t)
+                       rf"{devin}/skills/atlas-\1/", t)
             t = t.replace("<plugin root>", root)
-            t = re.sub(rf"sniper:({stages})\b", r"sniper-\1", t)
+            t = re.sub(rf"atlas:({stages})\b", r"atlas-\1", t)
             if f == "SKILL.md":
-                t = re.sub(rf"^name: {stage}$", f"name: sniper-{stage}", t, count=1, flags=re.M)
+                t = re.sub(rf"^name: {stage}$", f"name: atlas-{stage}", t, count=1, flags=re.M)
             open(p, "w").write(t)
 PYEOF
 done
 # prune installed stages that no longer exist upstream
-for d in "$DEVIN_DIR"/skills/sniper-*/; do
+for d in "$DEVIN_DIR"/skills/atlas-*/; do
   [ -d "$d" ] || continue
-  [ -d "$ROOT/skills/$(basename "$d" | sed 's/^sniper-//')" ] || rm -rf "$d"
+  [ -d "$ROOT/skills/$(basename "$d" | sed 's/^atlas-//')" ] || rm -rf "$d"
 done
 
 # agents: copied with `model:` resolved through agents/models.json (the tier
@@ -97,7 +99,7 @@ ROOT="$ROOT" DEVIN_DIR="$DEVIN_DIR" python3 - <<'PYEOF'
 import glob, json, os, re
 root, devin = os.environ["ROOT"], os.environ["DEVIN_DIR"]
 models = json.load(open(os.path.join(root, "agents/models.json")))["hosts"]["devin"]["models"]
-for src in glob.glob(os.path.join(root, "agents/sniper-*.md")):
+for src in glob.glob(os.path.join(root, "agents/atlas-*.md")):
     t = open(src).read()
     m = re.search(r"^model: (\w+)$", t, flags=re.M)
     if m and m.group(1) in models:
@@ -111,15 +113,16 @@ PYEOF
 ROOT="$ROOT" DEVIN_DIR="$DEVIN_DIR" python3 - <<'PYEOF'
 import json, os, re
 root, devin = os.environ["ROOT"], os.environ["DEVIN_DIR"]
-core = open(os.path.join(root, "core/SNIPER.md")).read().strip()
-block = f"<!-- sniper:core:start -->\n{core}\n<!-- sniper:core:end -->"
+core = open(os.path.join(root, "core/ATLAS.md")).read().strip()
+block = f"<!-- atlas:core:start -->\n{core}\n<!-- atlas:core:end -->"
 
 agents = os.path.join(devin, "AGENTS.md")
 t = open(agents).read() if os.path.exists(agents) else ""
-if "<!-- sniper:core:start -->" in t:
-    t = re.sub(r"<!-- sniper:core:start -->.*?<!-- sniper:core:end -->", block, t, flags=re.S)
+if "<!-- atlas:core:start -->" in t or "<!-- sniper:core:start -->" in t:
+    # a sniper-era block is refreshed under the new marker names (migration on write)
+    t = re.sub(r"<!-- (?:atlas|sniper):core:start -->.*?<!-- (?:atlas|sniper):core:end -->", block, t, flags=re.S)
 else:
-    t = t.rstrip() + ("\n\n" if t.strip() else "") + "# sniper\n\n" + block + "\n"
+    t = t.rstrip() + ("\n\n" if t.strip() else "") + "# atlas\n\n" + block + "\n"
 open(agents, "w").write(t)
 
 cfg_path = os.path.join(devin, "config.json")
@@ -142,7 +145,7 @@ for ev, groups in ours.items():
 open(cfg_path, "w").write(json.dumps(cfg, indent=2) + "\n")
 PYEOF
 
-n=$(ls -d "$DEVIN_DIR"/skills/sniper-*/ 2>/dev/null | wc -l | tr -d ' ')
-echo "sniper: installed for Devin in $DEVIN_DIR ($n skills, 4 agents, doctrine, guard)"
-echo "sniper: open a new Devin session; stages answer to /sniper-<stage>"
-echo 'sniper: when `devin auth login` is done, `devin plugins install giulioleone097/sniper` replaces this'
+n=$(ls -d "$DEVIN_DIR"/skills/atlas-*/ 2>/dev/null | wc -l | tr -d ' ')
+echo "atlas: installed for Devin in $DEVIN_DIR ($n skills, 4 agents, doctrine, guard)"
+echo "atlas: open a new Devin session; stages answer to /atlas-<stage>"
+echo 'atlas: when `devin auth login` is done, `devin plugins install giulioleone097/atlas` replaces this'

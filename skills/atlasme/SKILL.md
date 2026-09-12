@@ -1,5 +1,5 @@
 ---
-name: atlas
+name: atlasme
 description: Use when the user says grill me, or brings an idea, plan or design whose outcome is still undecided and wants it interrogated before any card exists. Works the decision tree in rounds through the host's question tool, each option costed by its reach at HEAD (domains, consumers, linked repositories), then asks whether to build, card only or stop. Not for a request whose shape is already clear.
 argument-hint: "[the idea, plan, design, file, issue or PR to grill] [--out <file>]"
 ---
@@ -10,6 +10,6 @@ argument-hint: "[the idea, plan, design, file, issue or PR to grill] [--out <fil
 
 3. When the frontier is empty, ask one last question through the host's question tool: build now, card only, or stop at the decisions, the recommendation first and chosen from what was settled. A design session is not yet a request to change code, so the loop starts here only on that answer.
 
-4. Print the settled tree exactly as the reference shows it, reach and risk per decision and the map when it applies. Card only, Stop, or `--out` given: write the tree to `--out <file>`, else `docs/atlas-<yyyy-mm-dd>-<slug>.md`, headed `# Atlas: <subject>` with a `next:` line, and print the path; `scope <file>` resumes from it. Then, on build now, invoke `scope` on the settled request (Skill tool `sniper:scope`, `$scope` on Codex); on card only, invoke `scope --card-only`.
+4. Print the settled tree exactly as the reference shows it, reach and risk per decision and the map when it applies. Card only, Stop, or `--out` given: write the tree to `--out <file>`, else `docs/atlasme-<yyyy-mm-dd>-<slug>.md`, headed `# Atlasme: <subject>` with a `next:` line, and print the path; `scope <file>` resumes from it. Then, on build now, invoke `scope` on the settled request (Skill tool `atlas:scope`, `$scope` on Codex); on card only, invoke `scope --card-only`.
 
 Stop when the tree is printed and the chosen handoff has run.

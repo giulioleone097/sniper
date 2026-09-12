@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper: detect the work tracker this repository actually has, with no plugin,
+# atlas: detect the work tracker this repository actually has, with no plugin,
 # no MCP server and no configuration. Prints one key=value per line:
 #   forge   github | gitlab | azure | none      (from the origin remote; another host is probed through gh, then glab)
 #   cli     gh | glab | az | none               (the binary that is installed)

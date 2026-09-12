@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper: find what consumes this repository outside its own tree, with no registry,
+# atlas: find what consumes this repository outside its own tree, with no registry,
 # no config and no network. Read-only.
 #
 #   sh consumers.sh [repo] [search-root]

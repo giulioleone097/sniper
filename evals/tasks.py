@@ -1,4 +1,4 @@
-"""Probe tasks for the sniper evals: each seeds a starter file, states the job the way a
+"""Probe tasks for the atlas evals: each seeds a starter file, states the job the way a
 ticket would (the safety or root-cause requirement left implicit), and scores what the
 agent leaves behind deterministically, stdlib only.
 

@@ -1,6 +1,6 @@
 # Map: the repository and the ones that depend on it
 
-Read on setup, or when discovery needs a missing or outdated part of `docs/sniper/map.md`.
+Read on setup, or when discovery needs a missing or outdated part of `docs/atlas/map.md`.
 
 1. Read what exists first. The map and conventions carry `stamp: <commit> <last PR> <date>`. When relevant changes since that stamp invalidate facts needed now, inspect and refresh those facts only, then stop. Otherwise reuse them. An older ancestor or unchanged PR count alone proves neither freshness nor staleness. `--refresh` or a missing map uses the discovery steps below; do not rebuild for a routine edit.
 
@@ -10,9 +10,9 @@ Read on setup, or when discovery needs a missing or outdated part of `docs/snipe
 
 4. Read the reviewers, not just the code. Take the merged PRs in the window, weight the reviewers by review count, and read their inline comments and review bodies (`gh api repos/<slug>/pulls/<n>/comments` and `/reviews`; `glab mr view <n> --comments`; `az repos pr` equivalents). What a reviewer asks for three times is a convention whether or not a document says it; what they never mention is not. Group what they ask for by theme with the quote and the PR that carries it, and note the PR authors whose changes pass with few comments as the reference style.
 
-5. Dispatch when the repository is large: one `sniper-scout` per top-level project or domain asking for entry points, the public surface, the tests that pin it and what reaches it from outside (Codex: `sniper_scout`); one scout for the reviewer comments when there are more than about forty. Read their `path:line` lines, not their prose.
+5. Dispatch when the repository is large: one `atlas-scout` per top-level project or domain asking for entry points, the public surface, the tests that pin it and what reaches it from outside (Codex: `atlas_scout`); one scout for the reviewer comments when there are more than about forty. Read their `path:line` lines, not their prose.
 
-6. Write `docs/sniper/map.md` in the repository, for a reader who has never opened it:
+6. Write `docs/atlas/map.md` in the repository, for a reader who has never opened it:
 
 ```
 stamp: <commit> <last merged PR> <yyyy-mm-dd>
@@ -31,9 +31,9 @@ stamp: <commit> <last merged PR> <yyyy-mm-dd>
 
    Note whether the repo keeps a `CONTEXT.md` or `CONTEXT-MAP.md` glossary; record its path under `Fonti` when present, or `none` when absent.
 
-   And `docs/sniper/conventions.md`, same stamp: one theme per section, the rule in one sentence, the reviewer quotes with PR numbers that prove it, and the reference PRs. Conventions a linter enforces are named as enforced and not repeated as prose.
+   And `docs/atlas/conventions.md`, same stamp: one theme per section, the rule in one sentence, the reviewer quotes with PR numbers that prove it, and the reference PRs. Conventions a linter enforces are named as enforced and not repeated as prose.
 
-7. `--linked`: run steps 2 to 6 on each consumer repository that is checked out, writing its own `docs/sniper/` there, and add one line per linked repository to this map. Not checked out: named as unread.
+7. `--linked`: run steps 2 to 6 on each consumer repository that is checked out, writing its own `docs/atlas/` there, and add one line per linked repository to this map. Not checked out: named as unread.
 
 8. Hand the durable part on. A convention that would change how a reviewer here judges code goes through ship's `learn.md` into the closest AGENTS.md as a Code Review Rule, three lines at most; the map itself is pointed at from AGENTS.md by the setup steps, never copied into it.
 

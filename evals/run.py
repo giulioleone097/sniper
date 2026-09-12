@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""sniper evals: does the plugin change what a real headless Claude Code session leaves behind?
+"""atlas evals: does the plugin change what a real headless Claude Code session leaves behind?
 
 Each cell is one `claude -p` session in a temp workspace seeded with a starter file, run
 in a bare session (nothing from the user's settings or other plugins) with no plugin
-(baseline), current sniper, or an optional previous plugin directory. Disk output is scored
+(baseline), current atlas, or an optional previous plugin directory. Disk output is scored
 deterministically by evals/tasks.py; the delta between arms is the point.
 
   python3 run.py --selftest             prove every scorer: good passes, bad is caught. No API.
   python3 run.py --runs 3               live run, all tasks, both arms (spends API; needs ANTHROPIC_API_KEY, bare mode reads no login)
-  python3 run.py --tasks safe-path --arms sniper --runs 1
+  python3 run.py --tasks safe-path --arms atlas --runs 1
   python3 run.py --rescore runs/<stamp> re-score kept workspaces after a scorer change. No API.
 
 Nothing here is installed, indexed or written outside evals/runs/.
@@ -34,7 +34,16 @@ RUNS = Path(__file__).resolve().parent / "runs"
 CELL_TIMEOUT = 300
 INSTRUCTIONS = ("Edit the files in place and use existing checks where useful. "
                 "Do not run servers or install anything. Only files and CLI metrics are scored.")
-ARMS = ("baseline", "sniper", "previous")
+ARMS = ("baseline", "atlas", "previous")
+
+
+def core_file(plugin_dir):
+    # SNIPER.md: a --previous-plugin dir preserved from before the rename still carries it
+    for name in ("ATLAS.md", "SNIPER.md"):
+        p = plugin_dir / "core" / name
+        if p.is_file():
+            return p
+    return plugin_dir / "core" / "ATLAS.md"
 
 
 def selftest():
@@ -71,18 +80,18 @@ def selftest():
 
 
 def run_cell(task, arm, model, keep_dir, plugin_dir):
-    work = Path(tempfile.mkdtemp(prefix=f"sniper-eval-{task}-{arm}-"))
+    work = Path(tempfile.mkdtemp(prefix=f"atlas-eval-{task}-{arm}-"))
     for fname, content in TASKS[task]["seed"].items():
         (work / fname).write_text(content)
     # --bare: no user settings, memory, other plugins or hooks, so both arms start equal. Hooks off
-    # means the doctrine is not injected by the plugin's own hook: the sniper arm carries it as an
+    # means the doctrine is not injected by the plugin's own hook: the atlas arm carries it as an
     # appended system prompt, and its skills and agents through --plugin-dir.
     cmd = ["claude", "-p", TASKS[task]["prompt"] + "\n\n" + INSTRUCTIONS, "--bare",
            "--output-format", "json", "--max-turns", "12", "--dangerously-skip-permissions"]
     if model:
         cmd += ["--model", model]
     if plugin_dir is not None:
-        cmd += ["--plugin-dir", str(plugin_dir), "--append-system-prompt-file", str(plugin_dir / "core" / "SNIPER.md")]
+        cmd += ["--plugin-dir", str(plugin_dir), "--append-system-prompt-file", str(core_file(plugin_dir))]
     env = dict(os.environ)
     try:
         p = subprocess.run(cmd, cwd=work, capture_output=True, text=True, timeout=CELL_TIMEOUT, env=env)
@@ -144,7 +153,7 @@ def main():
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--rescore")
     ap.add_argument("--tasks", default=",".join(TASKS))
-    ap.add_argument("--arms", help="comma-separated baseline,sniper,previous; previous is included by default when supplied")
+    ap.add_argument("--arms", help="comma-separated baseline,atlas,previous; previous is included by default when supplied")
     ap.add_argument("--previous-plugin", type=Path, help="previous plugin directory to compare using the same model and tasks")
     ap.add_argument("--runs", type=int, default=1)
     ap.add_argument("--model", default=None)
@@ -162,8 +171,8 @@ def main():
         ap.error("the previous arm requires --previous-plugin")
     if a.previous_plugin:
         a.previous_plugin = a.previous_plugin.resolve()
-        if not all((a.previous_plugin / f).is_file() for f in ("core/SNIPER.md", ".claude-plugin/plugin.json")):
-            ap.error("--previous-plugin must contain core/SNIPER.md and .claude-plugin/plugin.json")
+        if not (a.previous_plugin / ".claude-plugin/plugin.json").is_file() or not core_file(a.previous_plugin).is_file():
+            ap.error("--previous-plugin must contain core/ATLAS.md (or a pre-rename core/SNIPER.md) and .claude-plugin/plugin.json")
     if not selftest():
         sys.exit("scorers failed their selftest; not spending on a live run")
     keep = RUNS / datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -172,7 +181,7 @@ def main():
     for task in tasks:
         for arm in arms:
             for _ in range(a.runs):
-                row = run_cell(task, arm, a.model, keep, {"baseline": None, "sniper": ROOT, "previous": a.previous_plugin}[arm])
+                row = run_cell(task, arm, a.model, keep, {"baseline": None, "atlas": ROOT, "previous": a.previous_plugin}[arm])
                 rows.append(row)
                 print(json.dumps(row))
     (keep / "aggregate.json").write_text(json.dumps(rows, indent=2))

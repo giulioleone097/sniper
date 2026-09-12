@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper: name the checks a path's own project already has, so prove/review/simplify
+# atlas: name the checks a path's own project already has, so prove/review/simplify
 # run the repository's commands instead of guessing. No plugin, no config.
 #
 #   sh checks.sh [path]      path defaults to . ; walks up to the nearest project file

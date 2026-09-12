@@ -1,5 +1,5 @@
 stamp: e6f1fc1 none 2026-09-08
-# sniper - conventions
+# atlas - conventions
 
 Nessuna pull request merged nella finestra: le convenzioni qui vengono dai commit, dalle regole in `AGENTS.md` e da `scripts/check.sh`, che le esegue.
 
@@ -19,7 +19,7 @@ Un limite deliberato in uno script porta `ceiling: <limite>, upgrade <trigger>`;
 Nessuna variabile di host dentro skill e agenti; `<this skill>` e `<plugin root>` al loro posto. Un file hook per famiglia di host, ciascuno solo con gli eventi che quella famiglia lancia; gli script hook rispondono con l'unione delle forme dei quattro host. Eseguito da `check.sh` per variabili ed eventi.
 
 ## Rilascio
-Bump della versione nei quattro manifesti, `sh scripts/check.sh` verde, commit, push, poi `claude plugin update sniper@sniper`, `codex plugin remove` + `codex plugin add sniper@sniper`, `devin plugins update sniper` o reinstall su Cursor, `scripts/install-*.sh` dove usati, e `scripts/install-codex-agents.sh` quando un agente cambia.
+Bump della versione nei quattro manifesti, `sh scripts/check.sh` verde, commit, push, poi `claude plugin update atlas@atlas`, `codex plugin remove` + `codex plugin add atlas@atlas`, `devin plugins update atlas` o reinstall su Cursor, `scripts/install-*.sh` dove usati, e `scripts/install-codex-agents.sh` quando un agente cambia.
 
 ## Prova
 Le modifiche direttamente ispezionabili usano l'ispezione dell'output; quelle comportamentali usano il controllo esistente più vicino o un esercizio reale del percorso. Il rilevatore o lo script nuovo viene provato su repository reali di stack diversi prima del commit. Gli eval confrontano baseline, plugin corrente e precedente opzionale su cinque sonde; costi, durata e turni riportano copertura `available/total`, senza trasformare metriche mancanti in zero.

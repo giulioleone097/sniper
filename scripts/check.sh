@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper acceptance in one command: manifests, components, guard fixtures, doctrine sync.
+# atlas acceptance in one command: manifests, components, guard fixtures, doctrine sync.
 # Exit 1 on the first failing group; prints what failed.
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -26,7 +26,7 @@ for f in "$ROOT"/skills/*/references/*.md; do
 done
 # the doctrine travels as hook additionalContext: Claude Code cuts it at 10,000 characters and Codex
 # near 2,500 tokens, both silently replaced by a file preview, so it stays under 9,000 bytes
-n=$(wc -c < "$ROOT/core/SNIPER.md" | tr -d ' '); [ "$n" -le 9000 ] || { echo "rules: core/SNIPER.md is $n bytes; hook additionalContext is cut at 10,000 chars (Codex ~2,500 tokens)"; fail=1; }
+n=$(wc -c < "$ROOT/core/ATLAS.md" | tr -d ' '); [ "$n" -le 9000 ] || { echo "rules: core/ATLAS.md is $n bytes; hook additionalContext is cut at 10,000 chars (Codex ~2,500 tokens)"; fail=1; }
 if grep -rn 'CLAUDE_SKILL_DIR\|\${CLAUDE_PLUGIN_ROOT}' "$ROOT"/skills/*/SKILL.md "$ROOT"/skills/*/references "$ROOT"/agents >/dev/null 2>&1; then
   echo "rules: host env var inside a skill or agent body"; grep -rln 'CLAUDE_SKILL_DIR\|\${CLAUDE_PLUGIN_ROOT}' "$ROOT"/skills/*/SKILL.md "$ROOT"/skills/*/references "$ROOT"/agents; fail=1
 fi
@@ -88,7 +88,7 @@ for path, allowed in EVENTS.items():
     if unknown:
         print(f"rules: {path} names events its host never fires: {sorted(unknown)}"); bad += 1
 for f in ("scripts/install-devin.sh", "scripts/install-cursor.sh",
-          "scripts/install-codex-agents.sh", "rules/sniper-core.mdc"):
+          "scripts/install-codex-agents.sh", "rules/atlas-core.mdc"):
     if not os.path.exists(f"{root}/{f}"):
         print(f"rules: {f} missing"); bad += 1
 sys.exit(1 if bad else 0)
@@ -113,11 +113,11 @@ for f in glob.glob(f"{root}/agents/*.md"):
     m = re.search(r"^model: (\w+)$", open(f).read(), re.M)
     if m and m.group(1) not in reg["tiers"]:
         sys.exit(f"models.json: {f} declares unknown tier {m.group(1)}")
-core = open(f"{root}/core/SNIPER.md").read().strip()
-for f in ("AGENTS.md", "rules/sniper-core.mdc"):
-    m = re.search(r"<!-- sniper:core:start -->\n(.*?)\n<!-- sniper:core:end -->", open(f"{root}/{f}").read(), re.S)
+core = open(f"{root}/core/ATLAS.md").read().strip()
+for f in ("AGENTS.md", "rules/atlas-core.mdc"):
+    m = re.search(r"<!-- atlas:core:start -->\n(.*?)\n<!-- atlas:core:end -->", open(f"{root}/{f}").read(), re.S)
     if not m or m.group(1).strip() != core:
-        sys.exit(f"doctrine: {f} block differs from core/SNIPER.md")
+        sys.exit(f"doctrine: {f} block differs from core/ATLAS.md")
 v = [json.load(open(f"{root}/{f}"))["version"] for f in (
     ".claude-plugin/plugin.json", ".codex-plugin/plugin.json",
     ".devin-plugin/plugin.json", ".cursor-plugin/plugin.json")]

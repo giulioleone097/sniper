@@ -1,12 +1,12 @@
 #!/bin/sh
-# sniper core-context: session/subagent-start hook.
-# Injects core/SNIPER.md so the doctrine is active every turn: Claude Code,
+# atlas core-context: session/subagent-start hook.
+# Injects core/ATLAS.md so the doctrine is active every turn: Claude Code,
 # Codex and Devin read hookSpecificOutput.additionalContext (event
 # SessionStart/SubagentStart), Cursor reads top-level additional_context
 # (event sessionStart). hookEventName comes from the hook_event_name field on
 # stdin, default SessionStart. Any parse or read error: print nothing, exit 0.
 
-CORE_FILE="$(dirname "$0")/../core/SNIPER.md"
+CORE_FILE="$(dirname "$0")/../core/ATLAS.md"
 
 exec python3 -c '
 import os, sys, json
@@ -25,16 +25,19 @@ try:
 except Exception:
     pass
 
-# A project that carries the block (installed by /sniper:setup) already loads it as project
-# instructions, and non-fork subagents receive the same instruction files; injecting again would
-# cost the doctrine twice. The hook runs in the session cwd, which may be a subdirectory, so the
-# block is looked for up the tree to the filesystem root.
+# A project that carries the block (installed by the atlas setup skill, or by /sniper:setup
+# before the rename — both markers mean the doctrine is already loaded) already loads it as
+# project instructions, and non-fork subagents receive the same instruction files; injecting
+# again would cost the doctrine twice. The hook runs in the session cwd, which may be a
+# subdirectory, so the block is looked for up the tree to the filesystem root.
+BLOCK_MARKERS = ("<!-- atlas:core:start -->", "<!-- sniper:core:start -->")
 cwd = data.get("cwd") if isinstance(data, dict) else None
 d = os.path.abspath(cwd) if cwd else os.getcwd()
 while d:
     for name in ("AGENTS.md", "CLAUDE.md"):
         try:
-            if "<!-- sniper:core:start -->" in open(os.path.join(d, name)).read():
+            text = open(os.path.join(d, name)).read()
+            if any(m in text for m in BLOCK_MARKERS):
                 sys.exit(0)
         except Exception:
             pass
@@ -52,16 +55,18 @@ is_cursor = isinstance(data, dict) and "hook_event_name" not in data and (
 if not is_cursor:
     for name in (".config/devin/AGENTS.md", ".claude/CLAUDE.md", ".codex/AGENTS.md"):
         try:
-            if "<!-- sniper:core:start -->" in open(os.path.join(home, name)).read():
+            text = open(os.path.join(home, name)).read()
+            if any(m in text for m in BLOCK_MARKERS):
                 sys.exit(0)
         except Exception:
             pass
 
-# SNIPER_SUBAGENT_MATCHER: an unanchored, case-insensitive regex; when set, subagents whose
+# ATLAS_SUBAGENT_MATCHER: an unanchored, case-insensitive regex; when set, subagents whose
 # agent_type does not match get no doctrine. Unset means every subagent, as before. A bad
-# regex counts as unset rather than failing the hook.
+# regex counts as unset rather than failing the hook. SNIPER_SUBAGENT_MATCHER is honored as
+# fallback: existing users already set it.
 if event == "SubagentStart":
-    pat = os.environ.get("SNIPER_SUBAGENT_MATCHER")
+    pat = os.environ.get("ATLAS_SUBAGENT_MATCHER") or os.environ.get("SNIPER_SUBAGENT_MATCHER")
     if pat:
         import re
         try:

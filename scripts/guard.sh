@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper guard: pre-execution shell hook for Claude Code (PreToolUse Bash),
+# atlas guard: pre-execution shell hook for Claude Code (PreToolUse Bash),
 # Codex (same), Devin (PreToolUse exec/write_to_process) and Cursor
 # (beforeShellExecution). Denies a fixed list of destructive git/rm commands
 # anywhere in the command string, including after &&, ;, |.
@@ -13,7 +13,7 @@ def allow():
     sys.exit(0)
 
 def deny(reason):
-    msg = "sniper guard: " + reason
+    msg = "atlas guard: " + reason
     # one payload, every host reads the fields it knows:
     # Claude Code/Codex -> hookSpecificOutput.permissionDecision
     # Devin             -> decision + reason

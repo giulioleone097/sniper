@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper: install the agents as Codex custom agents.
+# atlas: install the agents as Codex custom agents.
 # Codex plugins cannot bundle agents, so this generates ~/.codex/agents/<name>.toml
 # from agents/*.md: Claude Code and Codex share one agent definition.
 # Re-run after editing an agent. Any error: exit 1 with the reason.

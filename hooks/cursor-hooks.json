@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "sniper hooks for Cursor. The doctrine arrives via rules/sniper-core.mdc (alwaysApply), so no sessionStart entry is needed; beforeShellExecution denies a fixed list of destructive git/rm commands before they run. ${CURSOR_PLUGIN_ROOT:-.} covers hosts that expand the variable and those that run hook commands from the plugin root.",
+  "description": "atlas hooks for Cursor. The doctrine arrives via rules/atlas-core.mdc (alwaysApply), so no sessionStart entry is needed; beforeShellExecution denies a fixed list of destructive git/rm commands before they run. ${CURSOR_PLUGIN_ROOT:-.} covers hosts that expand the variable and those that run hook commands from the plugin root.",
   "hooks": {
     "beforeShellExecution": [
       {

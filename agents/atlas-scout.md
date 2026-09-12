@@ -1,5 +1,5 @@
 ---
-name: sniper-scout
+name: atlas-scout
 description: Locates code for a question or symbol without modifying anything or proposing a fix. The lead spawns this to find where something lives, what calls it, or which files matter before scoping, planning, building, reviewing, or debugging — read-only and cheaper than exploring inline.
 model: sonnet
 tools: Read, Grep, Glob, Bash

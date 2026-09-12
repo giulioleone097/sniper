@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper: harvest every `ceiling:` shortcut comment into a ledger, so a deliberate
+# atlas: harvest every `ceiling:` shortcut comment into a ledger, so a deliberate
 # shortcut with a known ceiling gets revisited instead of rotting into permanent.
 # Read-only.
 #

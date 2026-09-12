@@ -1,5 +1,5 @@
 #!/bin/sh
-# sniper test-guard: fixture suite for scripts/guard.sh. Feeds each command as
+# atlas test-guard: fixture suite for scripts/guard.sh. Feeds each command as
 # PreToolUse(Bash) hook JSON on stdin; DENY commands must get a deny decision,
 # ALLOW commands must produce no output. Prints one line per mismatch, then
 # "guard: N/N ok"; exits 1 on any mismatch.

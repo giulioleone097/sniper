@@ -1,11 +1,11 @@
 {
-  "name": "sniper",
+  "name": "atlas",
   "interface": {
-    "displayName": "Sniper"
+    "displayName": "Atlas"
   },
   "plugins": [
     {
-      "name": "sniper",
+      "name": "atlas",
       "source": {
         "source": "local",
         "path": "./"

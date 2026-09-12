@@ -15,7 +15,10 @@ import re
 import subprocess
 import sys
 
-MARKER = "<!-- sniper:narrate walkthrough -->"
+MARKER = "<!-- atlas:narrate walkthrough -->"
+# Reviews and PR bodies posted before the sniper -> atlas rename carry these;
+# both still mark a body as ours when deciding whether it may be reused/replaced.
+LEGACY_MARKERS = ("<!-- sniper:narrate -->", "<!-- sniper:narrate walkthrough -->")
 
 
 def gh(*args, stdin=None):

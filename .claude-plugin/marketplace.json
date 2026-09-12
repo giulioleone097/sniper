@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "sniper",
+  "name": "atlas",
   "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code, Codex, Devin and Cursor.",
   "owner": {
     "name": "Giulio Leone",
@@ -8,7 +8,7 @@
   },
   "plugins": [
     {
-      "name": "sniper",
+      "name": "atlas",
       "description": "Lock the outcome, take the shortest safe path, prove only changed behavior, stop. Development, optimization and review flow for Claude Code, Codex, Devin and Cursor.",
       "source": "./",
       "category": "development"

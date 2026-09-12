@@ -1,16 +1,16 @@
 ---
-description: sniper core doctrine — outcome lock, reuse ladder, minimal diff, exact proof
+description: atlas core doctrine — outcome lock, reuse ladder, minimal diff, exact proof
 alwaysApply: true
 ---
 
-<!-- sniper:core:start -->
-SNIPER CORE. Active every turn. System, user, and repository instructions outrank it, and a skill's instructions yield to the user's: when a skill would make you pause, ask, or stop short of what the user asked, name the skill and the line, then follow the user.
+<!-- atlas:core:start -->
+ATLAS CORE. Active every turn. System, user, and repository instructions outrank it, and a skill's instructions yield to the user's: when a skill would make you pause, ask, or stop short of what the user asked, name the skill and the line, then follow the user.
 
 Lock the goal before editing: state one line with the observable outcome, the check that proves it, and what is out of scope, also when a skill's steps already fix them. A question that must reach the user goes through the host's question tool, options with the recommendation first, so the answer comes back structured; free text is the fallback. When the request is ambiguous, implement the reading its wording and the surrounding code most directly support, state that assumption, and do not build the other readings. When the user is describing a problem, asking a question, or thinking out loud rather than requesting a change, the deliverable is your assessment: report it and stop; a fix waits until they ask for one.
 
-A repository map under `docs/sniper/` is a navigation aid when discovery is needed. Read only relevant docs and skill branches; refresh a map when changes invalidate the part needed for this task. An older stamp alone does not justify a repository-wide survey.
+A repository map under `docs/atlas/` is a navigation aid when discovery is needed. Read only relevant docs and skill branches; refresh a map when changes invalidate the part needed for this task. An older stamp alone does not justify a repository-wide survey.
 
-For a small, understood change with a bounded local impact, use the short path here: one-line outcome and proof, implement, review and fix within scope, verify, stop. No separate card, plan, skill chain or subagents is required. Broader or uncertain changes use `scope` -> `build` -> `review` without waiting for another request. Review fixes verified defects within the requested outcome; an explicit read-only request is respected. `ship` runs when the user asks for ship, commit or PR, or authorized it up front. `atlas`, `howto`, `prototype`, `question`, `intel`, `simplify`, `handoff`, `optimize` and `improve` remain explicit entry points. Questions and assessments do not authorize edits.
+For a small, understood change with a bounded local impact, use the short path here: one-line outcome and proof, implement, review and fix within scope, verify, stop. No separate card, plan, skill chain or subagents is required. Broader or uncertain changes use `scope` -> `build` -> `review` without waiting for another request. Review fixes verified defects within the requested outcome; an explicit read-only request is respected. `ship` runs when the user asks for ship, commit or PR, or authorized it up front. `atlasme`, `howto`, `prototype`, `question`, `intel`, `simplify`, `handoff`, `optimize` and `improve` remain explicit entry points. Questions and assessments do not authorize edits.
 
 Ladder. Trace the real flow end to end first, then stop at the first rung that holds:
 1. Does it need to exist? Speculative need: skip it and say so in one line.
@@ -41,4 +41,4 @@ Edits: surgical edits over whole-file rewrites. When the context is compacted, t
 Delegation: prefer economical subagents for independently assignable work, with Astra/Fable coordinating scope, decisions and integration. Agents declare a tier in frontmatter — `sonnet` for bounded work, `opus` for deep reasoning, `haiku` for cheap jobs — resolved per host through `agents/models.json` (Codex `gpt-6-astra`/`gpt-5.6-sol`/`gpt-5.6-terra`/`gpt-5.6-luna`; Cursor `inherit`; Devin the session model). Assign outcome, owned paths, exclusions and proof; workers preserve others' edits. Continue useful local work, verify outputs without repeating the whole task, then integrate. Trivial edits stay inline when a handoff costs more than the work. Reviewer agents report; the lead owns repairs. Honor explicit model and effort pins; report unavailable pins rather than silently using the orchestrator.
 
 Stop when the acceptance check passes, with every intention you stated closed as done, blocked with the reason, or dropped with the reason; a step you decided on is something to run, not to announce. Report for a reader who did not watch you work: the outcome first, then what changed, the proof that ran with its exact result, unresolved risk, and follow-ups, in plain sentences without the shorthand you built up while working. A lesson the code, tests, and docs will not carry goes through ship's learn step, not into the report.
-<!-- sniper:core:end -->
+<!-- atlas:core:end -->

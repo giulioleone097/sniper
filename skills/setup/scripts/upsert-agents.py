@@ -1,18 +1,30 @@
 #!/usr/bin/env python3
-"""Install or refresh the sniper doctrine in a project's AGENTS.md and CLAUDE.md, without touching anything else.
+"""Install or refresh the atlas doctrine in a project's AGENTS.md and CLAUDE.md, without touching anything else.
 
 usage: upsert-agents.py PROJECT_DIR CORE_FILE
 
-AGENTS.md: the block between <!-- sniper:core:start --> and <!-- sniper:core:end --> is replaced with CORE_FILE;
+AGENTS.md: the block between <!-- atlas:core:start --> and <!-- atlas:core:end --> is replaced with CORE_FILE;
 a missing file gets a skeleton (title, the block, "## Working on this repo" with a fill marker, "## Code Review Rules").
 CLAUDE.md: created as "@AGENTS.md", or the import line is appended when absent. Idempotent: a second run changes nothing.
+
+Blocks installed before the sniper -> atlas rename carry <!-- sniper:core:start --> / <!-- sniper:core:end -->
+and <!-- sniper:fill: ... --> markers plus a docs/sniper/ pointer line; they are still recognized for refresh
+and --remove, and a refresh rewrites them under the new marker names (migration on write).
 """
 import re
 import sys
 from pathlib import Path
 
-START, END = "<!-- sniper:core:start -->", "<!-- sniper:core:end -->"
-FILL = "<!-- sniper:fill: the 3-6 commands that prove a change here (build, typecheck, lint, test), one per line -->"
+START, END = "<!-- atlas:core:start -->", "<!-- atlas:core:end -->"
+FILL = "<!-- atlas:fill: the 3-6 commands that prove a change here (build, typecheck, lint, test), one per line -->"
+LEGACY_START, LEGACY_END = "<!-- sniper:core:start -->", "<!-- sniper:core:end -->"
+LEGACY_FILL = "<!-- sniper:fill:"
+
+CORE_BLOCK = re.compile(
+    re.escape(START) + r".*?" + re.escape(END)
+    + r"|" + re.escape(LEGACY_START) + r".*?" + re.escape(LEGACY_END),
+    re.S,
+)
 
 
 def upsert_agents(path: Path, core: str, name: str) -> str:
@@ -24,8 +36,8 @@ def upsert_agents(path: Path, core: str, name: str) -> str:
         )
         return "created"
     text = path.read_text()
-    if START in text and END in text:
-        new = re.sub(re.escape(START) + r".*?" + re.escape(END), lambda _: block, text, count=1, flags=re.S)
+    if CORE_BLOCK.search(text):
+        new = CORE_BLOCK.sub(lambda _: block, text, count=1)
         if new == text:
             return "unchanged"
         path.write_text(new)
@@ -55,16 +67,20 @@ def upsert_claude(path: Path) -> str:
     return "import appended"
 
 
-POINTER = "Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with `setup --map`)."
+POINTER = "Repository map and conventions: `docs/atlas/map.md`, `docs/atlas/conventions.md` (refresh with `setup --map`)."
+LEGACY_POINTER = "Repository map and conventions: `docs/sniper/map.md`, `docs/sniper/conventions.md` (refresh with `setup --map`)."
 
 
 def remove_agents(path: Path) -> str:
-    if not path.exists() or START not in path.read_text():
+    if not path.exists():
         return "absent"
     text = path.read_text()
-    new = re.sub(re.escape(START) + r".*?" + re.escape(END) + r"\n*", "", text, count=1, flags=re.S)
-    new = new.replace(POINTER + "\n", "").replace(POINTER, "")
-    if FILL in new:
+    if START not in text and LEGACY_START not in text:
+        return "absent"
+    new = CORE_BLOCK.sub("", text, count=1)
+    for pointer in (POINTER, LEGACY_POINTER):
+        new = new.replace(pointer + "\n", "").replace(pointer, "")
+    if FILL in new or LEGACY_FILL in new:
         path.unlink()
         return "deleted (skeleton untouched)"
     path.write_text(re.sub(r"\n{3,}", "\n\n", new))
@@ -91,10 +107,17 @@ def remove_claude(path: Path) -> str:
 def upsert_pointer(path: Path) -> str:
     """One navigation line after the doctrine block, so AGENTS.md points at the map instead of holding it."""
     text = path.read_text()
-    if "docs/sniper/map.md" in text:
+    if "docs/atlas/map.md" in text:
         return "unchanged"
-    end = "<!-- sniper:core:end -->"
-    i = text.find(end)
+    if LEGACY_POINTER in text:
+        path.write_text(text.replace(LEGACY_POINTER, POINTER))
+        return "pointer migrated"
+    i = text.find(END)
+    if i < 0:
+        i = text.find(LEGACY_END)
+        end = LEGACY_END
+    else:
+        end = END
     if i < 0:
         return "no block"
     i += len(end)
@@ -111,7 +134,7 @@ def main():
     if "--remove" in flags:
         print(f"AGENTS.md: {remove_agents(project / 'AGENTS.md')}")
         print(f"CLAUDE.md: {remove_claude(project / 'CLAUDE.md')}")
-        print("docs/sniper/: left for manual deletion")
+        print("docs/atlas/: left for manual deletion")
         return
     core = Path(args[1]).read_text()
     print(f"AGENTS.md: {upsert_agents(project / 'AGENTS.md', core, project.name)}")
