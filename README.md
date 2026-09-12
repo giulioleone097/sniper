@@ -3,9 +3,9 @@
 One plugin for the whole development loop, for Claude Code, Codex, Devin and
 Cursor. Lock the
 outcome, take the shortest safe path, prove only changed behavior, stop. Five
-stages carry setup through ship, four entry points are typed by name (grill,
-simplify, handoff, optimize); four agents cover locating, bounded
-implementation, review, and integration.
+stages carry setup through ship, eight entry points are typed by name (grill,
+simplify, handoff, optimize, research, questionnaire, wayfinder, prototype);
+four agents cover locating, bounded implementation, review, and integration.
 
 ## Install
 
@@ -115,6 +115,10 @@ parallel hypotheses that keep only what beats the baseline.
 | `simplify` | you ask to simplify, shrink or de-slop code outside a review, or `--repo` / `--debt` | the files named, else the diff since the baseline or merge-base plus staged, unstaged and new files; the six rungs (reuse, stdlib, native, delete, yagni, shrink) per area, `slop` reviewers proposing when there are several, then the nearest check or the integrator proving nothing moved; never runs review |
 | `handoff` | you say hand off, stop here, pick this up later, or a session stops before the work is done | where the work stands (branch, tree, workers' worktrees), proven lines with their command and result, open items as work, decisions only the conversation carries, artifacts pointed at rather than copied, the skill the next session calls first; written to `--out <file>` or `docs/handoff-<date>-<slug>.md`, `scope <file>` resumes it and `ship` deletes it once the work is committed |
 | `optimize` | you ask to speed up, shrink or push a measured number toward a target | one `--metric` command that starts what it measures from the checkout, `--paths` for what may change (asked for when neither flag nor request names them); the baseline measured in a detached worktree of `HEAD` that stays as the champion tree, re-measured every round; rounds of distinct hypotheses (one family each) in parallel `git worktree`s, each measured three times; a candidate is kept only when it beats the baseline beyond the noise band, passes the regression check and narrows nothing the metric measures; families named from a profile of the metric when the stack has a profiler, `--guard <command> <max>` metrics that must stay under a maximum (memory, size, p99), runs raised from three to five or seven when the noise band is too wide for the target; stops at the target, after two dry rounds of new families, or at the budget, and a stopped run's `optimize/<slug>` branch blocks the next until landed or deleted; every run ends with `kpi:` lines (baseline to final, rounds, hypotheses, kept, wall time, regression) in the ledger and the report; the kept diff goes to `review`, and a review edit is re-measured |
+| `research` | a question needs an answer grounded in primary sources before work continues | a background subagent investigates the question against primary sources and writes one cited Markdown file; never edits code |
+| `questionnaire` | a decision is blocked on another person's knowledge, not on more digging | the open questions become `docs/questionnaire-<slug>.md`, one document handed to the person who holds the answers |
+| `wayfinder` | a multi-session effort needs a map of the decisions still open | `docs/wayfinder-<date>-<slug>.md`, a map of decision nodes resolved one at a time through `grill` |
+| `prototype` | a design question needs a throwaway UI to answer it, not production code | HTML/UI variants built to answer the question, compared, then discarded; never committed |
 | `ship` | you say ship, commit, PR, dossier, or asked up front to carry it through | atomic Conventional Commits (scope only when recent commits carry one), tracker item linked, `--pr` with the approval dossier as body (minimal: verdict, one map, one diagram per domain, real e2e screenshots or videos attached where the forge hosts them, in the repository's language or `--lang`; on the default branch a `<type>/<slug>` branch is created first, an open PR is reused, on Azure DevOps the drill-down goes as closed threads), `--dossier [pr]` alone on GitHub, GitLab or Azure DevOps (`--post` replaces the body, `--walkthrough` GitHub only), commit language from the repository's recent commits, CI awaited after `--pr` with failures attributed to base or new, one durable lesson (`--learn`, `--from-pr <n>`; `proposed (not written)` on a hands-off run), the handoff or grill file the work resumed from deleted; the block ends with `proof:`, `learned:` and `left:` naming what was kept out; push only with `--push` |
 
 Every stage keeps its branches in `references/`: the root file is a router, read in full, and a branch is read only when its case applies.
