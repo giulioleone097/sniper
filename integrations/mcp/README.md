@@ -1,9 +1,10 @@
 # Atlas workflows MCP bridge
 
-This is a small read-only stdio server for using explicitly installed Atlas and
-Spotter workflow packages through an MCP client. It takes a fixed startup
-snapshot of the canonical core doctrine and skill Markdown; callers can list
-skills, load one with its core doctrine, then read a package-relative reference.
+This is a small read-only stdio server for using one explicitly installed
+Atlas or Spotter workflow package through an MCP client. It takes a fixed
+startup snapshot of the canonical core doctrine and skill Markdown; callers can
+list skills, load one with its core doctrine, then read a package-relative
+reference.
 
 Install its locked Python environment from this directory:
 
@@ -11,18 +12,20 @@ Install its locked Python environment from this directory:
 uv sync --frozen
 ```
 
-Launch it with explicit package roots:
+Launch one server per plugin, with an explicit package root:
 
 ```sh
-.venv/bin/python server.py --plugin atlas=/path/to/atlas --plugin spotter=/path/to/spotter
+.venv/bin/python server.py --plugin atlas=/path/to/atlas
+.venv/bin/python server.py --plugin spotter=/path/to/spotter
 ```
 
-For a secure tunnel, use that command as the tunnel client's `mcp.commands`
-entry. Keep credentials in the tunnel client's credential reference, never in
-this server configuration or its command line.
+For secure tunnels, configure one tunnel profile per command. Keep credentials
+in the tunnel client's credential reference, never in this server configuration
+or its command line.
 
 The bridge does not read the filesystem after making its startup snapshot. It
 cannot run skill scripts, activate hooks or agents, read mail/calendars, write
 a tracker, create schedules, or perform external actions. An MCP connection
 therefore provides workflow content and guidance, not the host-side plugin
-runtime.
+runtime. In particular, an MCP client does not register native plugin skills,
+agents, or lifecycle hooks in its UI.

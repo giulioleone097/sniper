@@ -129,31 +129,35 @@ def load_package(plugin: str, root: Path) -> dict[str, Any]:
     if not workflows:
         raise ValueError(f"configured plugin {plugin!r} has no workflows")
 
+    interface = manifest.get("interface")
+    title = interface.get("displayName") if isinstance(interface, dict) else None
+    description = manifest.get("description")
     return {
         "name": plugin,
         "version": manifest["version"],
+        "title": title if isinstance(title, str) else plugin.title(),
+        "description": description if isinstance(description, str) else "Read-only workflow package",
         "core": {"path": f"core/{plugin.upper()}.md", **_entry(core_content)},
         "workflows": workflows,
         "files": files,
     }
 
 
-def parse_plugins(values: list[str]) -> dict[str, dict[str, Any]]:
-    packages: dict[str, dict[str, Any]] = {}
-    for value in values:
-        plugin, separator, location = value.partition("=")
-        if not separator or not location or plugin in packages:
-            raise ValueError("each --plugin must be a unique NAME=PATH pair")
-        packages[plugin] = load_package(plugin, Path(location).expanduser())
-    if not packages:
-        raise ValueError("at least one --plugin NAME=PATH is required")
-    return packages
+def parse_plugin(values: list[str]) -> dict[str, Any]:
+    if len(values) != 1:
+        raise ValueError("exactly one --plugin NAME=PATH is required")
+    plugin, separator, location = values[0].partition("=")
+    if not separator or not location:
+        raise ValueError("--plugin must be a NAME=PATH pair")
+    return load_package(plugin, Path(location).expanduser())
 
 
-def create_server(packages: dict[str, dict[str, Any]]) -> MCPServer:
+def create_server(package: dict[str, Any]) -> MCPServer:
     server = MCPServer(
-        "atlas-workflows",
-        version="0.1.0",
+        package["name"],
+        title=package["title"],
+        description=package["description"],
+        version=package["version"],
         instructions=(
             "This is a read-only snapshot of explicitly configured workflow packages. "
             "Map a native plugin skill invocation to list_workflows then load_workflow for "
@@ -167,25 +171,17 @@ def create_server(packages: dict[str, dict[str, Any]]) -> MCPServer:
     )
 
     @server.tool(
-        description="List the configured workflow packages and their available skills.",
+        description="List this package's available workflow skills.",
         annotations=READ_ONLY,
         structured_output=True,
     )
-    def list_workflows(plugin: str | None = None) -> dict[str, Any]:
-        if plugin is not None and plugin not in packages:
-            raise ToolError("unknown plugin")
-        selected = [packages[plugin]] if plugin else list(packages.values())
+    def list_workflows() -> dict[str, Any]:
         return {
-            "packages": [
-                {
-                    "plugin": package["name"],
-                    "version": package["version"],
-                    "workflows": [
-                        {"name": name, "description": workflow["description"]}
-                        for name, workflow in sorted(package["workflows"].items())
-                    ],
-                }
-                for package in selected
+            "plugin": package["name"],
+            "version": package["version"],
+            "workflows": [
+                {"name": name, "description": workflow["description"]}
+                for name, workflow in sorted(package["workflows"].items())
             ],
             "capabilities": {
                 "read_workflows": True,
@@ -200,10 +196,7 @@ def create_server(packages: dict[str, dict[str, Any]]) -> MCPServer:
         annotations=READ_ONLY,
         structured_output=True,
     )
-    def load_workflow(plugin: str, workflow: str) -> dict[str, Any]:
-        package = packages.get(plugin)
-        if package is None:
-            raise ToolError("unknown plugin")
+    def load_workflow(workflow: str) -> dict[str, Any]:
         workflow_data = package["workflows"].get(workflow)
         if workflow_data is None:
             raise ToolError("unknown workflow")
@@ -231,10 +224,7 @@ def create_server(packages: dict[str, dict[str, Any]]) -> MCPServer:
         annotations=READ_ONLY,
         structured_output=True,
     )
-    def read_reference(plugin: str, path: str) -> dict[str, Any]:
-        package = packages.get(plugin)
-        if package is None:
-            raise ToolError("unknown plugin")
+    def read_reference(path: str) -> dict[str, Any]:
         entry = package["files"].get(path)
         if entry is None:
             raise ToolError("unknown reference path")
@@ -247,7 +237,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--plugin", action="append", default=[], metavar="NAME=PATH")
     args = parser.parse_args()
-    create_server(parse_plugins(args.plugin)).run(transport="stdio")
+    create_server(parse_plugin(args.plugin)).run(transport="stdio")
 
 
 if __name__ == "__main__":

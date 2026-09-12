@@ -1,8 +1,11 @@
+import asyncio
 import tempfile
 import unittest
 from pathlib import Path
 
-from server import load_package
+from mcp.server.mcpserver.exceptions import ToolError
+
+from server import create_server, load_package, parse_plugin
 
 
 class PackageBoundaryTests(unittest.TestCase):
@@ -44,6 +47,20 @@ class PackageBoundaryTests(unittest.TestCase):
         package = load_package("atlas", self.root)
         for path in (".env", "../secret.md", str(secret), "skills/scope/references/leak.md"):
             self.assertNotIn(path, package["files"])
+
+    def test_server_isolated_to_one_package(self):
+        server = create_server(load_package("atlas", self.root))
+
+        async def assert_isolation():
+            listing = await server.call_tool("list_workflows", {})
+            self.assertEqual(listing.structured_content["plugin"], "atlas")
+            self.assertNotIn("spotter", str(listing.structured_content))
+            with self.assertRaises(ToolError):
+                await server.call_tool("read_reference", {"path": "skills/spotter/SKILL.md"})
+
+        asyncio.run(assert_isolation())
+        with self.assertRaisesRegex(ValueError, "exactly one"):
+            parse_plugin(["atlas=/tmp/atlas", "spotter=/tmp/spotter"])
 
 
 if __name__ == "__main__":
