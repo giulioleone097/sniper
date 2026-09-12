@@ -1,0 +1,26 @@
+{
+  "tiers": {
+    "sonnet": "bounded work: scout, worker default",
+    "opus": "complex reasoning: reviewer, integrator, worker on request",
+    "haiku": "cheap work"
+  },
+  "hosts": {
+    "claude": {
+      "delivery": "agents/*.md, frontmatter model: holds the tier name",
+      "models": { "sonnet": "sonnet", "opus": "opus", "haiku": "haiku" }
+    },
+    "codex": {
+      "delivery": "generated ~/.codex/agents/<name>.toml via scripts/install-codex-agents.sh",
+      "models": { "sonnet": "gpt-5.6-luna", "opus": "gpt-5.6-terra", "haiku": "gpt-5.6-luna" },
+      "effort": { "sonnet": "medium", "opus": "high", "haiku": "low" }
+    },
+    "devin": {
+      "delivery": "copied to ~/.config/devin/agents/, model: rewritten to the session model",
+      "models": { "sonnet": "swe-2-max", "opus": "swe-2-max", "haiku": "swe-2-max" }
+    },
+    "cursor": {
+      "delivery": "~/.cursor/agents/, model: rewritten by scripts/install-cursor.sh",
+      "models": { "sonnet": "inherit", "opus": "inherit", "haiku": "inherit" }
+    }
+  }
+}

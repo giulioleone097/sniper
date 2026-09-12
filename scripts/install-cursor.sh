@@ -48,7 +48,8 @@ import os, re, sys
 dest, stage, cursor, root = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 # only stage invocations (`sniper:<stage>`) become `sniper-<stage>`; markers
 # like <!-- sniper:core:start --> or <!-- sniper:narrate --> must not move.
-stages = "scope|build|review|ship|setup|grill|simplify|handoff|optimize"
+stages = "|".join(sorted(d for d in os.listdir(os.path.join(root, "skills"))
+                         if os.path.isdir(os.path.join(root, "skills", d))))
 for base, _, files in os.walk(dest):
     for f in files:
         if f.endswith((".md", ".py", ".yaml")):
@@ -69,11 +70,12 @@ for d in "$CURSOR_DIR"/skills/sniper-*/; do
 done
 
 for f in "$ROOT"/agents/sniper-*.md; do
-  python3 - "$f" "$CURSOR_DIR/agents/$(basename "$f")" <<'PYEOF'
-import re, sys
-src, dst = sys.argv[1], sys.argv[2]
+  python3 - "$f" "$CURSOR_DIR/agents/$(basename "$f")" "$ROOT/agents/models.json" <<'PYEOF'
+import json, re, sys
+src, dst, reg = sys.argv[1], sys.argv[2], sys.argv[3]
+models = json.load(open(reg))["hosts"]["cursor"]["models"]
 t = open(src).read()
-t = re.sub(r"^model: .*$", "model: inherit", t, count=1, flags=re.M)
+t = re.sub(r"^model: (\w+)$", lambda m: f'model: {models.get(m.group(1), "inherit")}', t, count=1, flags=re.M)
 open(dst, "w").write(t)
 PYEOF
 done
@@ -97,5 +99,6 @@ for ev, entries in ours.items():
 open(cfg_path, "w").write(json.dumps(cfg, indent=2) + "\n")
 PYEOF
 
-echo "sniper: installed for Cursor in $CURSOR_DIR (9 skills, 4 agents, doctrine hook, guard)"
+n=$(ls -d "$CURSOR_DIR"/skills/sniper-*/ 2>/dev/null | wc -l | tr -d ' ')
+echo "sniper: installed for Cursor in $CURSOR_DIR ($n skills, 4 agents, doctrine hook, guard)"
 echo "sniper: open a new Cursor agent session; stages answer to /sniper-<stage>"

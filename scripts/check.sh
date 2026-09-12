@@ -100,8 +100,19 @@ root = sys.argv[1]
 for f in (".claude-plugin/plugin.json", ".claude-plugin/marketplace.json",
           ".codex-plugin/plugin.json", ".agents/plugins/marketplace.json",
           ".devin-plugin/plugin.json", ".cursor-plugin/plugin.json",
-          "hooks/hooks.json", "hooks.json", "hooks/cursor-hooks.json"):
+          "hooks/hooks.json", "hooks.json", "hooks/cursor-hooks.json",
+          "agents/models.json"):
     json.load(open(f"{root}/{f}"))
+reg = json.load(open(f"{root}/agents/models.json"))
+for host, h in reg["hosts"].items():
+    missing = set(reg["tiers"]) - set(h["models"])
+    if missing:
+        sys.exit(f"models.json: host {host} lacks tiers {sorted(missing)}")
+import glob
+for f in glob.glob(f"{root}/agents/*.md"):
+    m = re.search(r"^model: (\w+)$", open(f).read(), re.M)
+    if m and m.group(1) not in reg["tiers"]:
+        sys.exit(f"models.json: {f} declares unknown tier {m.group(1)}")
 core = open(f"{root}/core/SNIPER.md").read().strip()
 for f in ("AGENTS.md", "rules/sniper-core.mdc"):
     m = re.search(r"<!-- sniper:core:start -->\n(.*?)\n<!-- sniper:core:end -->", open(f"{root}/{f}").read(), re.S)

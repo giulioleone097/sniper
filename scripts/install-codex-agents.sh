@@ -9,11 +9,11 @@ DEST="${CODEX_HOME:-$HOME/.codex}/agents"
 mkdir -p "$DEST" || exit 1
 
 exec python3 - "$ROOT/agents" "$DEST" <<'EOF'
-import glob, os, re, sys
+import glob, json, os, re, sys
 
 src, dest = sys.argv[1], sys.argv[2]
-effort = {"opus": "high", "sonnet": "medium", "haiku": "low"}
-models = {"opus": "gpt-5.6-terra", "sonnet": "gpt-5.6-luna", "haiku": "gpt-5.6-luna"}
+reg = json.load(open(os.path.join(src, "models.json")))["hosts"]["codex"]
+effort, models = reg["effort"], reg["models"]
 
 for path in sorted(glob.glob(os.path.join(src, "*.md"))):
     text = open(path).read()

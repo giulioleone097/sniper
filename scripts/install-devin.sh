@@ -67,7 +67,8 @@ import os, re, sys
 dest, stage, devin, root = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 # only stage invocations (`sniper:<stage>`) become `sniper-<stage>`; markers
 # like <!-- sniper:core:start --> or <!-- sniper:narrate --> must not move.
-stages = "scope|build|review|ship|setup|grill|simplify|handoff|optimize"
+stages = "|".join(sorted(d for d in os.listdir(os.path.join(root, "skills"))
+                         if os.path.isdir(os.path.join(root, "skills", d))))
 for base, _, files in os.walk(dest):
     for f in files:
         if f.endswith((".md", ".py", ".yaml")):
@@ -90,8 +91,19 @@ for d in "$DEVIN_DIR"/skills/sniper-*/; do
   [ -d "$ROOT/skills/$(basename "$d" | sed 's/^sniper-//')" ] || rm -rf "$d"
 done
 
-# agents: copied verbatim; the shared frontmatter already carries allowed-tools.
-cp "$ROOT"/agents/sniper-*.md "$DEVIN_DIR/agents/"
+# agents: copied with `model:` resolved through agents/models.json (sonnet/opus
+# are not Devin model ids); the shared frontmatter already carries allowed-tools.
+ROOT="$ROOT" DEVIN_DIR="$DEVIN_DIR" python3 - <<'PYEOF'
+import glob, json, os, re
+root, devin = os.environ["ROOT"], os.environ["DEVIN_DIR"]
+models = json.load(open(os.path.join(root, "agents/models.json")))["hosts"]["devin"]["models"]
+for src in glob.glob(os.path.join(root, "agents/sniper-*.md")):
+    t = open(src).read()
+    m = re.search(r"^model: (\w+)$", t, flags=re.M)
+    if m and m.group(1) in models:
+        t = t.replace(m.group(0), f'model: {models[m.group(1)]}', 1)
+    open(os.path.join(devin, "agents", os.path.basename(src)), "w").write(t)
+PYEOF
 
 # doctrine + hooks: global AGENTS.md block (always-on) and config.json hooks
 # (SessionStart self-heals if the block is removed; PreToolUse guards exec and
@@ -130,6 +142,7 @@ for ev, groups in ours.items():
 open(cfg_path, "w").write(json.dumps(cfg, indent=2) + "\n")
 PYEOF
 
-echo "sniper: installed for Devin in $DEVIN_DIR (9 skills, 4 agents, doctrine, guard)"
+n=$(ls -d "$DEVIN_DIR"/skills/sniper-*/ 2>/dev/null | wc -l | tr -d ' ')
+echo "sniper: installed for Devin in $DEVIN_DIR ($n skills, 4 agents, doctrine, guard)"
 echo "sniper: open a new Devin session; stages answer to /sniper-<stage>"
 echo 'sniper: when `devin auth login` is done, `devin plugins install giulioleone097/sniper` replaces this'
