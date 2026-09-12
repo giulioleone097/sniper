@@ -3,7 +3,7 @@
 # plugin is not installed from Customize -> Plugins. Mirrors the plugin: skills
 # land as ~/.cursor/skills/sniper-<stage> with `sniper:` cross-refs rewritten
 # to `sniper-`, agents land in ~/.cursor/agents/ with `model:` reset to
-# `inherit` (sonnet/opus are not Cursor model ids), and the hooks merge into
+# `inherit` (the tier names are not Cursor model ids), and the hooks merge into
 # ~/.cursor/hooks.json (sessionStart injects the doctrine,
 # beforeShellExecution guards shell commands).
 # Idempotent: re-run after pulling updates. Revert with --remove.

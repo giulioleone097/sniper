@@ -91,8 +91,8 @@ for d in "$DEVIN_DIR"/skills/sniper-*/; do
   [ -d "$ROOT/skills/$(basename "$d" | sed 's/^sniper-//')" ] || rm -rf "$d"
 done
 
-# agents: copied with `model:` resolved through agents/models.json (sonnet/opus
-# are not Devin model ids); the shared frontmatter already carries allowed-tools.
+# agents: copied with `model:` resolved through agents/models.json (the tier
+# names are not Devin model ids); the shared frontmatter already carries allowed-tools.
 ROOT="$ROOT" DEVIN_DIR="$DEVIN_DIR" python3 - <<'PYEOF'
 import glob, json, os, re
 root, devin = os.environ["ROOT"], os.environ["DEVIN_DIR"]

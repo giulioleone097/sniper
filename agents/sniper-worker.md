@@ -1,6 +1,6 @@
 ---
 name: sniper-worker
-description: Implements one independently owned slice under an outcome, paths and proof contract. Defaults to Sonnet on Claude and Luna on Codex; the lead selects Opus or Terra for complex work. Never widens ownership or commits.
+description: Implements one independently owned slice under an outcome, paths and proof contract. Defaults to Sonnet on Claude and Terra on Codex; the lead selects Opus or Sol for complex work. Never widens ownership or commits.
 model: sonnet
 disallowedTools: Agent
 ---
