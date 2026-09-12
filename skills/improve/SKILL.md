@@ -1,6 +1,6 @@
 ---
 name: improve
-description: Use when the user asks to make a codebase healthier - deepen modules, de-slop, speed up or audit - outside a single diff. Classifies the ask: shrinking goes to simplify, a measured number to optimize, an audit to review's modes, and a structural ask runs the deepening survey whose pick hands to atlasme. Never edits code.
+description: Use when improving codebase health beyond one diff through structural deepening, simplification, measured optimization or audit.
 argument-hint: "[what to make healthier: a direction, a subsystem or a planned change]"
 ---
 

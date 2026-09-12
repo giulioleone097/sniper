@@ -35,6 +35,7 @@ fi
 for f in "$ROOT"/skills/*/SKILL.md; do
   d=$(grep -m1 '^description:' "$f" | sed 's/^description: //')
   case "$d" in "Use when "*) ;; *) echo "rules: $f description must open with the trigger (Use when ...)"; fail=1;; esac
+  case "$d" in *": "*) echo "rules: $f unquoted YAML description contains colon-space"; fail=1;; esac
   w=$(printf '%s' "$d" | wc -w | tr -d ' '); [ "$w" -le 70 ] || { echo "rules: $f description has $w words (> 70)"; fail=1; }
 done
 for d in "$ROOT"/skills/*/; do
@@ -88,7 +89,7 @@ for path, allowed in EVENTS.items():
     if isinstance(inner, dict):
         events = set(inner.keys())
     else:
-        events = set(body.keys()) - {"description", "version"}  # Devin bare format
+        events = set(body.keys())  # Devin bare event map rejects non-event metadata
     unknown = events - allowed
     if unknown:
         print(f"rules: {path} names events its host never fires: {sorted(unknown)}"); bad += 1
