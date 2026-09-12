@@ -73,11 +73,14 @@ sh /path/to/atlas/scripts/install-cursor.sh    # --remove reverts
 
 ### ChatGPT and other MCP clients
 
-The optional [workflow MCP bridge](integrations/mcp/README.md) serves Atlas and
-Spotter skills with their canonical doctrine through a private stdio server.
-Use an OpenAI Secure MCP Tunnel to connect it to ChatGPT. This provides workflow
-content; hooks, automatic per-turn instructions and local execution still
-require host support.
+The [native-skill exporter](integrations/chatgpt/README.md) prepares separate
+Atlas and Spotter skill bundles, each with its doctrine and internal procedures.
+Upload and installation depend on the ChatGPT account's Skills support.
+
+The optional [workflow MCP bridge](integrations/mcp/README.md) serves one plugin
+per process. Connect Atlas and Spotter through separate Secure MCP Tunnels and
+custom apps. MCP tools do not install native skills; hooks, automatic per-turn
+instructions and local execution still require host support.
 
 ### Checks
 
