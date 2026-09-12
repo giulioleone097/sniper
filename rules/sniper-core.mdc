@@ -10,7 +10,7 @@ Lock the goal before editing: state one line with the observable outcome, the ch
 
 A repository map under `docs/sniper/` is a navigation aid when discovery is needed. Read only relevant docs and skill branches; refresh a map when changes invalidate the part needed for this task. An older stamp alone does not justify a repository-wide survey.
 
-For a small, understood change with a bounded local impact, use the short path here: one-line outcome and proof, implement, review and fix within scope, verify, stop. No separate card, plan, skill chain or subagents is required. Broader or uncertain changes use `scope` -> `build` -> `review` without waiting for another request. Review fixes verified defects within the requested outcome; an explicit read-only request is respected. `ship` runs when the user asks for ship, commit or PR, or authorized it up front. `grill`, `wayfinder`, `prototype`, `questionnaire`, `research`, `simplify`, `handoff` and `optimize` remain explicit entry points. Questions and assessments do not authorize edits.
+For a small, understood change with a bounded local impact, use the short path here: one-line outcome and proof, implement, review and fix within scope, verify, stop. No separate card, plan, skill chain or subagents is required. Broader or uncertain changes use `scope` -> `build` -> `review` without waiting for another request. Review fixes verified defects within the requested outcome; an explicit read-only request is respected. `ship` runs when the user asks for ship, commit or PR, or authorized it up front. `atlas`, `howto`, `prototype`, `question`, `intel`, `simplify`, `handoff`, `optimize` and `improve` remain explicit entry points. Questions and assessments do not authorize edits.
 
 Ladder. Trace the real flow end to end first, then stop at the first rung that holds:
 1. Does it need to exist? Speculative need: skip it and say so in one line.
@@ -32,7 +32,7 @@ Elision: once the replacement works, delete the superseded path, its compatibili
 
 Tests: add one only when indispensable to catch a meaningful regression that existing checks cannot adequately detect. A test suite, coverage target or convention alone is no reason to add tests. No implementation-mirroring assertions, framework tests, imaginary edge cases or committed scratch checks. TDD is optional. Run relevant existing checks; never weaken, skip or delete a test to make it pass, and never loosen a lint rule, type-check setting, formatter or ignore list for the same end: the configuration is as protected as the test.
 
-Proof: run the smallest check that would fail if the change were wrong (typecheck, lint, the targeted test, one real exercise of the path). Report pass, fail, unavailable, or blocked exactly. "Should work" is not a result.
+Proof: run the smallest check that would fail if the change were wrong (typecheck, lint, the targeted test, one real exercise of the path). A change to a user-facing flow in an app is not proven until a real end-to-end test in the app itself exercises the changed flow against the acceptance criteria. Report pass, fail, unavailable, or blocked exactly. "Should work" is not a result.
 
 Fix verified errors found while implementing, proving or reviewing the requested behavior, including defects that prevent it from working. Do not wait for a second request to fix an in-scope failure. Trace to the shared cause even when the repair needs a related file. Unrelated pre-existing bugs, speculative hardening, new features and cleanup stay untouched and become follow-ups.
 

@@ -16,14 +16,14 @@ argument-hint: "[the design question, state machine or UI to prototype]"
 
 6. Hand the artifact to the user, let them exercise it, and capture the verdict: which option won or what the logic proved, and what it ruled out. Leave the scratch dir where it is or delete it — either way it stays out of the versioned tree and nothing from it is committed.
 
-7. Report the verdict in this shape, then feed the proven answer into `grill` or `scope` (Skill tool `sniper:grill` / `sniper:scope`, `$grill` / `$scope` on Codex) so the settled design continues as a normal request:
+7. Report the verdict in this shape, then feed the proven answer into `atlas` or `scope` (Skill tool `sniper:atlas` / `sniper:scope`, `$atlas` / `$scope` on Codex) so the settled design continues as a normal request:
 
 ```
 prototype: <slug>
 question: <what it was built to answer>
 path: <scratch path, outside the versioned tree>
 verdict: <what the prototype proved and what it ruled out>
-next: grill <question> | scope <question> | none
+next: atlas <question> | scope <question> | none
 ```
 
 Stop when the artifact has produced a verdict and it has been reported, with the follow-up handoff run when the verdict warrants one.

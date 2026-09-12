@@ -12,7 +12,7 @@ argument-hint: "[what the next session is for] [--out <file>]"
 
 4. Separate what is proven from what is believed. Every proven line names the command that proved it and its exact result. A check that was never run is not proven: it is an assumption under Open. A failure that is also on the baseline says so.
 
-5. Name what is open as work, not as narrative: the next action first, then the blocked ones with what unblocks them, then the follow-ups deliberately left alone. Anything you assumed and did not verify belongs here, marked as an assumption. A decision settled or a constraint given in this conversation that no file carries (a path not to touch, a model pin, an alternative grill rejected on the way to build) is listed as `decided`: it is not open, but this file is the only place the next session will find it.
+5. Name what is open as work, not as narrative: the next action first, then the blocked ones with what unblocks them, then the follow-ups deliberately left alone. Anything you assumed and did not verify belongs here, marked as an assumption. A decision settled or a constraint given in this conversation that no file carries (a path not to touch, a model pin, an alternative atlas rejected on the way to build) is listed as `decided`: it is not open, but this file is the only place the next session will find it.
 
 6. Say which skill the next session should call first, and with what argument. The default is `scope <this file>`: intake reads a handoff file and resumes from its `next:` line without redoing what is marked proven.
 

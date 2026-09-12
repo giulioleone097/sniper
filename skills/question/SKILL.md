@@ -1,5 +1,5 @@
 ---
-name: questionnaire
+name: question
 description: Use when a decision is blocked on knowledge that lives in someone else's head. Turns the gap into a Markdown questionnaire the user hands to that person to fill async or together over a meeting, grilling the user only on who it goes to and what they need back. Not for questions the user or the repository can already answer.
 argument-hint: "[decision or topic that's blocked] [--out <file>]"
 ---
@@ -12,7 +12,7 @@ argument-hint: "[decision or topic that's blocked] [--out <file>]"
 
 4. Draft the questionnaire from the template below. Order questions most-important-first (async may give only one pass), group under `##` theme headings once there are more than a handful, one idea per question with an answer stub directly beneath, and a one-line "why this matters" only where the question invites a throwaway or misread answer. Every item named in step 3 maps to a question.
 
-5. Write the file to `--out <file>` when given, otherwise `docs/questionnaire-<slug>.md` (slug from the topic), and print the path.
+5. Write the file to `--out <file>` when given, otherwise `docs/question-<slug>.md` (slug from the topic), and print the path.
 
 ```
 # <Questionnaire title>

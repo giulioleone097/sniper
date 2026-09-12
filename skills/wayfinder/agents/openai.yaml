@@ -1,7 +1,0 @@
-interface:
-  display_name: "Wayfinder"
-  short_description: "Chart an effort too big for one session as a map of decision nodes, and resolve them one at a time until the way is clear"
-  default_prompt: "Use $wayfinder on this effort: chart the open decisions as a map of nodes with blocking edges, resolve one frontier node this session by running grill on it, and update the map file so a later session can resume."
-  brand_color: "#1A1A1A"
-policy:
-  allow_implicit_invocation: true

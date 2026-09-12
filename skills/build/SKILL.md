@@ -4,7 +4,7 @@ description: Use when a goal card or a clear build request exists and code must 
 argument-hint: "[goal card | what to build | the failure] [--tickets] [--no-review]"
 ---
 
-1. Take the goal card from `scope` or from the argument when one exists; otherwise lock the goal per core in one line, stating any chosen reading. An issue number, a URL, an image, a handoff or grill file is scope's input, not a card: invoke `scope` with it (Skill tool `sniper:scope`, `$scope` on Codex) and stop here; its intake reads the source, emits the card and invokes `build` with it.
+1. Take the goal card from `scope` or from the argument when one exists; otherwise lock the goal per core in one line, stating any chosen reading. An issue number, a URL, an image, a handoff or atlas file is scope's input, not a card: invoke `scope` with it (Skill tool `sniper:scope`, `$scope` on Codex) and stop here; its intake reads the source, emits the card and invokes `build` with it.
 
 2. Route. A small understood change follows core's short path; finish it here, including local review and fixes, without another skill handoff. A failure with no known cause: read `<this skill>/references/debug.md` (`<this skill>` is the directory this file lives in). `Size: complex`, several owners, a change others depend on, or `--tickets` (publishes the plan's tasks): read `references/plan.md`. Load `references/fix.md`, `references/refactor.md` or `references/migrate.md` only for the applicable work, and `references/ui-taste.md` only when making visual design decisions.
 

@@ -1,7 +1,0 @@
-interface:
-  display_name: "Questionnaire"
-  short_description: "Turn a decision blocked on someone else's knowledge into a Markdown questionnaire to hand them"
-  default_prompt: "Use $questionnaire on this decision: grill me only on who it goes to and what I need back, then draft the discovery questionnaire and write it to docs/."
-  brand_color: "#1A1A1A"
-policy:
-  allow_implicit_invocation: true

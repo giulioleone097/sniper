@@ -1,7 +1,0 @@
-interface:
-  display_name: "Grill"
-  short_description: "Interrogate an undecided idea or design in rounds, then ask whether to build, card only or stop"
-  default_prompt: "Use $grill on this idea: work the decision tree in rounds, look the facts up yourself and cost each option by its reach at HEAD, ask me only the open decisions with your recommendation first, then ask me whether to build, card only or stop."
-  brand_color: "#1A1A1A"
-policy:
-  allow_implicit_invocation: true

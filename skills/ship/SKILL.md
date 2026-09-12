@@ -20,7 +20,7 @@ argument-hint: "[--push] [--pr] [--dossier [pr] [--lang <code>] [--out <file>] [
 
 8. Keep the lesson: `references/learn.md`.
 
-9. Retire what this work resumed from: the handoff or grill file whose `next:` line was this work, an untracked `docs/handoff-*.md` or `docs/grill-*.md`, is deleted now that its commits exist; left in place, the next `scope` with no argument offers finished work.
+9. Retire what this work resumed from: the handoff or atlas file whose `next:` line was this work, an untracked `docs/handoff-*.md` or `docs/atlas-*.md`, is deleted now that its commits exist; left in place, the next `scope` with no argument offers finished work.
 
 Emit exactly this, and nothing else:
 

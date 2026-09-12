@@ -1,0 +1,7 @@
+interface:
+  display_name: "Improve"
+  short_description: "Route a codebase-health ask - shrink, number or audit - to the right skill, or run the shallow-module survey itself"
+  default_prompt: "Use $improve on this codebase: classify my ask, send a shrink to $simplify, a measured number to $optimize and an audit to $review's modes, run the deepening survey for a structural ask, then hand the card I pick to $atlas."
+  brand_color: "#1A1A1A"
+policy:
+  allow_implicit_invocation: true
